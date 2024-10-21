@@ -52,17 +52,22 @@ For more information on how to use read the full PyMongo documentation or ask Ch
 
 ### File struture
 ```plaintext
-├── root
+├── app
 │   ├── shipping
 │   │   ├── fedex.py
 │   │   └── ups.py
-│   ├── scraper
-│   │   └── *.py
-│   └── templates
-│       └── *.html
+│   ├── static
+│   │   ├── css
+│   │   └── js
+│   ├── templates
+│   │   └── *.html
+│   ├── __init__.py
+│   ├── models.py
+│   └── routes.py
 ├── .gitignore
 ├── README.md
-└── main.py
+├── config.py
+└── run.py
 ```
 
 
