@@ -1,0 +1,15 @@
+{
+    "name": "Packer Tool",
+    "short_name": "PackerTool",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#181818",
+    "theme_color": "#232323",
+    "icons": [
+        {
+            "src": "/static/icons/rgb-16x16",
+            "sizes": "16x16",
+            "type": "image/png"
+        }
+    ]
+}
