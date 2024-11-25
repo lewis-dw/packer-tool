@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[{{ order.order_name }}]</title>
+    <title>Search for order</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> -->
 </head>
 <body>
     <a href="/">Back to dashboard</a>
-    <!-- Display the info about the order -->
-    <h1>Order Details [{{ order.order_name }}]</h1>
-    <div>
-        <p>Customer Name: {{ order.customer_name }}</p>
-    </div>
+    <!-- Allow user to manually search for an id or scan one in here -->
+    <h1>Search for an order id:</h1>
+    <form action="/orders/get_manual_entry/" method="post">
+        <input type="text" id="order-id-input" name="order_id" placeholder="Order ID" autofocus>
+        <button type="submit">Search</button>
+    </form>
 </body>
 </html>

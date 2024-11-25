@@ -9,6 +9,7 @@ orders = Blueprint('orders', __name__, template_folder='templates/orders')
 
 
 
+
 """
 Get and display all current valid orders
 """
@@ -36,7 +37,7 @@ def display_order():
     # get the order_id from query
     order_id = request.args.get('order_id')
 
-    print(f'i wanna be here {order_id}')
+    print(order_id)
 
     # search the order_id passed in
     status, data = get_specific_order(order_id)
@@ -52,10 +53,33 @@ def display_order():
 
 
 """
-Receive the order id from the post form
+Receive the order id from the row click
 """
 @orders.route('/get_order_id/<order_id>')
 def get_order_id(order_id):
-    print(order_id)
     # Redirect directly to the desired URL
     return redirect(f'/orders/display_order?order_id={order_id}')
+
+
+
+
+
+"""
+Receive the order id from the manual entry/rdt scan in
+"""
+@orders.route("/get_manual_entry/", methods=["POST"])
+def get_manual_entry():
+    order_id = request.form.get("order_id")
+    # Redirect directly to the desired URL
+    return redirect(f'/orders/display_order?order_id={order_id}')
+
+
+
+
+
+"""
+Render the page that allows user to type in an order id or scan one in
+"""
+@orders.route('/manual_search/')
+def manual_search():
+    return render_template('manual_search.html')

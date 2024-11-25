@@ -92,6 +92,3 @@ def get_specific_order(order_id):
 
     # if no orders then return a fail
     return status, data
-
-
-_, data = get_specific_order('S131653')
