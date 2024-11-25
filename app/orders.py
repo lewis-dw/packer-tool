@@ -23,7 +23,7 @@ def all_orders():
 
     # need to redirect them to a page they can use to refresh which will reload this page
     elif result == 'Fail':
-        return redirect('/dashboard/')
+        return render_template('error.html', error_reason=data)
 
 
 
