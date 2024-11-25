@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify
 from . import db
-from odoo.get_orders import get_orders, get_first_order
+from app.odoo.get_orders import get_orders
 
 main = Blueprint('main', __name__)
 
@@ -24,15 +24,16 @@ def shipper_page():
 
 
 
-@main.route('/api/get_orders/') # result, data = get_first_order(data)
-def get_odoo_orders():
+@main.route('/orders/') # result, data = get_first_order(data)
+def valid_orders():
     # get valid orders
     result, data = get_orders()
 
-    # return all orders to be present to user
+    # show the valid orders to user
     if result == 'Success':
-        print(data)
-    # return data regardless but depending on result then we need to handle response differently
+        return render_template('orders.html', orders=data)
+
+    # need to redirect them to a page they can use to refresh which will reload this page
     elif result == 'Fail':
         print(data)
 

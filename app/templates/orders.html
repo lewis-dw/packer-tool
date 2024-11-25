@@ -1,0 +1,38 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+</head>
+<body>
+    <h1>Order Details</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Order Name</th>
+                <th>Pick Name</th>
+                <th>Shipping Name</th>
+                <th>Shipping Carrier</th>
+                <th>Shipping Cost</th>
+                <th>Order Total (Inc Tax)</th>
+                <th>Picking Internal Note</th>
+                <th>Picking Customer Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.order_name }}</td>
+                <td>{{ order.picking_names }}</td>
+                <td>{{ order.shipping_name }}</td>
+                <td>{{ order.order_carrier_name }}</td>
+                <td>{{ order.shipping_cost }}</td>
+                <td>{{ order.order_total_inc_tax }}</td>
+                <td>{{ order.picking_internal_note }}</td>
+                <td>{{ order.picking_customer_note }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

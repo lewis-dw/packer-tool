@@ -40,24 +40,6 @@ def join_url(*url_parts):
 # stage 1 - getting all orders
 
 
-def get_orders():
-    """Request all current orders and return the first one that wants to be processed."""
-    url = join_url(api_base_url, 'dwapi', 'orders')
-    res = request_url(url, main_headers)
-    with open(os.path.join(cur_dir, 'all_orders_dump.json'), 'w') as f:
-        json.dump(res, f, indent=4)
-
-    # handle the response
-    if res.get('error', 'no') == 'no':
-        return 'Success', res['result']
-    else:
-        return 'Fail', res['error']
-
-
-###########################################################################################################################################
-# stage 2 - find the first valid order and return the values
-
-
 def get_valid_orders(content):
     # loop over the content and check if the order wants to be completed
     valid_orders = []
@@ -70,30 +52,47 @@ def get_valid_orders(content):
     return valid_orders
 
 
+def get_orders():
+    """Request all current orders and return the first one that wants to be processed."""
+    url = join_url(api_base_url, 'dwapi', 'orders')
+    res = request_url(url, main_headers)
+    with open(os.path.join(cur_dir, 'all_orders_dump.json'), 'w') as f:
+        json.dump(res, f, indent=4)
 
-def get_first_order(content):
-    valid_orders = get_valid_orders(content)
-    # here we can query a table containing the last updated valid orders with a column for if they are being worked on
-    # then merge these 2 results together and use that
+    # handle the response
+    if res.get('error', 'no') == 'no':
+        valid_orders = get_valid_orders(res['result'])
+        print(f'{len(valid_orders)} orders waiting to be processed.')
+        return 'Success', valid_orders
+    else:
+        return 'Fail', res['error']
 
-    print(f'{len(valid_orders)} orders waiting to be processed.')
+
+###########################################################################################################################################
+# stage 2 - find the first valid order and return the values
 
 
-    status = 'Fail'
-    data = 'No orders found'
-    if valid_orders:
-        # loop over the valid orders until we find one that succeeds
-        data = 'No order data succeeded'
-        for order in valid_orders:
-            order_id = order['order_name']
 
-            # get the additional info about the order
-            url = join_url(api_base_url, 'dwapi', 'order', order_id)
-            res = request_url(url, main_headers)
-            if res.get('error', 'no') == 'no':
-                status = 'Success'
-                data = res['result']
-                break
+# def get_first_order(content):
+#     # here we can query a table containing the last updated valid orders with a column for if they are being worked on
+#     # then merge these 2 results together and use that
 
-    # if no orders then return a fail
-    return status, data
+
+#     status = 'Fail'
+#     data = 'No orders found'
+#     if valid_orders:
+#         # loop over the valid orders until we find one that succeeds
+#         data = 'No order data succeeded'
+#         for order in valid_orders:
+#             order_id = order['order_name']
+
+#             # get the additional info about the order
+#             url = join_url(api_base_url, 'dwapi', 'order', order_id)
+#             res = request_url(url, main_headers)
+#             if res.get('error', 'no') == 'no':
+#                 status = 'Success'
+#                 data = res['result']
+#                 break
+
+#     # if no orders then return a fail
+#     return status, data
