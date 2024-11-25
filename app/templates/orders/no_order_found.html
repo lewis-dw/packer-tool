@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ order.order_name }}</title>
+    <title>No order found</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> -->
 </head>
 <body>
     <a href="/">Back to dashboard</a>
-    <!-- Display the info about the order -->
-    <h1>Order Details [{{ order.order_name }}]</h1>
-    <div>
-        <p>Customer Name: {{ order.customer_name }}</p>
-    </div>
+    <h1>I couldn't find an order with the ID: {{ order_id }}</h1>
 </body>
 </html>

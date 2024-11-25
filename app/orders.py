@@ -46,7 +46,7 @@ def display_order():
     if status == 'Success':
         return render_template('display_order.html', order=data)
     else:
-        return redirect('/dashboard/')
+        return render_template('no_order_found.html', order_id=order_id)
 
 
 
