@@ -1,14 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search for order</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> -->
-</head>
+{% extends "layout.html" %}
+
+{% block title %}
+Search for order
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block header %}
+<a href="/">Back to dashboard</a>
+{% endblock %}
+
+{% block main %}
 <body>
-    <a href="/">Back to dashboard</a>
     <!-- Allow user to manually search for an id or scan one in here -->
     <h1>Search for an order id:</h1>
     <form action="/orders/get_manual_entry/" method="post">
@@ -16,4 +20,4 @@
         <button type="submit">Search</button>
     </form>
 </body>
-</html>
+{% endblock %}

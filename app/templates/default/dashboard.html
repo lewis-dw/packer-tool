@@ -1,13 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Flask App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-</head>
+{% extends "layout.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block main %}
 <body>
     <h1>Dashboard</h1>
     <div role="listbox" class="dashboard-options">
@@ -25,4 +29,4 @@
         </div>
     </div>
 </body>
-</html>
+{% endblock %}

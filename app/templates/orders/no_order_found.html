@@ -1,14 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No order found</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> -->
-</head>
+{% extends "layout.html" %}
+
+{% block title %}
+No order found
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block header %}
+<a href="/">Back to dashboard</a>
+{% endblock %}
+
+{% block main %}
 <body>
-    <a href="/">Back to dashboard</a>
     <h1>I couldn't find an order with the ID: {{ order_id }}</h1>
 </body>
-</html>
+{% endblock %}
