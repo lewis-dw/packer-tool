@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, render_template
+from flask import Blueprint, request, redirect, render_template, make_response
 from app.odoo.api import get_orders, get_specific_order
 
 """
@@ -18,7 +18,7 @@ def all_orders():
 
     # show the valid orders to user
     if result == 'Success':
-        return render_template('orders.html', orders=data)
+        return render_template('all_orders.html', orders=data)
 
     # need to redirect them to a page they can use to refresh which will reload this page
     elif result == 'Fail':
@@ -34,14 +34,28 @@ Get and display all info about the order
 @orders.route('/display_order')
 def display_order():
     # get the order_id from query
-    order_id = request.args.get('id')
+    order_id = request.args.get('order_id')
+
+    print(f'i wanna be here {order_id}')
 
     # search the order_id passed in
     status, data = get_specific_order(order_id)
 
     # on success then pass in the whole json to the order page
     if status == 'Success':
-        print(order_id)
-        return render_template('order.html', order=data)
+        return render_template('display_order.html', order=data)
     else:
         return redirect('/dashboard/')
+
+
+
+
+
+"""
+Receive the order id from the post form
+"""
+@orders.route('/get_order_id/<order_id>')
+def get_order_id(order_id):
+    print(order_id)
+    # Redirect directly to the desired URL
+    return redirect(f'/orders/display_order?order_id={order_id}')
