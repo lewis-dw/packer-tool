@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[{{ order.order_name }}]</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> -->
+</head>
+<body>
+    <!-- Display the info about the order -->
+    <h1>Order Details [{{ order.order_name }}]</h1>
+    <div>
+        <p>Customer Name: {{ order.customer_name }}</p>
+    </div>
+</body>
+</html>

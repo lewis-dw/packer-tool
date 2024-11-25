@@ -32,6 +32,7 @@ def request_url(url, headers={}, data={}):
 
 
 def join_url(*url_parts):
+    url_parts = map(str, url_parts)
     full_url = '/'.join(url_parts).replace(' ', '%20')
     return full_url
 
@@ -73,26 +74,24 @@ def get_orders():
 
 
 
-# def get_first_order(content):
-#     # here we can query a table containing the last updated valid orders with a column for if they are being worked on
-#     # then merge these 2 results together and use that
+def get_specific_order(order_id):
+    # here we can query a table containing the last updated valid orders with a column for if they are being worked on
+    # then merge these 2 results together and use that
+    status = 'Fail'
+    data = 'Error'
+
+    # get the additional info about the order
+    url = join_url(api_base_url, 'dwapi', 'order', order_id)
+    res = request_url(url, main_headers)
+    if res.get('error', 'no') == 'no':
+        status = 'Success'
+        data = res['result']
+
+        with open(os.path.join(cur_dir, 'order_dump.json'), 'w') as f:
+            json.dump(res, f, indent=4)
+
+    # if no orders then return a fail
+    return status, data
 
 
-#     status = 'Fail'
-#     data = 'No orders found'
-#     if valid_orders:
-#         # loop over the valid orders until we find one that succeeds
-#         data = 'No order data succeeded'
-#         for order in valid_orders:
-#             order_id = order['order_name']
-
-#             # get the additional info about the order
-#             url = join_url(api_base_url, 'dwapi', 'order', order_id)
-#             res = request_url(url, main_headers)
-#             if res.get('error', 'no') == 'no':
-#                 status = 'Success'
-#                 data = res['result']
-#                 break
-
-#     # if no orders then return a fail
-#     return status, data
+_, data = get_specific_order('S131653')

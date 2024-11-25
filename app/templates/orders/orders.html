@@ -1,15 +1,18 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details</title>
+    <title>All Orders</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
 </head>
 <body>
-    <h1>Order Details</h1>
-    <table border="1">
+    <h1>Current Valid Orders:</h1>
+    <table>
         <thead>
             <tr>
-                <th>Order Name</th>
+                <th>Order ID</th>
                 <th>Pick Name</th>
                 <th>Shipping Name</th>
                 <th>Shipping Carrier</th>
@@ -23,7 +26,7 @@
         <!-- For each order display the content in each row -->
         <tbody>
             {% for order in orders %}
-            <tr>
+            <tr onclick="rowClicked('{{ order.order_name }}')">
                 <td>{{ order.order_name }}</td>
                 <td>{{ order.picking_names }}</td>
                 <td>{{ order.shipping_name }}</td>
@@ -37,4 +40,13 @@
         </tbody>
     </table>
 </body>
+<script>
+    function rowClicked(orderID) {
+        fetch('/orders/save_order_id/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ order_id: orderID })
+        });
+    }
+</script>
 </html>
