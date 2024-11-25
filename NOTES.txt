@@ -1,0 +1,13 @@
+plan of action
+
+pull the 'all orders' into a refreshable saved list of orders to do and mark if being completed by someone or done etc
+
+allow user to click an order which will call the api method to get all the data related and populate the 'currently editing' data bit (not decided data format)
+
+allow option to :
+    - edit person info
+    - edit package info
+    - quote it
+    - ship it
+
+finally need a history pull

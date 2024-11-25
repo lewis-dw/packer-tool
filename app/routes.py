@@ -1,11 +1,15 @@
 from flask import Blueprint, render_template, jsonify
 from . import db
+from odoo.get_orders import get_orders, get_first_order
 
 main = Blueprint('main', __name__)
+
+
 
 @main.route('/')
 def index():
     return render_template('dashboard.html')
+
 
 
 @main.route('/page_1/')
@@ -13,9 +17,24 @@ def page_1(user='Lewis'):
     return render_template('page_1.html', user=user)
 
 
+
 @main.route('/shipper/')
 def shipper_page():
     return render_template('shipper.html')
+
+
+
+@main.route('/api/get_orders/') # result, data = get_first_order(data)
+def get_odoo_orders():
+    # get valid orders
+    result, data = get_orders()
+
+    # return all orders to be present to user
+    if result == 'Success':
+        print(data)
+    # return data regardless but depending on result then we need to handle response differently
+    elif result == 'Fail':
+        print(data)
 
 
 

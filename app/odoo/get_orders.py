@@ -97,26 +97,3 @@ def get_first_order(content):
 
     # if no orders then return a fail
     return status, data
-
-
-
-###########################################################################################################################################
-# main execution
-
-
-if __name__ == '__main__':
-    # get all orders
-    result, data = get_orders()
-
-    # on success we want to find the first order we can process
-    if result == 'Success':
-        result, data = get_first_order(data)
-
-        # on success we want to dump the order data (for now)
-        if result == 'Success':
-            with open(os.path.join(cur_dir, 'order.json'), 'w') as f:
-                json.dump(data, f, indent=4)
-
-    # handles either fail
-    if result == 'Fail':
-        print(data)
