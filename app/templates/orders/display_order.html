@@ -16,7 +16,44 @@
     <!-- Display the info about the order -->
     <h1>Order Details [{{ order.order_name }}]</h1>
     <div>
-        <p>Customer Name: {{ order.customer_name }}</p>
+        <!-- customer details -->
+        <p>Customer Name: {{ order.shipping_name }}</p>
+        <p>Customer Type: {{ order.customer_pricelist }}</p>
+        <p>Email: {{ order.customer_email }}</p>
+        <p>Phone Number: {{ order.shipping_telephone }}</p>
+        <p>Company: {{ order.shipping_company }}</p>
+        <p>Streetline 1: {{ order.shipping_street }}</p>
+        <p>Streetline 2: {{ order.shipping_street2 }}</p>
+        <p>Locality: {{ order.shipping_locality }}</p>
+        <p>Region: {{ order.shipping_region }}</p>
+        <p>Postcode: {{ order.shipping_postcode }}</p>
+        <p>Country: {{ order.shipping_country }}</p>
+        <p>Country ID: {{ order.shipping_country_id }}</p>
+
+
+        <!-- shippign details -->
+        <p>Carrier: {{ order.order_carrier_name }}</p>
+        <p>Customer Paid: {{ order.shipping_cost }}</p>
+        <p>Total Cost: {{ order.order_total }}</p>
+        <p>Order Tax: {{ order.order_total_tax }}</p>
+        <p>Total Cost inc Tax: {{ order.order_total_inc_tax }}</p>
+
+
+
+        <!-- additional details -->
+        <p>Picking Internal Note: {{ order.picking_internal_note }}</p>
+        <p>Customer Note 1: {{ order.picking_customer_note }}</p>
+        <p>Customer Note 2: {{ order.customer_notes }}</p>
+
+
+        <!-- view billing info button -->
+            <!-- needs to pass entire result to next page to extract billing info -->
+
+        <!-- view items -->
+            <!-- needs to pass `items` to next page -->
+
+        <!-- view invoice items -->
+            <!-- needs to pass `commercial_invoice_lines` to next page -->
     </div>
 </body>
 {% endblock %}

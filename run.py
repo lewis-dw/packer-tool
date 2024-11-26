@@ -12,5 +12,13 @@ from app import create_app
 if __name__ == '__main__':
     # run the app
     app = create_app()
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0', ssl_context=('ssl/cert.pem', 'ssl/key.pem'), debug=True)
 
+
+"""
+AVAILABLE AT:
+https://local.dwtool.com:5000
+https://localhost:5000
+https://10.10.66.192:5000
+https://127.0.0.1:5000
+"""

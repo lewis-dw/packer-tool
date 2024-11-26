@@ -1,9 +1,24 @@
 from flask import Flask, render_template, send_from_directory
+from flask_talisman import Talisman
 
 def create_app():
     # create app
     app = Flask(__name__)
     app.config.from_object('config.Config')
+
+
+    # talisman settings
+    talisman = Talisman(
+        app,
+        force_https=True,
+        content_security_policy=None
+        # content_security_policy={
+        #     'default-src': '\'self\'',
+        #     'manifest-src': '\'self\'',
+        #     'worker-src': '\'self\'',
+        #     'img-src': '*'
+        # }
+    )
 
 
     # Import and register blueprints

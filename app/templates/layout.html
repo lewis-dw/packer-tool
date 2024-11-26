@@ -11,8 +11,8 @@
     <title>{% block title %}Main{% endblock %}</title>
 
     <!-- links to css and manifest -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="static/css/global.css">
     {% block head %}{% endblock %}
 </head>
 
@@ -27,17 +27,5 @@
         <!-- maybe put a footer -->
     </footer>
 </body>
-
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/static/service-worker.js')
-            .then((registration) => {
-                console.log('Service Worker registered:', registration);
-            })
-            .catch((error) => {
-                console.log('Service Worker registration failed:', error);
-            });
-    }
-</script>
 
 </html>

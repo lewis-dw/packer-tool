@@ -1,6 +1,6 @@
 {
-    "name": "Packer Tool",
-    "short_name": "PackerTool",
+    "name": "Driftworks Tool",
+    "short_name": "DWTool",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#181818",
@@ -20,6 +20,20 @@
             "src": "/static/icons/driftworks_48x48.png",
             "sizes": "48x48",
             "type": "image/png"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/static/screenshots/desktop-view.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/static/screenshots/mobile-view.png",
+            "sizes": "720x1280",
+            "type": "image/png",
+            "form_factor": "narrow"
         }
     ]
 }
