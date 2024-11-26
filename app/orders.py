@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, render_template, make_response
+from flask import Blueprint, request, redirect, render_template, session
 from app.odoo.api import get_orders, get_specific_order
 
 """
@@ -30,23 +30,11 @@ def all_orders():
 
 
 """
-Get and display all info about the order
+Render the page that allows user to type in an order id or scan one in
 """
-@orders.route('/display_order')
-def display_order():
-    # get the order_id from query
-    order_id = request.args.get('order_id')
-
-    print(order_id)
-
-    # search the order_id passed in
-    status, data = get_specific_order(order_id)
-
-    # on success then pass in the whole json to the order page
-    if status == 'Success':
-        return render_template('display_order.html', order=data)
-    else:
-        return render_template('no_order_found.html', order_id=order_id)
+@orders.route('/manual_search/')
+def manual_search():
+    return render_template('manual_search.html')
 
 
 
@@ -78,8 +66,19 @@ def get_manual_entry():
 
 
 """
-Render the page that allows user to type in an order id or scan one in
+Get and display all info about the order
 """
-@orders.route('/manual_search/')
-def manual_search():
-    return render_template('manual_search.html')
+@orders.route('/display_order')
+def display_order():
+    # get the order_id from query
+    order_id = request.args.get('order_id')
+
+    # search the order_id passed in
+    status, data = get_specific_order(order_id)
+
+    # on success then pass in the whole json to the order page
+    if status == 'Success':
+        data['order_items'] = data.pop('items')
+        return render_template('display_order.html', order=data)
+    else:
+        return render_template('no_order_found.html', order_id=order_id)

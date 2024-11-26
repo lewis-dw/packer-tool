@@ -5,6 +5,21 @@
 {% endblock %}
 
 {% block head %}
+<style>
+    .section {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        overflow: auto;
+        z-index: 1000;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+</style>
 {% endblock %}
 
 {% block header %}
@@ -17,43 +32,115 @@
     <h1>Order Details [{{ order.order_name }}]</h1>
     <div>
         <!-- customer details -->
-        <p>Customer Name: {{ order.shipping_name }}</p>
-        <p>Customer Type: {{ order.customer_pricelist }}</p>
-        <p>Email: {{ order.customer_email }}</p>
-        <p>Phone Number: {{ order.shipping_telephone }}</p>
-        <p>Company: {{ order.shipping_company }}</p>
-        <p>Streetline 1: {{ order.shipping_street }}</p>
-        <p>Streetline 2: {{ order.shipping_street2 }}</p>
-        <p>Locality: {{ order.shipping_locality }}</p>
-        <p>Region: {{ order.shipping_region }}</p>
-        <p>Postcode: {{ order.shipping_postcode }}</p>
-        <p>Country: {{ order.shipping_country }}</p>
-        <p>Country ID: {{ order.shipping_country_id }}</p>
+        <p>Customer Name: {{ order.shipping_name or 'dw_n/a' }}</p>
+        <p>Customer Type: {{ order.customer_pricelist or 'dw_n/a' }}</p>
+        <p>Email: {{ order.customer_email or 'dw_n/a' }}</p>
+        <p>Phone Number: {{ order.shipping_telephone or 'dw_n/a' }}</p>
+        <p>Company: {{ order.shipping_company or 'dw_n/a' }}</p>
+        <p>Streetline 1: {{ order.shipping_street or 'dw_n/a' }}</p>
+        <p>Streetline 2: {{ order.shipping_street2 or 'dw_n/a' }}</p>
+        <p>Locality: {{ order.shipping_locality or 'dw_n/a' }}</p>
+        <p>Region: {{ order.shipping_region or 'dw_n/a' }}</p>
+        <p>Postcode: {{ order.shipping_postcode or 'dw_n/a' }}</p>
+        <p>Country: {{ order.shipping_country or 'dw_n/a' }}</p>
+        <p>Country ID: {{ order.shipping_country_id or 'dw_n/a' }}</p>
 
 
-        <!-- shippign details -->
-        <p>Carrier: {{ order.order_carrier_name }}</p>
-        <p>Customer Paid: {{ order.shipping_cost }}</p>
-        <p>Total Cost: {{ order.order_total }}</p>
-        <p>Order Tax: {{ order.order_total_tax }}</p>
-        <p>Total Cost inc Tax: {{ order.order_total_inc_tax }}</p>
-
+        <!-- shipping details -->
+        <p>Carrier: {{ order.order_carrier_name or 'dw_n/a' }}</p>
+        <p>Customer Paid: {{ order.shipping_cost or 'dw_n/a' }}</p>
+        <p>Total Cost: {{ order.order_total or 'dw_n/a' }}</p>
+        <p>Order Tax: {{ order.order_total_tax or 'dw_n/a' }}</p>
+        <p>Total Cost inc Tax: {{ order.order_total_inc_tax or 'dw_n/a' }}</p>
 
 
         <!-- additional details -->
-        <p>Picking Internal Note: {{ order.picking_internal_note }}</p>
-        <p>Customer Note 1: {{ order.picking_customer_note }}</p>
-        <p>Customer Note 2: {{ order.customer_notes }}</p>
+        <p>Picking Internal Note: {{ order.picking_internal_note or 'dw_n/a' }}</p>
+        <p>Customer Note 1: {{ order.picking_customer_note or 'dw_n/a' }}</p>
+        <p>Customer Note 2: {{ order.customer_notes or 'dw_n/a' }}</p>
 
 
-        <!-- view billing info button -->
-            <!-- needs to pass entire result to next page to extract billing info -->
+        <!-- Toggle Buttons -->
+        <button onclick="toggleSection('billing-info')">View Billing Info</button>
+        <button onclick="toggleSection('items-info')">View Items</button>
+        <button onclick="toggleSection('invoice-info')">View Invoice Items</button>
 
-        <!-- view items -->
-            <!-- needs to pass `items` to next page -->
 
-        <!-- view invoice items -->
-            <!-- needs to pass `commercial_invoice_lines` to next page -->
+        <!-- hidden sections -->
+        <!-- billing info -->
+        <div id="billing-info" class="section">
+            <button onclick="closeSection()">Close</button>
+            <h2>Billing Info</h2>
+            <p>Company: {{ order.billing_company or 'dw_n/a' }}</p>
+            <p>Name: {{ order.billing_name or 'dw_n/a' }}</p>
+            <p>Streetline 1: {{ order.billing_street or 'dw_n/a' }}</p>
+            <p>Streetline 2: {{ order.billing_street2 or 'dw_n/a' }}</p>
+            <p>Locality: {{ order.billing_locality or 'dw_n/a' }}</p>
+            <p>Region: {{ order.billing_region or 'dw_n/a' }}</p>
+            <p>Postcode: {{ order.billing_postcode or 'dw_n/a' }}</p>
+            <p>Country: {{ order.billing_country or 'dw_n/a' }}</p>
+            <p>Country ID: {{ order.billing_country_id or 'dw_n/a' }}</p>
+            <p>Telephone: {{ order.billing_telephone or 'dw_n/a' }}</p>
+            <p>VAT ID: {{ order.billing_vat_id or 'dw_n/a' }}</p>
+        </div>
+
+
+        <!-- items info -->
+        <div id="items-info" class="section">
+            <button onclick="closeSection()">Close</button>
+            <h2>Items Info</h2>
+            {% for item in order.order_items %}
+            <div>
+                <p><strong>Product SKU:</strong> {{ item.product_sku or 'dw_n/a' }}</p>
+                <p><strong>Product Name:</strong> {{ item.product_name or 'dw_n/a' }}</p>
+                <p><strong>Description:</strong> {{ item.line_description or 'dw_n/a' }}</p>
+                <p><strong>Quantity:</strong> {{ item.product_demand_qty or 'dw_n/a' }}</p>
+                <p><strong>Delivered Quantity:</strong> {{ item.product_delivered_qty or 'dw_n/a' }}</p>
+                <p><strong>Reserved Quantity:</strong> {{ item.product_reserved_qty or 'dw_n/a' }}</p>
+                <p><strong>Picking State:</strong> {{ item.line_picking_state or 'dw_n/a' }}</p>
+            </div>
+            {% else %}
+                <p>No items found</p>
+            {% endfor %}
+        </div>
+
+
+        <!-- invoice info -->
+        <div id="invoice-info" class="section">
+            <button onclick="closeSection()">Close</button>
+            <h2>Invoice Info</h2>
+            {% for line in order.commercial_invoice_lines %}
+            <div>
+                <p><strong>Product Name:</strong> {{ line.product_name or 'dw_n/a' }}</p>
+                <p><strong>Description:</strong> {{ line.line_description or 'dw_n/a' }}</p>
+                <p><strong>Commodity Code:</strong> {{ line.commodity_code or 'dw_n/a' }}</p>
+                <p><strong>Country of Manufacture:</strong> {{ line.country_of_manufacture or 'dw_n/a' }}</p>
+                <p><strong>Quantity:</strong> {{ line.product_demand_qty or 'dw_n/a' }}</p>
+                <p><strong>Unit Price:</strong> {{ line.unit_price or 'dw_n/a' }}</p>
+                <p><strong>Line Price:</strong> {{ line.line_price or 'dw_n/a' }}</p>
+            </div>
+            {% else %}
+                <p>No items found</p>
+            {% endfor %}
+        </div>
     </div>
+
+
+    <script>
+        function toggleSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+
+            // Show the selected section
+            const section = document.getElementById(sectionId);
+            section.style.display = 'block';
+        }
+
+        function closeSection() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+        }
+    </script>
 </body>
 {% endblock %}
