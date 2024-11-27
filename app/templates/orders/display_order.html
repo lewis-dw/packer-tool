@@ -28,103 +28,169 @@
 
 {% block main %}
 <body>
-    <!-- Display the info about the order -->
-    <h1>Order Details [{{ order.order_name }}]</h1>
     <div>
-        <!-- customer details -->
-        <p>Customer Name: {{ order.shipping_name or 'dw_n/a' }}</p>
-        <p>Customer Type: {{ order.customer_pricelist or 'dw_n/a' }}</p>
-        <p>Email: {{ order.customer_email or 'dw_n/a' }}</p>
-        <p>Phone Number: {{ order.shipping_telephone or 'dw_n/a' }}</p>
-        <p>Company: {{ order.shipping_company or 'dw_n/a' }}</p>
-        <p>Streetline 1: {{ order.shipping_street or 'dw_n/a' }}</p>
-        <p>Streetline 2: {{ order.shipping_street2 or 'dw_n/a' }}</p>
-        <p>Locality: {{ order.shipping_locality or 'dw_n/a' }}</p>
-        <p>Region: {{ order.shipping_region or 'dw_n/a' }}</p>
-        <p>Postcode: {{ order.shipping_postcode or 'dw_n/a' }}</p>
-        <p>Country: {{ order.shipping_country or 'dw_n/a' }}</p>
-        <p>Country ID: {{ order.shipping_country_id or 'dw_n/a' }}</p>
+        <!-- Display the info about the order -->
+        <h1>Order Details [{{ order.order_name }}]</h1>
+        <form method="POST" action="{{ url_for('orders.save_order') }}">
+            <input type="hidden" name="order_id" value="{{ order.order_name }}">
 
-
-        <!-- shipping details -->
-        <p>Carrier: {{ order.order_carrier_name or 'dw_n/a' }}</p>
-        <p>Customer Paid: {{ order.shipping_cost or 'dw_n/a' }}</p>
-        <p>Total Cost: {{ order.order_total or 'dw_n/a' }}</p>
-        <p>Order Tax: {{ order.order_total_tax or 'dw_n/a' }}</p>
-        <p>Total Cost inc Tax: {{ order.order_total_inc_tax or 'dw_n/a' }}</p>
-
-
-        <!-- additional details -->
-        <p>Picking Internal Note: {{ order.picking_internal_note or 'dw_n/a' }}</p>
-        <p>Customer Note 1: {{ order.picking_customer_note or 'dw_n/a' }}</p>
-        <p>Customer Note 2: {{ order.customer_notes or 'dw_n/a' }}</p>
-
-
-        <!-- Toggle Buttons -->
-        <button onclick="toggleSection('billing-info')">View Billing Info</button>
-        <button onclick="toggleSection('items-info')">View Items</button>
-        <button onclick="toggleSection('invoice-info')">View Invoice Items</button>
-
-
-        <!-- hidden sections -->
-        <!-- billing info -->
-        <div id="billing-info" class="section">
-            <button onclick="closeSection()">Close</button>
-            <h2>Billing Info</h2>
-            <p>Company: {{ order.billing_company or 'dw_n/a' }}</p>
-            <p>Name: {{ order.billing_name or 'dw_n/a' }}</p>
-            <p>Streetline 1: {{ order.billing_street or 'dw_n/a' }}</p>
-            <p>Streetline 2: {{ order.billing_street2 or 'dw_n/a' }}</p>
-            <p>Locality: {{ order.billing_locality or 'dw_n/a' }}</p>
-            <p>Region: {{ order.billing_region or 'dw_n/a' }}</p>
-            <p>Postcode: {{ order.billing_postcode or 'dw_n/a' }}</p>
-            <p>Country: {{ order.billing_country or 'dw_n/a' }}</p>
-            <p>Country ID: {{ order.billing_country_id or 'dw_n/a' }}</p>
-            <p>Telephone: {{ order.billing_telephone or 'dw_n/a' }}</p>
-            <p>VAT ID: {{ order.billing_vat_id or 'dw_n/a' }}</p>
-        </div>
-
-
-        <!-- items info -->
-        <div id="items-info" class="section">
-            <button onclick="closeSection()">Close</button>
-            <h2>Items Info</h2>
-            {% for item in order.order_items %}
+            <!-- customer details -->
             <div>
-                <p><strong>Product SKU:</strong> {{ item.product_sku or 'dw_n/a' }}</p>
-                <p><strong>Product Name:</strong> {{ item.product_name or 'dw_n/a' }}</p>
-                <p><strong>Description:</strong> {{ item.line_description or 'dw_n/a' }}</p>
-                <p><strong>Quantity:</strong> {{ item.product_demand_qty or 'dw_n/a' }}</p>
-                <p><strong>Delivered Quantity:</strong> {{ item.product_delivered_qty or 'dw_n/a' }}</p>
-                <p><strong>Reserved Quantity:</strong> {{ item.product_reserved_qty or 'dw_n/a' }}</p>
-                <p><strong>Picking State:</strong> {{ item.line_picking_state or 'dw_n/a' }}</p>
+                <label for="s_name">Customer Name:</label>
+                <input type="text" id="s_name" name="s_name" value="{{ order.shipping_name or 'dw_n/a' }}">
+
+                <p>Customer Type: {{ order.customer_pricelist or 'dw_n/a' }}</p>
+
+                <label for="s_email">Customer Email:</label>
+                <input type="text" id="s_email" name="s_email" value="{{ order.customer_email or 'dw_n/a' }}">
+
+                <label for="s_phone">Customer Phone Number:</label>
+                <input type="text" id="s_phone" name="s_phone" value="{{ order.shipping_telephone or 'dw_n/a' }}">
+
+                <label for="s_company">Company:</label>
+                <input type="text" id="s_company" name="s_company" value="{{ order.shipping_company or 'dw_n/a' }}">
+
+                <label for="s_street1">Streetline 1:</label>
+                <input type="text" id="s_street1" name="s_street1" value="{{ order.shipping_street or 'dw_n/a' }}">
+
+                <label for="s_street2">Streetline 2:</label>
+                <input type="text" id="s_street2" name="s_street2" value="{{ order.shipping_street2 or 'dw_n/a' }}">
+
+                <label for="s_locality">Locality:</label>
+                <input type="text" id="s_locality" name="s_locality" value="{{ order.shipping_locality or 'dw_n/a' }}">
+
+                <label for="s_region">Region:</label>
+                <input type="text" id="s_region" name="s_region" value="{{ order.shipping_region or 'dw_n/a' }}">
+
+                <label for="s_postcode">Postcode:</label>
+                <input type="text" id="s_postcode" name="s_postcode" value="{{ order.shipping_postcode or 'dw_n/a' }}">
+
+                <label for="s_country">Country:</label>
+                <input type="text" id="s_country" name="s_country" value="{{ order.shipping_country or 'dw_n/a' }}">
+
+                <label for="s_country_id">Country ID:</label>
+                <input type="text" id="s_country_id" name="s_country_id" value="{{ order.shipping_country_id or 'dw_n/a' }}">
             </div>
-            {% else %}
-                <p>No items found</p>
-            {% endfor %}
-        </div>
 
 
-        <!-- invoice info -->
-        <div id="invoice-info" class="section">
-            <button onclick="closeSection()">Close</button>
-            <h2>Invoice Info</h2>
-            {% for line in order.commercial_invoice_lines %}
+            <!-- shipping details -->
             <div>
-                <p><strong>Product Name:</strong> {{ line.product_name or 'dw_n/a' }}</p>
-                <p><strong>Description:</strong> {{ line.line_description or 'dw_n/a' }}</p>
-                <p><strong>Commodity Code:</strong> {{ line.commodity_code or 'dw_n/a' }}</p>
-                <p><strong>Country of Manufacture:</strong> {{ line.country_of_manufacture or 'dw_n/a' }}</p>
-                <p><strong>Quantity:</strong> {{ line.product_demand_qty or 'dw_n/a' }}</p>
-                <p><strong>Unit Price:</strong> {{ line.unit_price or 'dw_n/a' }}</p>
-                <p><strong>Line Price:</strong> {{ line.line_price or 'dw_n/a' }}</p>
+                <p>Carrier: {{ order.order_carrier_name or 'dw_n/a' }}</p>
+                <p>Customer Paid Shipping: {{ order.shipping_cost or 'dw_n/a' }}</p>
+
+                <label for="tot_order_cost">Total Cost of Order:</label>
+                <input type="text" id="tot_order_cost" name="tot_order_cost" value="{{ order.order_total or 'dw_n/a' }}">
+
+                <label for="order_tax">Order Tax:</label>
+                <input type="text" id="order_tax" name="order_tax" value="{{ order.order_total_tax or 'dw_n/a' }}">
+
+                <label for="tot_order_cost_inc_tax">Total Cost inc Tax:</label>
+                <input type="text" id="tot_order_cost_inc_tax" name="tot_order_cost_inc_tax" value="{{ order.order_total_inc_tax or 'dw_n/a' }}">
             </div>
-            {% else %}
-                <p>No items found</p>
-            {% endfor %}
-        </div>
+
+
+            <!-- additional details -->
+            <div>
+                <p>Picking Internal Note: {{ order.picking_internal_note or 'dw_n/a' }}</p>
+                <p>Customer Note 1: {{ order.picking_customer_note or 'dw_n/a' }}</p>
+                <p>Customer Note 2: {{ order.customer_notes or 'dw_n/a' }}</p>
+            </div>
+
+
+            <!-- Toggle Buttons -->
+            <div>
+                <button type="button" onclick="toggleSection('billing-info')">View Billing Info</button>
+                <button type="button" onclick="toggleSection('items-info')">View Items</button>
+                <button type="button" onclick="toggleSection('invoice-info')">View Invoice Items</button>
+            </div>
+
+
+            <!-- hidden sections -->
+            <!-- billing info -->
+            <div id="billing-info" class="section">
+                <button type="button" onclick="closeSection()">Close</button>
+                <h2>Billing Info</h2>
+                <p>Company: {{ order.billing_company or 'dw_n/a' }}</p>
+                <p>Name: {{ order.billing_name or 'dw_n/a' }}</p>
+                <p>Streetline 1: {{ order.billing_street or 'dw_n/a' }}</p>
+                <p>Streetline 2: {{ order.billing_street2 or 'dw_n/a' }}</p>
+                <p>Locality: {{ order.billing_locality or 'dw_n/a' }}</p>
+                <p>Region: {{ order.billing_region or 'dw_n/a' }}</p>
+                <p>Postcode: {{ order.billing_postcode or 'dw_n/a' }}</p>
+                <p>Country: {{ order.billing_country or 'dw_n/a' }}</p>
+                <p>Country ID: {{ order.billing_country_id or 'dw_n/a' }}</p>
+                <p>Telephone: {{ order.billing_telephone or 'dw_n/a' }}</p>
+                <p>VAT ID: {{ order.billing_vat_id or 'dw_n/a' }}</p>
+            </div>
+
+
+            <!-- items info -->
+            <div id="items-info" class="section">
+                <button type="button" onclick="closeSection()">Close</button>
+                <h2>Items Info</h2>
+                {% for item in order.order_items %}
+                <div>
+                    <label for="item_sku_{{ loop.index }}">Product SKU:</label>
+                    <input type="text" id="item_sku_{{ loop.index }}" name="item_sku_{{ loop.index }}" value="{{ item.product_sku or 'dw_n/a' }}">
+
+                    <label for="item_name_{{ loop.index }}">Product Name:</label>
+                    <input type="text" id="item_name_{{ loop.index }}" name="item_name_{{ loop.index }}" value="{{ item.product_name or 'dw_n/a' }}">
+
+                    <label for="item_desc_{{ loop.index }}">Description:</label>
+                    <input type="text" id="item_desc_{{ loop.index }}" name="item_desc_{{ loop.index }}" value="{{ item.line_description or 'dw_n/a' }}">
+
+                    <label for="item_qty_{{ loop.index }}">Quantity:</label>
+                    <input type="text" id="item_qty_{{ loop.index }}" name="item_qty_{{ loop.index }}" value="{{ item.product_demand_qty or 'dw_n/a' }}">
+
+                    <label for="item_del_qty_{{ loop.index }}">Delivered Quantity:</label>
+                    <input type="text" id="item_del_qty_{{ loop.index }}" name="item_del_qty_{{ loop.index }}" value="{{ item.product_delivered_qty or 'dw_n/a' }}">
+
+                    <label for="item_res_qty_{{ loop.index }}">Reserved Quantity:</label>
+                    <input type="text" id="item_res_qty_{{ loop.index }}" name="item_res_qty_{{ loop.index }}" value="{{ item.product_reserved_qty or 'dw_n/a' }}">
+
+                    <label for="item_state_{{ loop.index }}">Picking State:</label>
+                    <input type="text" id="item_state_{{ loop.index }}" name="item_state_{{ loop.index }}" value="{{ item.line_picking_state or 'dw_n/a' }}">
+                </div>
+                {% else %}
+                    <p>No items found</p>
+                {% endfor %}
+            </div>
+
+
+            <!-- invoice info -->
+            <div id="invoice-info" class="section">
+                <button type="button" onclick="closeSection()">Close</button>
+                <h2>Invoice Info</h2>
+                {% for line in order.commercial_invoice_lines %}
+                <div>
+                    <label for="line_name_{{ loop.index }}">Product Name:</label>
+                    <input type="text" id="line_name_{{ loop.index }}" name="line_name_{{ loop.index }}" value="{{ line.product_name or 'dw_n/a' }}">
+
+                    <label for="line_desc_{{ loop.index }}">Description:</label>
+                    <input type="text" id="line_desc_{{ loop.index }}" name="line_desc_{{ loop.index }}" value="{{ line.line_description or 'dw_n/a' }}">
+
+                    <label for="line_commodity_{{ loop.index }}">Commodity Code:</label>
+                    <input type="text" id="line_commodity_{{ loop.index }}" name="line_commodity_{{ loop.index }}" value="{{ line.commodity_code or 'dw_n/a' }}">
+
+                    <label for="line_manufactured_{{ loop.index }}">Country of Manufacture:</label>
+                    <input type="text" id="line_manufactured_{{ loop.index }}" name="line_manufactured_{{ loop.index }}" value="{{ line.country_of_manufacture or 'dw_n/a' }}">
+
+                    <label for="line_dem_qty_{{ loop.index }}">Quantity:</label>
+                    <input type="text" id="line_dem_qty_{{ loop.index }}" name="line_dem_qty_{{ loop.index }}" value="{{ line.product_demand_qty or 'dw_n/a' }}">
+
+                    <label for="line_unit_price_{{ loop.index }}">Unit Price:</label>
+                    <input type="text" id="line_unit_price_{{ loop.index }}" name="line_unit_price_{{ loop.index }}" value="{{ line.unit_price or 'dw_n/a' }}">
+
+                    <label for="line_price_{{ loop.index }}">Line Price:</label>
+                    <input type="text" id="line_price_{{ loop.index }}" name="line_price_{{ loop.index }}" value="{{ line.line_price or 'dw_n/a' }}">
+                </div>
+                {% else %}
+                    <p>No items found</p>
+                {% endfor %}
+            </div>
+            <button type="submit">Quote</button>
+        </form>
     </div>
-
 
     <script>
         function toggleSection(sectionId) {

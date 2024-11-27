@@ -1,5 +1,10 @@
 from flask import Flask, render_template, send_from_directory
 from flask_talisman import Talisman
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def create_app():
     # create app
@@ -12,13 +17,11 @@ def create_app():
         app,
         force_https=True,
         content_security_policy=None
-        # content_security_policy={
-        #     'default-src': '\'self\'',
-        #     'manifest-src': '\'self\'',
-        #     'worker-src': '\'self\'',
-        #     'img-src': '*'
-        # }
     )
+
+
+    # secret key
+    app.secret_key = os.getenv('API_KEY')
 
 
     # Import and register blueprints

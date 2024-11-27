@@ -17,13 +17,13 @@ Dashboard
     <h1>Dashboard</h1>
     <div role="listbox" class="dashboard-options">
         <div class="dashboard-icon">
-            <a href="/orders/all_orders/">
+            <a href="{{ url_for('orders.all_orders') }}">
                 <img src="static/icons/shipper-icon.png" alt="___">
                 <p>Orders</p>
             </a>
         </div>
         <div class="dashboard-icon">
-            <a href="/orders/manual_search/">
+            <a href="{{ url_for('orders.manual_search') }}">
                 <img src="static/icons/shipper-icon.png" alt="___">
                 <p>Search Order</p>
             </a>
