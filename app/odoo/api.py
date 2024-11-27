@@ -3,6 +3,7 @@ import json
 import os
 import pathlib
 from dotenv import load_dotenv
+import re
 
 
 # load .env variables
@@ -79,7 +80,6 @@ def get_orders():
 # stage 2 - find the first valid order and return the values
 
 
-
 def get_specific_order(order_id):
     # get the additional info about the order
     url = join_url(api_base_url, 'dwapi', 'order', order_id)
@@ -100,3 +100,22 @@ def get_specific_order(order_id):
 
     # return the status of the request and the response
     return status, data
+
+
+###########################################################################################################################################
+# stage 3 - cleaning functions for the data
+
+
+def parse_product_description(description):
+    product_options = []
+    if description:
+        # first replace all newlines with a custom separator, then split by that separator
+        description = re.sub(r'\n+', '\n', description).replace('\n', '~DW~')
+        description = description.split('~DW~')
+        
+        # loop over the desc pieces and find the data we want
+        for piece in description:
+            if 'Option Price' in piece: # should always be present
+                piece = piece.split('Option Price')[0].strip(' -')
+                product_options.append(piece)
+    return product_options

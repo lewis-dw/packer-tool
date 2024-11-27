@@ -15,7 +15,7 @@ Search for order
 <body>
     <!-- Allow user to manually search for an id or scan one in here -->
     <h1>Search for an order id:</h1>
-    <form action="/orders/get_manual_entry/" method="post">
+    <form action="{{ url_for('orders.get_manual_entry') }}" method="post">
         <input type="text" id="order-id-input" name="order_id" placeholder="Order ID" autofocus>
         <button type="submit">Search</button>
     </form>

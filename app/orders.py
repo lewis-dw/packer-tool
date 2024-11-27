@@ -46,7 +46,7 @@ Receive the order id from the row click
 @orders.route('/get_order_id/<order_id>')
 def get_order_id(order_id):
     # Redirect directly to the desired URL
-    return redirect(f'/orders/load_order?order_id={order_id}')
+    return redirect(url_for('orders.load_order', order_id=order_id))
 
 
 
@@ -141,5 +141,9 @@ def save_order():
     #     else:
     #         order_data[key] = value
 
-    # print(order_data)
+
+    for key, value in request.form.items():
+        print(key, value)
+
+
     return redirect('/')
