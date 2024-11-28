@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Quote Order
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block header %}
+<a href="/">Back to dashboard</a>
+{% endblock %}
+
+{% block main %}
+
+<body>
+    <div>
+        <form method="POST" action="{{ url_for('shipping.handle_statecode') }}">
+            <label for="options">Select correct statecode:</label>
+            <select id="options" name="options">
+                <!-- this is just for testing - dynamically generate this -->
+                <option value="MN">Minnesota</option>
+                <option value="a">ignore</option>
+                <option value="b">ignore</option>
+                <option value="c">ignore</option>
+            </select>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+{% endblock %}

@@ -27,8 +27,10 @@ def create_app():
     # Import and register blueprints
     from app.default import default
     from app.orders import orders
+    from app.shipping import shipping
     app.register_blueprint(default, url_prefix='/')
     app.register_blueprint(orders, url_prefix='/orders')
+    app.register_blueprint(shipping, url_prefix='/shipping')
 
 
     # Global 404 error handler

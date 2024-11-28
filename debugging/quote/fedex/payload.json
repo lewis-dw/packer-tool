@@ -1,0 +1,138 @@
+{
+    "requestedShipment": {
+        "shipper": {
+            "address": {
+                "city": "Birmingham",
+                "postalCode": "B112LQ",
+                "countryCode": "GB",
+                "residential": "false"
+            }
+        },
+        "recipient": {
+            "address": {
+                "city": "Saint Paul",
+                "postalCode": "55125-2369",
+                "countryCode": "US",
+                "residential": "true",
+                "stateOrProvinceCode": null
+            }
+        },
+        "shipDateStamp": "2024-11-29",
+        "pickupType": "USE_SCHEDULED_PICKUP",
+        "rateRequestType": [
+            "ACCOUNT"
+        ],
+        "customsClearanceDetail": {
+            "dutiesPayment": {
+                "paymentType": "SENDER",
+                "payor": {
+                    "responsibleParty": "null"
+                }
+            },
+            "commodities": [
+                {
+                    "name": "JR-S-JR2020105X2074SM",
+                    "description": "Japan Racing - JR Wheels JR20 20x10",
+                    "countryOfManufacture": "Taiwan",
+                    "quantity": "4.0",
+                    "quantityUnits": "PCS",
+                    "unitPrice": {
+                        "amount": "277.82",
+                        "currency": "UKL"
+                    },
+                    "customsValue": {
+                        "amount": 1111.28,
+                        "currency": "UKL"
+                    },
+                    "weight": {
+                        "units": "KG",
+                        "value": 0.0
+                    },
+                    "harmonizedCode": "87087050"
+                }
+            ]
+        },
+        "totalPackageCount": 4,
+        "requestedPackageLineItems": [
+            {
+                "customerReferenceType": [
+                    {
+                        "customerReferenceType": "CUSTOMER_REFERENCE",
+                        "value": "S131339"
+                    }
+                ],
+                "groupPackageCount": 1,
+                "weight": {
+                    "value": 1,
+                    "units": "KG"
+                },
+                "dimensions": {
+                    "length": 56.8,
+                    "width": 56.8,
+                    "height": 33.4,
+                    "units": "CM"
+                }
+            },
+            {
+                "customerReferenceType": [
+                    {
+                        "customerReferenceType": "CUSTOMER_REFERENCE",
+                        "value": "S131339"
+                    }
+                ],
+                "groupPackageCount": 1,
+                "weight": {
+                    "value": 1,
+                    "units": "KG"
+                },
+                "dimensions": {
+                    "length": 56.8,
+                    "width": 56.8,
+                    "height": 33.4,
+                    "units": "CM"
+                }
+            },
+            {
+                "customerReferenceType": [
+                    {
+                        "customerReferenceType": "CUSTOMER_REFERENCE",
+                        "value": "S131339"
+                    }
+                ],
+                "groupPackageCount": 1,
+                "weight": {
+                    "value": 1,
+                    "units": "KG"
+                },
+                "dimensions": {
+                    "length": 56.8,
+                    "width": 56.8,
+                    "height": 33.4,
+                    "units": "CM"
+                }
+            },
+            {
+                "customerReferenceType": [
+                    {
+                        "customerReferenceType": "CUSTOMER_REFERENCE",
+                        "value": "S131339"
+                    }
+                ],
+                "groupPackageCount": 1,
+                "weight": {
+                    "value": 1,
+                    "units": "KG"
+                },
+                "dimensions": {
+                    "length": 56.8,
+                    "width": 56.8,
+                    "height": 33.4,
+                    "units": "CM"
+                }
+            }
+        ]
+    },
+    "accountNumber": {
+        "value": "802255209"
+    }
+}

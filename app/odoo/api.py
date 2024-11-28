@@ -17,7 +17,7 @@ cur_dir = pathlib.Path(__file__).parent
 
 
 ###########################################################################################################################################
-# used functions
+# Helper functions
 
 
 def request_url(url, headers={}, data={}):

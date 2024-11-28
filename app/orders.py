@@ -135,7 +135,6 @@ def save_order():
                 key, index = key.rsplit('_', 1)
                 key = key.split('-')[1]
                 index = int(index) - 1
-                print(key, index)
                 data['commercial_invoice_lines'][index][key] = value
 
             # order items
@@ -144,7 +143,6 @@ def save_order():
                 key, index = key.rsplit('_', 1)
                 key = key.split('-')[1]
                 index = int(index) - 1
-                print(key, index)
                 data['order_items'][index][key] = value
 
             # all other values
@@ -154,6 +152,6 @@ def save_order():
         # reset the session order data and redirect user
         session.clear()
         session['data'] = data
-        return redirect('/')
+        return redirect(url_for('shipping.quote_order'))
     else:
         return redirect('/')
