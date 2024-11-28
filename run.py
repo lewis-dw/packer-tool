@@ -1,5 +1,5 @@
 # dunder variables
-__version__ = '0.1.0' # semantic versioning [MAJOR|MINOR|PATCH]
+__version__ = '1.2.0' # semantic versioning [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 
