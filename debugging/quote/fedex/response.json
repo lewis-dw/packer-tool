@@ -1,9 +1,0 @@
-{
-    "transactionId": "1c5165fc-ec2f-401e-96ad-e0263141fe6d",
-    "errors": [
-        {
-            "code": "INVALID.INPUT.EXCEPTION",
-            "message": "Invalid field value in the input"
-        }
-    ]
-}
