@@ -1,5 +1,5 @@
 from flask import Blueprint, request, redirect, render_template, session, url_for
-from app.odoo.api import get_orders, get_specific_order
+from app.odoo.api import get_orders, get_specific_order, clean_data
 
 """
 These routes are used for when getting orders from odoo
@@ -81,15 +81,14 @@ def load_order():
         # rename the items key as it causes issues
         data['order_items'] = data.pop('items')
 
-        """run some cleaning functions here"""
+        # clean the data up
+        data = clean_data(data)
 
         # set session 'data' to the order data
         session['data'] = data
 
         # finally redirect them to the display order page
-        # return redirect('/orders/display_order/')
         return redirect(url_for('orders.display_order'))
-
 
     # if it errored then redirect to the no order found error page
     else:
@@ -124,26 +123,37 @@ Save the currently loaded data from the 'display order' page
 """
 @orders.route('/save_order', methods=['POST'])
 def save_order():
-    # # init the order vars
-    # order_data = {}
-    # items = ['']*50
-    # lines = ['']*50
+    # we will update the session data with what we got returned from the post form
+    data = session.get('data', {})
 
-    # # loop over the request form items to rebuild the order data
-    # for key, value in request.form.items():
-    #     if key.startswith('item_'):
-    #         index = key.split('_')[-1]
-    #         items[index] = {
+    # if there is not session order data then we want to redirect but if there is we can proceed
+    if data:
+        for key, value in request.form.items():
+            # order commercial invoice lines
+            if key.startswith('line-'):
+                # extract the key name and index from the key
+                key, index = key.rsplit('_', 1)
+                key = key.split('-')[1]
+                index = int(index) - 1
+                print(key, index)
+                data['commercial_invoice_lines'][index][key] = value
 
-    #         }
-    #     elif key.startswith('line_'):
-    #         pass
-    #     else:
-    #         order_data[key] = value
+            # order items
+            elif key.startswith('item-'):
+                # extract the key name and index from the key
+                key, index = key.rsplit('_', 1)
+                key = key.split('-')[1]
+                index = int(index) - 1
+                print(key, index)
+                data['order_items'][index][key] = value
 
+            # all other values
+            else:
+                data[key] = value
 
-    for key, value in request.form.items():
-        print(key, value)
-
-
-    return redirect('/')
+        # reset the session order data and redirect user
+        session.clear()
+        session['data'] = data
+        return redirect('/')
+    else:
+        return redirect('/')
