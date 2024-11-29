@@ -4,7 +4,7 @@ from app.shipper import fedex, ups, shipping_functions
 """
 These routes are used for quoting and shipping an order
 """
-shipping = Blueprint('shipping', __name__, template_folder='templates/shipping')
+shipping = Blueprint('shipping', __name__, template_folder='templates/shipping', static_folder='static')
 
 
 # run this to get all the jsons we want
@@ -111,7 +111,16 @@ def quote_order():
         session.pop('verify_from', None)
 
         # after verification proceed to quote the order
-        res = fedex.quote_order(data)
+        fedex_result = fedex.quote_order(data)
+
+        # loop over all quotes and join the successful ones
+        all_quotes = []
+        for quote in [fedex_result]:
+            if quote['state'] == 'Success':
+                all_quotes.extend(quote['value'])
+
+        # parse the results and display
+        result = shipping_functions.parse_quotes(all_quotes)
         return render_template('quote_order.html')
 
     # if no data then redirect to dashboard as they shouldnt be here

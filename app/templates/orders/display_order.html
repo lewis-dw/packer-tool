@@ -129,26 +129,13 @@
                 <h2>Items Info</h2>
                 {% for item in order.order_items %}
                 <div>
-                    <label for="item-product_sku_{{ loop.index }}">Product SKU:</label>
-                    <input type="text" id="item-product_sku_{{ loop.index }}" name="item-product_sku_{{ loop.index }}" value="{{ item.product_sku or '' }}">
-
-                    <label for="item-product_name_{{ loop.index }}">Product Name:</label>
-                    <input type="text" id="item-product_name_{{ loop.index }}" name="item-product_name_{{ loop.index }}" value="{{ item.product_name or '' }}">
-
-                    <label for="item-line_description_{{ loop.index }}">Description:</label>
-                    <input type="text" id="item-line_description_{{ loop.index }}" name="item-line_description_{{ loop.index }}" value="{{ item.line_description or '' }}">
-
-                    <label for="item-product_demand_qty_{{ loop.index }}">Quantity:</label>
-                    <input type="text" id="item-product_demand_qty_{{ loop.index }}" name="item-product_demand_qty_{{ loop.index }}" value="{{ item.product_demand_qty or '' }}">
-
-                    <label for="item-product_delivered_qty_{{ loop.index }}">Delivered Quantity:</label>
-                    <input type="text" id="item-product_delivered_qtyy_{{ loop.index }}" name="item-product_delivered_qty_{{ loop.index }}" value="{{ item.product_delivered_qty or '' }}">
-
-                    <label for="item-product_reserved_qty_{{ loop.index }}">Reserved Quantity:</label>
-                    <input type="text" id="item-product_reserved_qty_{{ loop.index }}" name="item-product_reserved_qty_{{ loop.index }}" value="{{ item.product_reserved_qty or '' }}">
-
-                    <label for="item-line_picking_state_{{ loop.index }}">Picking State:</label>
-                    <input type="text" id="item-line_picking_state_{{ loop.index }}" name="item-line_picking_state_{{ loop.index }}" value="{{ item.line_picking_state or '' }}">
+                    <p>Product SKU: {{ item.product_sku or '' }}</p>
+                    <p>Product Name: {{ item.product_name or '' }}</p>
+                    <p>Description: {{ item.line_description or '' }}</p>
+                    <p>Quantity: {{ item.product_demand_qty or '' }}</p>
+                    <p>Delivered Quantity: {{ item.product_delivered_qty or '' }}</p>
+                    <p>Reserved Quantity: {{ item.product_reserved_qty or '' }}</p>
+                    <p>Picking State: {{ item.line_picking_state or '' }}</p>
                 </div>
                 {% else %}
                     <p>No items found</p>
@@ -184,6 +171,9 @@
 
                     <label for="line-line_price_{{ loop.index }}">Line Price:</label>
                     <input type="text" id="line-line_price_{{ loop.index }}" name="line-line_price_{{ loop.index }}" value="{{ line.line_price or '' }}">
+
+                    <label for="line-parcel_insurance_{{ loop.index }}">Parcel Insurance:</label>
+                    <input type="text" id="line-parcel_insurance_{{ loop.index }}" name="line-parcel_insurance_{{ loop.index }}" value=0>
                 </div>
                 {% else %}
                     <p>No items found</p>

@@ -3,7 +3,7 @@ from flask import Blueprint, render_template
 """
 These routes are for default operations on the Website/PWA
 """
-default = Blueprint('default', __name__, template_folder='templates/default')
+default = Blueprint('default', __name__, template_folder='templates/default', static_folder='static')
 
 
 

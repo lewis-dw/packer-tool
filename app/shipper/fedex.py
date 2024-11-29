@@ -1,7 +1,7 @@
 import os
 import pathlib
 from dotenv import load_dotenv
-from app.shipper.shipping_functions import verify_line, get_shipping_date, find_statecode
+from app.shipper.shipping_functions import verify_line, get_shipping_date, get_country_code
 import json
 import requests
 
@@ -52,8 +52,8 @@ def format_items(data):
             item_dict = {
                 "name": invoice_line["product_sku"][:35],
                 "description": invoice_line["product_name"][:35],
-                "countryOfManufacture": invoice_line["country_of_manufacture"],
-                "quantity": invoice_line["product_demand_qty"],
+                "countryOfManufacture": get_country_code(invoice_line["country_of_manufacture"]),
+                "quantity": int(float(invoice_line["product_demand_qty"])),
                 "quantityUnits": "PCS",
                 "unitPrice": {
                     "amount": invoice_line["unit_price"],
@@ -105,6 +105,19 @@ def format_parcels(data, order_id):
                         "units": "CM"
                     }
                 }
+
+                # if there is insurance on the parcel add it in
+                if invoice_line['parcel_insurance'] > 0.0:
+                    parcel_dict["PackageServiceOptions"] = {
+                        "DeclaredValue": {
+                            "Type": {
+                                "Code": "01"
+                            },
+                            "MonetaryValue": invoice_line['parcel_insurance'],
+                            "CurrencyCode": "GBP"
+                        }
+                    }
+
                 parcels_extend.append(parcel_dict)
             all_parcels.extend(parcels_extend)
     return all_parcels
@@ -163,6 +176,7 @@ def create_quote_payload(data, items, parcels):
 
 
 
+
 def quote_order(data):
     # first check if our auth is valid still (or create a new one upon first run)
     token = get_auth()
@@ -189,7 +203,32 @@ def quote_order(data):
     with open(os.path.join(debug_dir, 'quote', 'fedex', 'response.json'), 'w') as f:
         json.dump(res.json(), f, indent=4)
 
-    return res
+    # parse the result and return
+    quotes = parse_response(res.json())
+    return quotes
+
+
+
+
+
+def parse_response(res):
+    # check if we have errors
+    if res.get('errors', '') != '':
+        errors = []
+        for error in res['errors']:
+            errors.append(f"{error['code']} - {error['message']}")
+        return {'state':'Error', 'value':errors}
+
+    # no errors? lets go parsing!
+    else:
+        quotes = []
+        for method in res['output']['rateReplyDetails']:
+            quotes.append({
+                'courier': 'fedex',
+                'method_name': method['serviceType'],
+                'cost': method["ratedShipmentDetails"][0]["totalNetCharge"]
+            })
+        return {'state':'Success', 'value':quotes}
 
 
 ###########################################################################################################################################
@@ -275,7 +314,7 @@ def create_ship_payload(data, shipping_code, size, items, parcels):
                     "comments": ["Commercial invoice for items dispatched from Driftworks Ltd"],
                     "declarationStatement": "I declare all the information contained in this invoice to be true and correct.",
                     "freightCharge": {
-                        "amount": str(round(float(data['________']), 2)),
+                        "amount": round(float(data['shipping_cost']), 2),
                         "currency": "UKL"
                     }
                 },

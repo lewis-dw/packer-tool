@@ -5,7 +5,7 @@ Dashboard
 {% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="static/css/dashboard.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 {% endblock %}
 
 {% block header %}

@@ -14,6 +14,7 @@ main_headers = {"api_key": os.getenv('API_KEY')}
 
 # vars
 cur_dir = pathlib.Path(__file__).parent
+debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 
 
 ###########################################################################################################################################
@@ -62,7 +63,7 @@ def get_orders():
     """Request all current orders and return the first one that wants to be processed."""
     url = join_url(api_base_url, 'dwapi', 'orders')
     res = request_url(url, main_headers)
-    with open(os.path.join(cur_dir, 'all_orders_dump.json'), 'w') as f:
+    with open(os.path.join(debug_dir, 'orders', 'all_orders_dump.json'), 'w') as f:
         json.dump(res, f, indent=4)
 
     # handle the response
@@ -90,7 +91,7 @@ def get_specific_order(order_id):
         status = 'Success'
         data = res['result']
 
-        with open(os.path.join(cur_dir, 'order_dump.json'), 'w') as f:
+        with open(os.path.join(debug_dir, 'orders', 'order_dump.json'), 'w') as f:
             json.dump(res, f, indent=4)
 
     # if a fail then save the error

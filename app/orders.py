@@ -4,7 +4,7 @@ from app.odoo.api import get_orders, get_specific_order, clean_data
 """
 These routes are used for when getting orders from odoo
 """
-orders = Blueprint('orders', __name__, template_folder='templates/orders')
+orders = Blueprint('orders', __name__, template_folder='templates/orders', static_folder='static')
 
 
 

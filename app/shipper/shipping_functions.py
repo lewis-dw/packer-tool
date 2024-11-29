@@ -29,12 +29,17 @@ def join_url(*url_parts):
 
 
 def verify_line(name):
+    """
+    If any of the bad keywords are present in the name then return False
+    """
     keywords = [
-        'fedex', 'ups'
+        ' fedex ', ' ups '
     ]
-    if any(keyword in name.lower() for keyword in keywords):
+    if any(keyword in f' {name} '.lower() for keyword in keywords):
         return False
     return True
+
+
 
 
 
@@ -72,6 +77,9 @@ def get_shipping_date(end_time, days_penalty, date_format):
 
 
 def get_eircode(postcode):
+    """
+    Returns the Irish county for a given postcode
+    """
     header = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
 
     # get session key for eircode website
@@ -110,6 +118,9 @@ def get_eircode(postcode):
 
 
 def get_statecode(country, post_code):
+    """
+    Returns the USA/Canada state code for a given post code
+    """
     nomi = Nominatim(country)
     result = nomi.query_postal_code(post_code)
     state_code = str(result["state_code"])
@@ -123,6 +134,9 @@ def get_statecode(country, post_code):
 
 
 def find_statecode(data):
+    """
+    Depending on the country code, it will run the relevant 'get state code' function
+    """
     # extract vars
     postcode = data['shipping_postcode']
     country_code = data['shipping_country_id']
@@ -141,6 +155,20 @@ def find_statecode(data):
 
 
 
+def get_country_code(country):
+    """
+    Returns the country code for a given country
+    """
+    # maybe inefficient but load the country_codes from yaml and search for the given country in there
+    country_codes = get_all_yamls('country_codes')
+    country_code = country_codes.get(country, country) # if it doesnt exist then just return the country
+    return country_code
+
+
+
+
+
+
 def get_all_yamls(*yamls):
     """
     For each file_name passed in, open the yaml file and return to user
@@ -149,4 +177,14 @@ def get_all_yamls(*yamls):
     for file_name in yamls:
         with open(os.path.join(data_dir, f'{file_name}.yaml'), 'r') as file:
             results.append(yaml.safe_load(file))
+    if len(results) == 1:
+        results = results[0]
     return results
+
+
+
+
+
+def parse_quotes(quotes):
+    for quote in quotes:
+        print(quote)
