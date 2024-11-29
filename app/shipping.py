@@ -1,8 +1,5 @@
 from flask import Blueprint, request, redirect, render_template, session, url_for
 from app.shipper import fedex, ups, shipping_functions
-import yaml
-import os
-import pathlib
 
 """
 These routes are used for quoting and shipping an order
@@ -114,8 +111,7 @@ def quote_order():
         session.pop('verify_from', None)
 
         # after verification proceed to quote the order
-        res, data = fedex.quote_order(data)
-        session['data'] = data # in case the statecode was added it gets updated for the session
+        res = fedex.quote_order(data)
         return render_template('quote_order.html')
 
     # if no data then redirect to dashboard as they shouldnt be here

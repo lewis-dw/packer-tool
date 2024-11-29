@@ -12,7 +12,7 @@ debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 # load env variables and set if using live or test
 load_dotenv()
 prefix = 'TEST_'
-# prefix = ''
+prefix = ''
 
 # get the url parts
 auth_url = os.getenv(f'{prefix}FEDEX_OAUTH_URL')
@@ -111,10 +111,10 @@ def format_parcels(data, order_id):
 
 
 ###########################################################################################################################################
-# Quoting Stage 1 - Load data into correct format
+# Quoting
 
 
-def create_payload(data, items, parcels):
+def create_quote_payload(data, items, parcels):
     payload = {
         "requestedShipment": {
             "shipper": {
@@ -133,7 +133,7 @@ def create_payload(data, items, parcels):
                     "residential": True
                 }
             },
-            "shipDateStamp": get_shipping_date('16:00', 1, r'%Y-%m-%d'),
+            "shipDateStamp": get_shipping_date('12:00', 1, r'%Y-%m-%d'),
             "pickupType": "USE_SCHEDULED_PICKUP",
             "rateRequestType": [
                 "ACCOUNT"
@@ -155,10 +155,10 @@ def create_payload(data, items, parcels):
         }
     }
 
+    # if the country code is in this list then it needs state_code which should be present due to earlier data verification
     if data['shipping_country_id'] in ['IE', 'US', 'CA']:
-        # needs 'stateOrProvinceCode' in recipient address (this should exist due to earlier data verification)
         payload["requestedShipment"]["recipient"]["address"]["stateOrProvinceCode"] = data.get('shipping_statecode', '')
-    return payload, data
+    return payload
 
 
 
@@ -172,7 +172,7 @@ def quote_order(data):
     parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
 
     # create the payload and header
-    payload, data = create_payload(data, items, parcels)
+    payload = create_quote_payload(data, items, parcels)
     headers = {
         'Content-Type': "application/json",
         'X-locale': "en_US",
@@ -180,8 +180,8 @@ def quote_order(data):
     }
 
     # quote the payload
-    # payload = json.dumps(payload).replace('"null"', 'null').replace('"true"', 'true').replace('"false"', 'false')
-    res = requests.post(quote_url, data=payload, headers=headers)
+    spayload = json.dumps(payload)
+    res = requests.post(quote_url, data=spayload, headers=headers)
 
     # we want to dump the payload and response for debugging
     with open(os.path.join(debug_dir, 'quote', 'fedex', 'payload.json'), 'w') as f:
@@ -189,5 +189,140 @@ def quote_order(data):
     with open(os.path.join(debug_dir, 'quote', 'fedex', 'response.json'), 'w') as f:
         json.dump(res.json(), f, indent=4)
 
-    return res, data
+    return res
 
+
+###########################################################################################################################################
+# Shipping
+
+
+def create_ship_payload(data, shipping_code, size, items, parcels):
+    payload = {
+        "labelResponseOptions": "URL_ONLY",
+        "requestedShipment": {
+            "shipper": {
+                "contact": {
+                    "personName": "Nick Biggerstaff",
+                    "phoneNumber": 441217922000,
+                    "emailAddress": "logistics@driftworks.com",
+                    "companyName": "Driftworks"
+                },
+                "address": {
+                    "streetLines": [
+                        "Driftworks, Unit 7"
+                    ],
+                    "city": "Birmingham",
+                    "postalCode": "B112LQ",
+                    "countryCode": "GB"
+                }
+            },
+            "recipients": [
+                {
+                    "contact": {
+                        "personName": data['shipping_name'],
+                        "phoneNumber": data['customer_telephone'],
+                        "companyName": data['shipping_company'],
+                        "emailAddress": data['customer_email']
+                    },
+                    "address": {
+                        "streetLines": [
+                            data['shipping_street'],
+                            data['shipping_street2'],
+                            data['shipping_region']
+                        ],
+                        "city": data['shipping_locality'],
+                        "postalCode": data['shipping_postcode'],
+                        "countryCode": data['shipping_country_id']
+                    }
+                }
+            ],
+            "shipDatestamp": get_shipping_date('12:00', 1, r'%Y-%m-%d'),
+            "serviceType": shipping_code,
+            "packagingType": "YOUR_PACKAGING",
+            "pickupType": "USE_SCHEDULED_PICKUP",
+            "blockInsightVisibility": "false",
+            "shippingChargesPayment": {
+                "paymentType": "SENDER"
+            },
+            "labelSpecification": {
+                "imageType": "ZPLII",
+                "labelFormatType": "COMMON2D",
+                "labelOrder": "SHIPPING_LABEL_FIRST",
+                "labelStockType": size,
+                "labelRotation": "UPSIDE_DOWN",
+                "labelPrintingOrientation": "TOP_EDGE_OF_TEXT_FIRST",
+                "customerSpecifiedDetail": {
+                    "docTabContent": {
+                        "docTabContentType": "BARCODED",
+                        "barcoded": {
+                            "symbology": "CODE39",
+                            "specification": {
+                                "zoneNumber": 1,
+                                "header": "MAWB",
+                                "dataField": "REPLY/SHIPMENT/MasterTrackingId/TrackingNumber",
+                                "justification": "LEFT"
+                            }
+                        }
+                    }
+                }
+            },
+            "customsClearanceDetail": {
+                "dutiesPayment": {
+                    "paymentType": "RECIPIENT"
+                },
+                "commercialInvoice": {
+                    "termsOfSale": "DDU",
+                    "comments": ["Commercial invoice for items dispatched from Driftworks Ltd"],
+                    "declarationStatement": "I declare all the information contained in this invoice to be true and correct.",
+                    "freightCharge": {
+                        "amount": str(round(float(data['________']), 2)),
+                        "currency": "UKL"
+                    }
+                },
+                "isDocumentOnly": "false",
+                "commodities": items
+            },
+            "shippingDocumentSpecification": {
+                "shippingDocumentTypes": [
+                    "COMMERCIAL_INVOICE"
+                ],
+                "commercialInvoiceDetail": {
+                    "customerImageUsages": [
+                        {
+                            "id": "IMAGE_1",
+                            "type": "SIGNATURE",
+                            "providedImageType": "SIGNATURE"
+                        },
+                        {
+                            "id": "IMAGE_2",
+                            "type": "LETTER_HEAD",
+                            "providedImageType": "LETTER_HEAD"
+                        }
+                    ],
+                    "documentFormat": {
+                        "docType": "PDF",
+                        "stockType": "PAPER_LETTER"
+                    }
+                }
+            },
+            "shipmentSpecialServices": {
+                "etdDetail": {
+                    "requestedDocumentTypes": [
+                        "COMMERCIAL_INVOICE"
+                    ]
+                },
+                "specialServiceTypes": [
+                    "ELECTRONIC_TRADE_DOCUMENTS"
+                ]
+            },
+            "requestedPackageLineItems": parcels
+        },
+        "accountNumber": {
+            "value": account_id
+        }
+    }
+
+    # if the country code is in this list then it needs state_code which should be present due to earlier data verification
+    if data['shipping_country_id'] in ['IE', 'US', 'CA']:
+        payload["requestedShipment"]["recipient"]["address"]["stateOrProvinceCode"] = data.get('shipping_statecode', '')
+    return payload
