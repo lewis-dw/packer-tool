@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import os
 import pathlib
 import yaml
+import pandas as pd
 
 
 # find the data dir
@@ -185,6 +186,56 @@ def get_all_yamls(*yamls):
 
 
 
-def parse_quotes(quotes):
-    for quote in quotes:
-        print(quote)
+def parse_quotes(data):
+    """
+    Just parses through the quotes and errors to format it into something displayable
+    """
+    # parse quotes
+    if data['quotes']:
+        # sort the quotes by cost
+        quotes = sorted(
+            data['quotes'], 
+            key=lambda x: float(x['cost'])
+        )
+
+        # loop over the quotes after sorting and build up a html table
+        table_html = []
+        for quote in quotes:
+            courier = quote['courier'].upper()
+            method_name = quote['method_name']
+            cost = quote['cost']
+            html_row = (
+                f'<tr onclick="rowClicked(\'{courier}, {method_name}\')>'
+                f'<td>{courier}</td><td>{method_name}</td><td>{cost}</td></tr>'
+            )
+            table_html.append(html_row)
+
+        # finalize the html format
+        quote_content = ''.join([
+            '<table>',
+            '<thead><tr><th>Courier</th><th>Method</th><th>Cost</th></tr></thead>',
+            '<tbody>',
+            ''.join(table_html),
+            '</tbody></table>',
+        ])
+
+    else:
+        quote_content = '<p>No quotes succeeded</p>'
+
+
+
+    # parse errors
+    if data['errors']:
+        # one liner to construct the error table - hard to debug? just never get an error
+        table_html = [table_html.append(f"<tr><td>{error['courier']}</td><td>{error['error']}</td></tr>") for error in data['errors']]
+        error_content = ''.join([
+            '<table>',
+            '<thead><tr><th>Courier</th><th>Error</th></tr></thead>',
+            '<tbody>',
+            ''.join(table_html),
+            '</tbody></table>',
+        ])
+    else:
+        error_content = '<p>No errors during quoting</p>'
+
+    return quote_content, error_content

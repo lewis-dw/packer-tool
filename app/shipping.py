@@ -112,16 +112,26 @@ def quote_order():
 
         # after verification proceed to quote the order
         fedex_result = fedex.quote_order(data)
+        ups_result = ups.quote_order(data)
 
         # loop over all quotes and join the successful ones
         all_quotes = []
-        for quote in [fedex_result]:
+        all_errors = []
+        for quote in [fedex_result, ups_result]:
             if quote['state'] == 'Success':
                 all_quotes.extend(quote['value'])
+            else:
+                all_errors.extend(quote['value'])
 
         # parse the results and display
-        result = shipping_functions.parse_quotes(all_quotes)
-        return render_template('quote_order.html')
+        quote_content, error_content = shipping_functions.parse_quotes({'quotes':all_quotes, 'errors':all_errors})
+        data = {
+            'order_id': data['order_name'],
+            'country_to': data['shipping_country'],
+            'quote_content': quote_content,
+            'error_content': error_content
+        }
+        return render_template('quote_order.html', data=data)
 
     # if no data then redirect to dashboard as they shouldnt be here
     else:

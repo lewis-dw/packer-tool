@@ -126,9 +126,18 @@ def save_order():
     # we will update the session data with what we got returned from the post form
     data = session.get('data', {})
 
+
     # if there is not session order data then we want to redirect but if there is we can proceed
     if data:
         for key, value in request.form.items():
+            # format value to correct data type that it should be eg str(1.0) -> int(1)
+            value = str(value)
+            if value.replace('.', '').replace(' ', '').isdigit():
+                value = float(value)
+                if value.is_integer():
+                    value = int(value)
+
+
             # order commercial invoice lines
             if key.startswith('line-'):
                 # extract the key name and index from the key
@@ -136,6 +145,7 @@ def save_order():
                 key = key.split('-')[1]
                 index = int(index) - 1
                 data['commercial_invoice_lines'][index][key] = value
+
 
             # order items
             elif key.startswith('item-'):
@@ -145,9 +155,11 @@ def save_order():
                 index = int(index) - 1
                 data['order_items'][index][key] = value
 
+
             # all other values
             else:
                 data[key] = value
+
 
         # reset the session order data and redirect user
         session.clear()

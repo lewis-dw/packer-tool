@@ -34,9 +34,9 @@ def get_auth():
     # if self.token and self.expires_at and time.time() + 60 < self.expires_at:
     #     return self.token
     payload = f"grant_type=client_credentials&client_id={_id}&client_secret={secret}"
-    header = {'Content-Type': "application/x-www-form-urlencoded"}
-    response = requests.post(auth_url, data=payload, headers=header)
-    token = response.json()["access_token"]
+    headers = {'Content-Type': "application/x-www-form-urlencoded"}
+    res = requests.post(auth_url, data=payload, headers=headers).json()
+    token = res["access_token"]
     return token
 
 
@@ -107,7 +107,7 @@ def format_parcels(data, order_id):
                 }
 
                 # if there is insurance on the parcel add it in
-                if invoice_line['parcel_insurance'] > 0.0:
+                if float(invoice_line['parcel_insurance']) > 0.0:
                     parcel_dict["PackageServiceOptions"] = {
                         "DeclaredValue": {
                             "Type": {

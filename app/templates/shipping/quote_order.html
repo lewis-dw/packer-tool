@@ -13,6 +13,23 @@ Quote Order
 
 {% block main %}
 <body>
-    <h1>Hello!</h1>
+    <h1>Quoted [{{ data.order_id }}] to {{ data.country_to }}</h1>
+
+    <div>
+        <h2>Quotes</h2>
+        {{ data.quote_content|safe }}
+    </div>
+
+    <div>
+        <h2>Errors</h2>
+        {{ data.error_content|safe }}
+    </div>
 </body>
+<script>
+    function rowClicked(courier, methodName) {
+        console.log("Courier:", courier);
+        console.log("Method Name:", methodName);
+        window.location.href = `/`;
+    }
+</script>
 {% endblock %}

@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from app.shipper.shipping_functions import verify_line, get_shipping_date, get_country_code
 import json
 import requests
+from requests.auth import HTTPBasicAuth
 
 # generate root_dir for outputting debug files
 cur_dir = pathlib.Path(__file__).parent
@@ -34,9 +35,9 @@ def get_auth():
     # if self.token and self.expires_at and time.time() + 60 < self.expires_at:
     #     return self.token
     payload = f"grant_type=client_credentials"
-    header = {'Content-Type': "application/x-www-form-urlencoded", "x-merchant-id": account_id}
-    response = requests.post(auth_url, data=payload, headers=header)
-    token = response.json()["access_token"]
+    headers = {'Content-Type': "application/x-www-form-urlencoded", "x-merchant-id": account_id}
+    res = requests.post(auth_url, data=payload, headers=headers, auth=HTTPBasicAuth(_id, secret)).json()
+    token = res["access_token"]
     return token
 
 
@@ -94,16 +95,16 @@ def format_parcels(data, _extra=''):
                             "Description": "Dimensions",
                             "Code": "CM"
                         },
-                        "Length": invoice_line['product_length'],
-                        "Width": invoice_line['product_width'],
-                        "Height": invoice_line['product_height']
+                        "Length": str(float(invoice_line['product_length'])),
+                        "Width": str(float(invoice_line['product_width'])),
+                        "Height": str(float(invoice_line['product_height']))
                     },
                     "PackageWeight": {
                         "UnitOfMeasurement": {
-                            "Description": "Weight",
+                            "Description": "Kilograms",
                             "Code": "KGS"
                         },
-                        "Weight": invoice_line['unit_weight']
+                        "Weight": str(float(invoice_line['unit_weight']))
                     }
                 }
 
@@ -194,7 +195,7 @@ def quote_order(data):
     token = get_auth()
 
     # generate parcels and items before creating payload
-    parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
+    parcels = format_parcels(data['commercial_invoice_lines'])
 
     # create the payload and header
     payload = create_quote_payload(data, parcels)
@@ -224,19 +225,19 @@ def quote_order(data):
 
 def parse_response(res):
     # check if we have errors
-    if res.get('errors', '') != '':
+    if res.get('response', '') != '':
         errors = []
-        for error in res['errors']:
-            errors.append(f"{error['code']} - {error['message']}")
+        for error in res['response']['errors']:
+            errors.append({'courier': 'ups', 'error': f"{error['code']} - {error['message']}"})
         return {'state':'Error', 'value':errors}
 
     # no errors? lets go parsing!
     else:
         quotes = []
-        for method in res['output']['rateReplyDetails']:
+        for method in res["RateResponse"]["RatedShipment"]:
             quotes.append({
                 'courier': 'ups',
-                'method_name': method['serviceType'],
-                'cost': method["ratedShipmentDetails"][0]["totalNetCharge"]
+                'method_name': method["Service"]["Code"],
+                'cost': method["NegotiatedRateCharges"]["TotalCharge"]["MonetaryValue"]
             })
         return {'state':'Success', 'value':quotes}
