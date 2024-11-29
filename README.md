@@ -11,3 +11,11 @@ Combined functionality of the scraper tool and the shipper tool.
 - Started planning the project and what needs to be done, pulled my shipper into the project to pull functions from.
 - Need the scraper from Ed to begin looking at the functions in there.
 - Need to plan out all basic functionality properly and meet with Webby to see what functionality he wants.
+
+### 29-11-2024 - v1.5
+- Have begun development and successfully implemented:
+  - Pulling orders from Odoo
+  - Fedex Quoting
+  - UPS Quoting
+- Project versioning is a bit chaotic as I am solo developing this (the other collaborator is my personal GitHub)
+- I will try to update this log as development continues as I have been making large progress with few commits and no updates to this log. (Each Minor update I will update this)
