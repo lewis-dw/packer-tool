@@ -128,50 +128,61 @@ def format_parcels(data, _extra=''):
 # Quoting
 
 
-def create_quote_payload(data, items, parcels):
+def create_quote_payload(data, parcels):
     payload = {
-        "requestedShipment": {
-            "shipper": {
-                "address": {
-                    "city": "Birmingham",
-                    "postalCode": "B112LQ",
-                    "countryCode": "GB",
-                    "residential": False
-                }
-            },
-            "recipient": {
-                "address": {
-                    "city": data['shipping_locality'],
-                    "postalCode": data['shipping_postcode'],
-                    "countryCode": data['shipping_country_id'],
-                    "residential": True
-                }
-            },
-            "shipDateStamp": get_shipping_date('12:00', 1, r'%Y-%m-%d'),
-            "pickupType": "USE_SCHEDULED_PICKUP",
-            "rateRequestType": [
-                "ACCOUNT"
-            ],
-            "customsClearanceDetail": {
-                "dutiesPayment": {
-                    "paymentType": "SENDER",
-                    "payor": {
-                        "responsibleParty": None
+            "RateRequest": {
+                "Request": {
+                    "RequestOption": "Shop",
+                    "TransactionReference": {
+                        "CustomerContext": "CustomerContext"
                     }
                 },
-                "commodities": items
-            },
-            "totalPackageCount": len(parcels),
-            "requestedPackageLineItems": parcels
-        },
-        "accountNumber": {
-            "value": account_id
+                "Shipment": {
+                    "Shipper": {
+                        "Name": "Driftworks",
+                        "ShipperNumber": account_id,
+                        "Address": {
+                            "AddressLine": ["Driftworks", "Unit 7"],
+                            "City": "Birmingham",
+                            "PostalCode": "B112LQ",
+                            "CountryCode": "GB"
+                        }
+                    },
+                    "ShipTo": {
+                        "Name": data['shipping_company'],
+                        "Address": {
+                            "AddressLine": [
+                                data['shipping_street'],
+                                data['shipping_street2'],
+                                data['shipping_region']
+                            ],
+                            "City": data['shipping_locality'],
+                            "PostalCode": data['shipping_postcode'],
+                            "CountryCode": data['shipping_country_id']
+                        }
+                    },
+                    "ShipFrom": {
+                        "Name": "DRIFTWORKS LTD",
+                        "Address": {
+                            "AddressLine": ["Driftworks", "Unit 7"],
+                            "City": "Birmingham",
+                            "PostalCode": "B112LQ",
+                            "CountryCode": "GB"
+                        }
+                    },
+                    "NumOfPieces": len(parcels),
+                    "Package": parcels,
+                    "ShipmentRatingOptions": {
+                        "NegotiatedRatesIndicator": {}
+                    },
+                    "ShipmentServiceOptions": {} # this has some weird SAT indicator mischief going into it but for now just ignore
+                }
+            }
         }
-    }
 
     # if the country code is in this list then it needs state_code which should be present due to earlier data verification
     if data['shipping_country_id'] in ['IE', 'US', 'CA']:
-        payload["requestedShipment"]["recipient"]["address"]["stateOrProvinceCode"] = data.get('shipping_statecode', '')
+        payload["RateRequest"]["Shipment"]["ShipTo"]["Address"]["StateProvinceCode"] = data.get('shipping_statecode', '')
     return payload
 
 
@@ -183,11 +194,10 @@ def quote_order(data):
     token = get_auth()
 
     # generate parcels and items before creating payload
-    items = format_items(data['commercial_invoice_lines'])
     parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
 
     # create the payload and header
-    payload = create_quote_payload(data, items, parcels)
+    payload = create_quote_payload(data, parcels)
     headers = {
         'Content-Type': "application/json",
         'X-locale': "en_US",
