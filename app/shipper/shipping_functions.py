@@ -2,6 +2,14 @@ from pgeocode import Nominatim
 import requests
 import re
 from datetime import datetime, timedelta
+import os
+import pathlib
+import yaml
+
+
+# find the data dir
+cur_dir = pathlib.Path(__file__).parent
+data_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'data'))
 
 
 
@@ -91,13 +99,10 @@ def get_eircode(postcode):
         postal = response.json()["postalAddress"]
         county = str(postal[-1]).upper().replace("CO. ", "")
         county = re.sub(r'\d+', '', county).strip()
-
-        """do a database call here instead of dict lookups"""
-        state_code = 'n/a'
-        return {'state':'Success', 'value':state_code}
+        return {'state':'Success', 'value':county}
 
     except Exception:
-        # bad request error (key invalid or got blocked) and keyerror (no address found) are caught with this
+        # bad request error (key invalid or got blocked) are caught with this
         return {'state':'Error', 'value':'eircode failed'}
 
 
@@ -131,3 +136,17 @@ def find_statecode(data):
         result = get_statecode(country_code, postcode)
 
     return result
+
+
+
+
+
+def get_all_yamls(*yamls):
+    """
+    For each file_name passed in, open the yaml file and return to user
+    """
+    results = []
+    for file_name in yamls:
+        with open(os.path.join(data_dir, f'{file_name}.yaml'), 'r') as file:
+            results.append(yaml.safe_load(file))
+    return results

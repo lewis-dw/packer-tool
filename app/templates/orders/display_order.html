@@ -37,62 +37,62 @@
             <!-- customer details -->
             <div>
                 <label for="shipping_name">Customer Name:</label>
-                <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or 'dw_n/a' }}">
+                <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or '' }}">
 
-                <p>Customer Type: {{ order.customer_pricelist or 'dw_n/a' }}</p>
+                <p>Customer Type: {{ order.customer_pricelist or '' }}</p>
 
                 <label for="customer_email">Customer Email:</label>
-                <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or 'dw_n/a' }}">
+                <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or '' }}">
 
                 <label for="shipping_telephone">Customer Phone Number:</label>
-                <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or 'dw_n/a' }}">
+                <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
 
                 <label for="shipping_company">Company:</label>
-                <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or 'dw_n/a' }}">
+                <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or '' }}">
 
                 <label for="shipping_street">Streetline 1:</label>
-                <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or 'dw_n/a' }}">
+                <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
 
                 <label for="shipping_street2">Streetline 2:</label>
-                <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or 'dw_n/a' }}">
+                <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
 
                 <label for="shipping_locality">Locality:</label>
-                <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or 'dw_n/a' }}">
+                <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
 
                 <label for="shipping_region">Region:</label>
-                <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or 'dw_n/a' }}">
+                <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
 
                 <label for="shipping_postcode">Postcode:</label>
-                <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or 'dw_n/a' }}">
+                <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
 
                 <label for="shipping_country">Country:</label>
-                <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or 'dw_n/a' }}">
+                <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
 
                 <label for="shipping_country_id">Country ID:</label>
-                <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or 'dw_n/a' }}">
+                <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
             </div>
 
 
             <!-- shipping details -->
             <div>
-                <p>Carrier: {{ order.order_carrier_name or 'dw_n/a' }}</p>
-                <p>Customer Paid Shipping: {{ order.shipping_cost or 'dw_n/a' }}</p>
+                <p>Carrier: {{ order.order_carrier_name or '' }}</p>
+                <p>Customer Paid Shipping: {{ order.shipping_cost or '' }}</p>
 
                 <label for="order_total">Total Cost of Order:</label>
-                <input type="text" id="order_total" name="order_total" value="{{ order.order_total or 'dw_n/a' }}">
+                <input type="text" id="order_total" name="order_total" value="{{ order.order_total or '' }}">
 
                 <label for="order_total_tax">Order Tax:</label>
-                <input type="text" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or 'dw_n/a' }}">
+                <input type="text" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or '' }}">
 
                 <label for="order_total_inc_tax">Total Cost inc Tax:</label>
-                <input type="text" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or 'dw_n/a' }}">
+                <input type="text" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '' }}">
             </div>
 
 
             <!-- additional details -->
             <div>
-                <p>Picking Internal Note: {{ order.picking_internal_note or 'dw_n/a' }}</p>
-                <p>Customer Note 1: {{ order.picking_customer_note or 'dw_n/a' }}</p>
+                <p>Picking Internal Note: {{ order.picking_internal_note or '' }}</p>
+                <p>Customer Note 1: {{ order.picking_customer_note or '' }}</p>
             </div>
 
 
@@ -109,17 +109,17 @@
             <div id="billing-info" class="section">
                 <button type="button" onclick="closeSection()">Close</button>
                 <h2>Billing Info</h2>
-                <p>Company: {{ order.billing_company or 'dw_n/a' }}</p>
-                <p>Name: {{ order.billing_name or 'dw_n/a' }}</p>
-                <p>Streetline 1: {{ order.billing_street or 'dw_n/a' }}</p>
-                <p>Streetline 2: {{ order.billing_street2 or 'dw_n/a' }}</p>
-                <p>Locality: {{ order.billing_locality or 'dw_n/a' }}</p>
-                <p>Region: {{ order.billing_region or 'dw_n/a' }}</p>
-                <p>Postcode: {{ order.billing_postcode or 'dw_n/a' }}</p>
-                <p>Country: {{ order.billing_country or 'dw_n/a' }}</p>
-                <p>Country ID: {{ order.billing_country_id or 'dw_n/a' }}</p>
-                <p>Telephone: {{ order.billing_telephone or 'dw_n/a' }}</p>
-                <p>VAT ID: {{ order.billing_vat_id or 'dw_n/a' }}</p>
+                <p>Company: {{ order.billing_company or '' }}</p>
+                <p>Name: {{ order.billing_name or '' }}</p>
+                <p>Streetline 1: {{ order.billing_street or '' }}</p>
+                <p>Streetline 2: {{ order.billing_street2 or '' }}</p>
+                <p>Locality: {{ order.billing_locality or '' }}</p>
+                <p>Region: {{ order.billing_region or '' }}</p>
+                <p>Postcode: {{ order.billing_postcode or '' }}</p>
+                <p>Country: {{ order.billing_country or '' }}</p>
+                <p>Country ID: {{ order.billing_country_id or '' }}</p>
+                <p>Telephone: {{ order.billing_telephone or '' }}</p>
+                <p>VAT ID: {{ order.billing_vat_id or '' }}</p>
             </div>
 
 
@@ -130,25 +130,25 @@
                 {% for item in order.order_items %}
                 <div>
                     <label for="item-product_sku_{{ loop.index }}">Product SKU:</label>
-                    <input type="text" id="item-product_sku_{{ loop.index }}" name="item-product_sku_{{ loop.index }}" value="{{ item.product_sku or 'dw_n/a' }}">
+                    <input type="text" id="item-product_sku_{{ loop.index }}" name="item-product_sku_{{ loop.index }}" value="{{ item.product_sku or '' }}">
 
                     <label for="item-product_name_{{ loop.index }}">Product Name:</label>
-                    <input type="text" id="item-product_name_{{ loop.index }}" name="item-product_name_{{ loop.index }}" value="{{ item.product_name or 'dw_n/a' }}">
+                    <input type="text" id="item-product_name_{{ loop.index }}" name="item-product_name_{{ loop.index }}" value="{{ item.product_name or '' }}">
 
                     <label for="item-line_description_{{ loop.index }}">Description:</label>
-                    <input type="text" id="item-line_description_{{ loop.index }}" name="item-line_description_{{ loop.index }}" value="{{ item.line_description or 'dw_n/a' }}">
+                    <input type="text" id="item-line_description_{{ loop.index }}" name="item-line_description_{{ loop.index }}" value="{{ item.line_description or '' }}">
 
                     <label for="item-product_demand_qty_{{ loop.index }}">Quantity:</label>
-                    <input type="text" id="item-product_demand_qty_{{ loop.index }}" name="item-product_demand_qty_{{ loop.index }}" value="{{ item.product_demand_qty or 'dw_n/a' }}">
+                    <input type="text" id="item-product_demand_qty_{{ loop.index }}" name="item-product_demand_qty_{{ loop.index }}" value="{{ item.product_demand_qty or '' }}">
 
                     <label for="item-product_delivered_qty_{{ loop.index }}">Delivered Quantity:</label>
-                    <input type="text" id="item-product_delivered_qtyy_{{ loop.index }}" name="item-product_delivered_qty_{{ loop.index }}" value="{{ item.product_delivered_qty or 'dw_n/a' }}">
+                    <input type="text" id="item-product_delivered_qtyy_{{ loop.index }}" name="item-product_delivered_qty_{{ loop.index }}" value="{{ item.product_delivered_qty or '' }}">
 
                     <label for="item-product_reserved_qty_{{ loop.index }}">Reserved Quantity:</label>
-                    <input type="text" id="item-product_reserved_qty_{{ loop.index }}" name="item-product_reserved_qty_{{ loop.index }}" value="{{ item.product_reserved_qty or 'dw_n/a' }}">
+                    <input type="text" id="item-product_reserved_qty_{{ loop.index }}" name="item-product_reserved_qty_{{ loop.index }}" value="{{ item.product_reserved_qty or '' }}">
 
                     <label for="item-line_picking_state_{{ loop.index }}">Picking State:</label>
-                    <input type="text" id="item-line_picking_state_{{ loop.index }}" name="item-line_picking_state_{{ loop.index }}" value="{{ item.line_picking_state or 'dw_n/a' }}">
+                    <input type="text" id="item-line_picking_state_{{ loop.index }}" name="item-line_picking_state_{{ loop.index }}" value="{{ item.line_picking_state or '' }}">
                 </div>
                 {% else %}
                     <p>No items found</p>
@@ -163,27 +163,27 @@
                 {% for line in order.commercial_invoice_lines %}
                 <div>
                     <label for="line-product_sku_{{ loop.index }}">Product SKU:</label>
-                    <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or 'dw_n/a' }}">
+                    <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}">
 
                     <label for="line-product_name_{{ loop.index }}">Product Name:</label>
-                    <input type="text" id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}" value="{{ line.product_name or 'dw_n/a' }}">
+                    <input type="text" id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}" value="{{ line.product_name or '' }}">
 
-                    <p>Options: {{ line.product_options or 'dw_n/a' }}</p>
+                    <p>Options: {{ line.product_options or '' }}</p>
 
                     <label for="line-commodity_code_{{ loop.index }}">Commodity Code:</label>
-                    <input type="text" id="line-commodity_code_{{ loop.index }}" name="line-commodity_code_{{ loop.index }}" value="{{ line.commodity_code or 'dw_n/a' }}">
+                    <input type="text" id="line-commodity_code_{{ loop.index }}" name="line-commodity_code_{{ loop.index }}" value="{{ line.commodity_code or '' }}">
 
                     <label for="line-country_of_manufacture_{{ loop.index }}">Country of Manufacture:</label>
-                    <input type="text" id="line-country_of_manufacture_{{ loop.index }}" name="line-country_of_manufacture_{{ loop.index }}" value="{{ line.country_of_manufacture or 'dw_n/a' }}">
+                    <input type="text" id="line-country_of_manufacture_{{ loop.index }}" name="line-country_of_manufacture_{{ loop.index }}" value="{{ line.country_of_manufacture or '' }}">
 
                     <label for="line-product_demand_qty_{{ loop.index }}">Quantity:</label>
-                    <input type="text" id="line-product_demand_qty_{{ loop.index }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or 'dw_n/a' }}">
+                    <input type="text" id="line-product_demand_qty_{{ loop.index }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}">
 
                     <label for="line-unit_price_{{ loop.index }}">Unit Price:</label>
-                    <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or 'dw_n/a' }}">
+                    <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}">
 
                     <label for="line-line_price_{{ loop.index }}">Line Price:</label>
-                    <input type="text" id="line-line_price_{{ loop.index }}" name="line-line_price_{{ loop.index }}" value="{{ line.line_price or 'dw_n/a' }}">
+                    <input type="text" id="line-line_price_{{ loop.index }}" name="line-line_price_{{ loop.index }}" value="{{ line.line_price or '' }}">
                 </div>
                 {% else %}
                     <p>No items found</p>

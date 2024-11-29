@@ -1,0 +1,95 @@
+# USA
+AL: Alabama
+AK: Alaska
+AZ: Arizona
+AR: Arkansas
+CA: California
+CO: Colorado
+CT: Connecticut
+DE: Delaware
+FL: Florida
+GA: Georgia
+HI: Hawaii
+ID: Idaho
+IL: Illinois
+IN: Indiana
+IA: Iowa
+KS: Kansas
+KY: Kentucky
+LA: Louisiana
+ME: Maine
+MD: Maryland
+MA: Massachusetts
+MI: Michigan
+MN: Minnesota
+MS: Mississippi
+MO: Missouri
+MT: Montana
+NE: Nebraska
+NV: Nevada
+NH: New Hampshire
+NJ: New Jersey
+NM: New Mexico
+NY: New York
+NC: North Carolina
+ND: North Dakota
+OH: Ohio
+OK: Oklahoma
+OR: Oregon
+PA: Pennsylvania
+RI: Rhode Island
+SC: South Carolina
+SD: South Dakota
+TN: Tennessee
+TX: Texas
+UT: Utah
+VT: Vermont
+VA: Virginia
+WA: Washington
+WV: West Virginia
+WI: Wisconsin
+WY: Wyoming
+
+# Canada
+AB: Alberta
+BC: British Columbia
+MB: Manitoba
+NB: New Brunswick
+NL: Newfoundland and Labrador
+NS: Nova Scotia
+NT: Northwest Territories
+NU: Nunavut
+ON: Ontario
+PE: Prince Edward Island
+QC: Quebec
+SK: Saskatchewan
+YT: Yukon
+
+# Ireland
+N0: Carlow
+N1: Cavan
+N2: Clare
+N3: Cork
+N4: Donegal
+N5: Dublin
+N6: Galway
+N7: Kerry
+N8: Kildare
+N9: Kilkenny
+NA: Laois
+NG: Leitrim
+NI: Limerick
+NK: Longford
+NL: Louth
+NN: Mayo
+NO: Meath
+NP: Monaghan
+NQ: Offaly
+NR: Roscommon
+NW: Sligo
+NX: Tipperary North
+NY: Tipperary South
+NZ: Waterford
+10: Westmeath
+11: Wexford
+12: Wicklow

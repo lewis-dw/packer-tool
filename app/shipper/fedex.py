@@ -122,7 +122,7 @@ def create_payload(data, items, parcels):
                     "city": "Birmingham",
                     "postalCode": "B112LQ",
                     "countryCode": "GB",
-                    "residential": "false"
+                    "residential": False
                 }
             },
             "recipient": {
@@ -130,7 +130,7 @@ def create_payload(data, items, parcels):
                     "city": data['shipping_locality'],
                     "postalCode": data['shipping_postcode'],
                     "countryCode": data['shipping_country_id'],
-                    "residential": "true"
+                    "residential": True
                 }
             },
             "shipDateStamp": get_shipping_date('16:00', 1, r'%Y-%m-%d'),
@@ -142,7 +142,7 @@ def create_payload(data, items, parcels):
                 "dutiesPayment": {
                     "paymentType": "SENDER",
                     "payor": {
-                        "responsibleParty": "null"
+                        "responsibleParty": None
                     }
                 },
                 "commodities": items

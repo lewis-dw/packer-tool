@@ -1,11 +1,17 @@
 from flask import Blueprint, request, redirect, render_template, session, url_for
-from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.shipper import fedex, ups, shipping_functions
+import yaml
+import os
+import pathlib
 
 """
 These routes are used for quoting and shipping an order
 """
 shipping = Blueprint('shipping', __name__, template_folder='templates/shipping')
+
+
+# run this to get all the jsons we want
+state_codes, province_lookup = shipping_functions.get_all_yamls('state_codes', 'province_lookup')
 
 
 
@@ -36,8 +42,10 @@ Allow user to select the correct statecode for country code
 @shipping.route('/select_statecode')
 def select_statecode():
     data = session.get('data', {})
+
+    # if data exists then load the page and pass in all the statecodes to choose from
     if data:
-        return render_template('select_statecode.html')
+        return render_template('select_statecode.html', codes=state_codes)
     else:
         return redirect('/')
 
@@ -55,9 +63,18 @@ def verify_data():
     if data:
         # need to check if the data needs a shipping statecode and doesnt have one assigned yet
         if data['shipping_country_id'] in ['IE', 'US', 'CA'] and data.get('shipping_statecode', '') == '':
+            # find state code
             result = shipping_functions.find_statecode(data)
             if result['state'] == 'Success':
-                data['shipping_statecode'] = result['value']
+                # extract state code
+                state_code = result['value']
+
+                # if it was ireland we need to translate the result
+                if data['shipping_country_id'] == 'IE':
+                    state_code = province_lookup[state_code]
+
+                # set statecode in the order data
+                data['shipping_statecode'] = state_code
             else:
                 # redirect user to the statecode setter page
                 return redirect(url_for('shipping.select_statecode'))

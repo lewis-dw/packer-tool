@@ -21,7 +21,7 @@ def create_app():
 
 
     # secret key
-    app.secret_key = os.getenv('API_KEY')
+    app.secret_key = os.getenv('SECRET_KEY')
 
 
     # Import and register blueprints
