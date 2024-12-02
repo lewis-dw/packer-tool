@@ -216,7 +216,10 @@ def parse_response(res):
     if res.get('errors', '') != '':
         errors = []
         for error in res['errors']:
-            errors.append(f"{error['code']} - {error['message']}")
+            errors.append({
+                'courier': 'fedex',
+                'error': f"{error['code']} - {error['message']}"
+            })
         return {'state':'Error', 'value':errors}
 
     # no errors? lets go parsing!

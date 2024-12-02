@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, render_template, session, url_for
+from flask import Blueprint, request, redirect, render_template, session, url_for, flash
 from app.odoo.api import get_orders, get_specific_order, clean_data
 
 """
@@ -85,7 +85,7 @@ def load_order():
         data = clean_data(data)
 
         # set session 'data' to the order data
-        session['data'] = data
+        session['order_data'] = data
 
         # finally redirect them to the display order page
         return redirect(url_for('orders.display_order'))
@@ -103,17 +103,13 @@ Get and display all info about the order
 """
 @orders.route('/display_order')
 def display_order():
-    # these are the key cols that are not allowed to be empty
-    key_cols = {
-        'shipping_street': ''
-    }
-
     # get the currently loaded data from flask session
-    data = session.get('data', {})
+    data = session.get('order_data', {})
+    errors = session.pop('required_fields', {})
 
     # if there is data then display it to user
     if data:
-        return render_template('display_order.html', order=data, errors=key_cols)
+        return render_template('display_order.html', order=data, errors=errors)
 
     # if user tried to load the page with no data in the session then they need to be redirected back to the dashboard
     else:
@@ -130,12 +126,18 @@ Save the currently loaded data from the 'display order' page
 def save_order():
     # these are the key cols that are not allowed to be empty
     key_cols = {
-        'shipping_street': ''
+        # shipping info
+        'shipping_street': '',
+        'shipping_postcode': '',
+
+        # invoice lines
+        'product_sku': '',
+        'unit_price': ''
     }
     missing_vals = False
 
     # we will update the session data with what we got returned from the post form
-    data = session.get('data', {})
+    data = session.get('order_data', {})
 
 
     # if there is not session order data then we want to redirect but if there is we can proceed
@@ -170,12 +172,17 @@ def save_order():
 
         # if there were missing values then we need to re-render the page with the missing cols highlighted
         if missing_vals:
-            return render_template('display_order.html', order=data, errors=key_cols)
+            session['required_fields'] = key_cols
+            session['order_data'] = data
+            for field, message in key_cols.items():
+                if message == 'Required':
+                    flash(f"{field.replace('_', ' ').capitalize()} is required.", "error")
+            return redirect(url_for('orders.display_order'))
 
         # if all required fields were entered then delete all current order data and resave the updated data and redirect user
         else:
             session.clear()
-            session['data'] = data
+            session['order_data'] = data
             return redirect(url_for('shipping.quote_order'))
     else:
         return redirect('/')

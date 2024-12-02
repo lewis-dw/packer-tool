@@ -20,10 +20,10 @@ Handle what the user selected as the statecode
 @shipping.route('/handle_statecode', methods=['POST'])
 def handle_statecode():
     # get the result of user selecting statecode
-    data = session.get('data', {})
+    data = session.get('order_data', {})
     if data:
         data['shipping_statecode'] = request.form.get('order_id')
-        session['data'] = data
+        session['order_data'] = data
         redirect_dest = session.get('verify_from', '/')
         return redirect(url_for(f'shipping.{redirect_dest}'))
     else:
@@ -38,7 +38,7 @@ Allow user to select the correct statecode for country code
 """
 @shipping.route('/select_statecode')
 def select_statecode():
-    data = session.get('data', {})
+    data = session.get('order_data', {})
 
     # if data exists then load the page and pass in all the statecodes to choose from
     if data:
@@ -56,7 +56,7 @@ Redirect used to verify the data is valid and has all values it needs to be proc
 @shipping.route('/verify_data')
 def verify_data():
     # get order data from session and verify it exists
-    data = session.get('data', {})
+    data = session.get('order_data', {})
     if data:
         # need to check if the data needs a shipping statecode and doesnt have one assigned yet
         if data['shipping_country_id'] in ['IE', 'US', 'CA'] and data.get('shipping_statecode', '') == '':
@@ -79,7 +79,7 @@ def verify_data():
 
         # after finishing set the dw_verified state and update the order data in the session var
         data['dw_verified'] = 'True'
-        session['data'] = data
+        session['order_data'] = data
 
     # if no data then redirect to dashboard as they shouldnt be here
     else:
@@ -99,7 +99,7 @@ Display the results of quoting the order
 @shipping.route('/quote_order')
 def quote_order():
     # get the currently loaded data from flask session
-    data = session.get('data', {})
+    data = session.get('order_data', {})
 
 
     # if there is data then display it to user

@@ -38,7 +38,7 @@
 
                 <label for="shipping_street">Streetline 1:</label>
                 <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
-                {% if errors.shipping_street %}<span class="missing">Required</span>{% endif %}
+                {% if errors.get('shipping_street') %}<span class="missing">Required</span>{% endif %}
 
                 <label for="shipping_street2">Streetline 2:</label>
                 <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
@@ -51,6 +51,7 @@
 
                 <label for="shipping_postcode">Postcode:</label>
                 <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
+                {% if errors.get('shipping_postcode') %}<span class="missing">Required</span>{% endif %}
 
                 <label for="shipping_country">Country:</label>
                 <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
@@ -138,6 +139,7 @@
                 <div>
                     <label for="line-product_sku_{{ loop.index }}">Product SKU:</label>
                     <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}">
+                    {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
 
                     <label for="line-product_name_{{ loop.index }}">Product Name:</label>
                     <input type="text" id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}" value="{{ line.product_name or '' }}">
@@ -155,6 +157,7 @@
 
                     <label for="line-unit_price_{{ loop.index }}">Unit Price:</label>
                     <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}">
+                    {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
 
                     <label for="line-line_price_{{ loop.index }}">Line Price:</label>
                     <input type="text" id="line-line_price_{{ loop.index }}" name="line-line_price_{{ loop.index }}" value="{{ line.line_price or '' }}">

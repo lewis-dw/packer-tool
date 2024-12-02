@@ -235,8 +235,9 @@ def parse_quotes(data):
 
     # parse errors
     if data['errors']:
+        print(data['errors'])
         # one liner to construct the error table - hard to debug? just never get an error
-        table_html = [table_html.append(f"<tr><td>{error['courier']}</td><td>{error['error']}</td></tr>") for error in data['errors']]
+        table_html = [f"<tr><td>{error['courier']}</td><td>{error['error']}</td></tr>" for error in data['errors']]
         error_content = ''.join([
             '<table>',
             '<thead><tr><th>Courier</th><th>Error</th></tr></thead>',

@@ -25,7 +25,7 @@ tr:hover {
     padding: 20px;
     box-sizing: border-box;
 }
-.error{
+.missing{
     color: red;
     font-size: 0.9em;
 }
