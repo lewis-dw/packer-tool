@@ -147,8 +147,15 @@ def parse_product_description(description):
 
 
 def clean_data(data):
-    # need to extract the product options from the product description
+    # loop over commerical invoice items and clean them up
+    commercial_invoice = []
     for line in data['commercial_invoice_lines']:
+        # need to extract the product options from the product description
         line['product_options'] = parse_product_description(line['line_description'])
+
+        # need to remove the shipping method from the commercial invoice
+        if line['product_name'] != data['order_carrier_name']:
+            commercial_invoice.append(line)
+    data['commercial_invoice_lines'] = commercial_invoice
 
     return data

@@ -29,29 +29,6 @@ def join_url(*url_parts):
 
 
 
-def verify_lineold(name):
-    """
-    If any of the bad keywords are present in the name then return False
-    """
-    keywords = [
-        'Shipping - Priority Courier Delivery'
-    ]
-    if any(keyword.lower() in name.lower() for keyword in keywords):
-        return False
-    return True
-
-def verify_line(sku):
-    """
-    If any of the bad keywords are present in the name then return False
-    """
-    if sku == '':
-        return False
-    return True
-
-
-
-
-
 def get_shipping_date(end_time, days_penalty, date_format):
     """
     Gets the ship date for a quote/ship call

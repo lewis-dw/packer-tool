@@ -1,7 +1,7 @@
 import os
 import pathlib
 from dotenv import load_dotenv
-from app.shipper.shipping_functions import verify_line, get_shipping_date, get_country_code
+from app.shipper.shipping_functions import get_shipping_date, get_country_code
 import json
 import requests
 from requests.auth import HTTPBasicAuth
@@ -48,26 +48,24 @@ def format_items(data):
     # loop over the invoice lines to create each item
     all_items = []
     for invoice_line in data:
-        # we need to only add commodity items for actual products not the shipping
-        if verify_line(invoice_line['product_sku']):
-            item_dict = {
-                "PartNumber": invoice_line["product_sku"][:35],
-                "Description": invoice_line["product_name"][:35],
-                "Unit": {
-                    "Value": invoice_line["unit_price"],
-                    "Number": invoice_line["product_demand_qty"],
-                    "UnitOfMeasurement": {
-                        "Code": "EA"
-                    }
-                },
-                "CommodityCode": invoice_line["commodity_code"],
-                "OriginCountryCode": get_country_code(invoice_line["country_of_manufacture"]),
-                "PackageWeight": {
-                    "UnitOfMeasurement": "KGS",
-                    "Weight": max(float(invoice_line["unit_weight"]), 1)
-                },
-            }
-            all_items.append(item_dict)
+        item_dict = {
+            "PartNumber": invoice_line["product_sku"][:35],
+            "Description": invoice_line["product_name"][:35],
+            "Unit": {
+                "Value": invoice_line["unit_price"],
+                "Number": invoice_line["product_demand_qty"],
+                "UnitOfMeasurement": {
+                    "Code": "EA"
+                }
+            },
+            "CommodityCode": invoice_line["commodity_code"],
+            "OriginCountryCode": get_country_code(invoice_line["country_of_manufacture"]),
+            "PackageWeight": {
+                "UnitOfMeasurement": "KGS",
+                "Weight": max(float(invoice_line["unit_weight"]), 1)
+            },
+        }
+        all_items.append(item_dict)
     return all_items
 
 
@@ -78,50 +76,48 @@ def format_parcels(data, _extra=''):
     # loop over the invoice lines
     all_parcels = []
     for invoice_line in data:
-        # we need to only create parcels for actual products not the shipping
-        if verify_line(invoice_line['product_sku']):
-            # loop over the number of parcels that a required for the invoice line
-            parcels_extend = []
-            for _ in range(int(float(invoice_line['product_demand_qty']))):
-                # generate the parcel
-                parcel_dict = {
-                    "Description": "Products from Driftworks",
-                    f"PackagingType{_extra}": {
-                        "Code": "02",
-                        "Description": ""
+        # loop over the number of parcels that a required for the invoice line
+        parcels_extend = []
+        for _ in range(int(float(invoice_line['product_demand_qty']))):
+            # generate the parcel
+            parcel_dict = {
+                "Description": "Products from Driftworks",
+                f"PackagingType{_extra}": {
+                    "Code": "02",
+                    "Description": ""
+                },
+                "Dimensions": {
+                    "UnitOfMeasurement": {
+                        "Description": "Dimensions",
+                        "Code": "CM"
                     },
-                    "Dimensions": {
-                        "UnitOfMeasurement": {
-                            "Description": "Dimensions",
-                            "Code": "CM"
-                        },
-                        "Length": str(float(invoice_line['product_length'])),
-                        "Width": str(float(invoice_line['product_width'])),
-                        "Height": str(float(invoice_line['product_height']))
+                    "Length": str(float(invoice_line['product_length'])),
+                    "Width": str(float(invoice_line['product_width'])),
+                    "Height": str(float(invoice_line['product_height']))
+                },
+                "PackageWeight": {
+                    "UnitOfMeasurement": {
+                        "Description": "Kilograms",
+                        "Code": "KGS"
                     },
-                    "PackageWeight": {
-                        "UnitOfMeasurement": {
-                            "Description": "Kilograms",
-                            "Code": "KGS"
+                    "Weight": str(float(invoice_line['unit_weight']))
+                }
+            }
+
+            # if there is insurance on the parcel add it in
+            if invoice_line['parcel_insurance'] > 0.0:
+                parcel_dict["PackageServiceOptions"] = {
+                    "DeclaredValue": {
+                        "Type": {
+                            "Code": "01"
                         },
-                        "Weight": str(float(invoice_line['unit_weight']))
+                        "MonetaryValue": invoice_line['parcel_insurance'],
+                        "CurrencyCode": "GBP"
                     }
                 }
 
-                # if there is insurance on the parcel add it in
-                if invoice_line['parcel_insurance'] > 0.0:
-                    parcel_dict["PackageServiceOptions"] = {
-                        "DeclaredValue": {
-                            "Type": {
-                                "Code": "01"
-                            },
-                            "MonetaryValue": invoice_line['parcel_insurance'],
-                            "CurrencyCode": "GBP"
-                        }
-                    }
-
-                parcels_extend.append(parcel_dict)
-            all_parcels.extend(parcels_extend)
+            parcels_extend.append(parcel_dict)
+        all_parcels.extend(parcels_extend)
     return all_parcels
 
 
