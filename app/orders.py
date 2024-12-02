@@ -103,12 +103,17 @@ Get and display all info about the order
 """
 @orders.route('/display_order')
 def display_order():
+    # these are the key cols that are not allowed to be empty
+    key_cols = {
+        'shipping_street': ''
+    }
+
     # get the currently loaded data from flask session
     data = session.get('data', {})
 
     # if there is data then display it to user
     if data:
-        return render_template('display_order.html', order=data)
+        return render_template('display_order.html', order=data, errors=key_cols)
 
     # if user tried to load the page with no data in the session then they need to be redirected back to the dashboard
     else:
@@ -123,6 +128,12 @@ Save the currently loaded data from the 'display order' page
 """
 @orders.route('/save_order', methods=['POST'])
 def save_order():
+    # these are the key cols that are not allowed to be empty
+    key_cols = {
+        'shipping_street': ''
+    }
+    missing_vals = False
+
     # we will update the session data with what we got returned from the post form
     data = session.get('data', {})
 
@@ -141,29 +152,30 @@ def save_order():
             # order commercial invoice lines
             if key.startswith('line-'):
                 # extract the key name and index from the key
-                key, index = key.rsplit('_', 1)
-                key = key.split('-')[1]
+                true_key, index = key.rsplit('_', 1)
+                true_key = true_key.split('-')[1]
                 index = int(index) - 1
-                data['commercial_invoice_lines'][index][key] = value
-
-
-            # order items
-            elif key.startswith('item-'):
-                # extract the key name and index from the key
-                key, index = key.rsplit('_', 1)
-                key = key.split('-')[1]
-                index = int(index) - 1
-                data['order_items'][index][key] = value
-
+                data['commercial_invoice_lines'][index][true_key] = value
 
             # all other values
             else:
+                true_key = key
                 data[key] = value
 
+            # if the key was a key col and the value was empty then need to update the missing cols
+            if true_key in key_cols.keys() and value == '':
+                missing_vals = True
+                key_cols[key] = 'Required'
 
-        # reset the session order data and redirect user
-        session.clear()
-        session['data'] = data
-        return redirect(url_for('shipping.quote_order'))
+
+        # if there were missing values then we need to re-render the page with the missing cols highlighted
+        if missing_vals:
+            return render_template('display_order.html', order=data, errors=key_cols)
+
+        # if all required fields were entered then delete all current order data and resave the updated data and redirect user
+        else:
+            session.clear()
+            session['data'] = data
+            return redirect(url_for('shipping.quote_order'))
     else:
         return redirect('/')

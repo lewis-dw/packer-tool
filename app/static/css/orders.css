@@ -10,3 +10,22 @@ tr:hover {
     background-color: #f1f1f1;
     cursor: pointer;
 }
+
+
+.section {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    overflow: auto;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.error{
+    color: red;
+    font-size: 0.9em;
+}

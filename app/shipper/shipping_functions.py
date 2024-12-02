@@ -29,14 +29,22 @@ def join_url(*url_parts):
 
 
 
-def verify_line(name):
+def verify_lineold(name):
     """
     If any of the bad keywords are present in the name then return False
     """
     keywords = [
-        ' fedex ', ' ups '
+        'Shipping - Priority Courier Delivery'
     ]
-    if any(keyword in f' {name} '.lower() for keyword in keywords):
+    if any(keyword.lower() in name.lower() for keyword in keywords):
+        return False
+    return True
+
+def verify_line(sku):
+    """
+    If any of the bad keywords are present in the name then return False
+    """
+    if sku == '':
         return False
     return True
 
@@ -201,6 +209,7 @@ def parse_quotes(data):
         # loop over the quotes after sorting and build up a html table
         table_html = []
         for quote in quotes:
+            print(quote)
             courier = quote['courier'].upper()
             method_name = quote['method_name']
             cost = quote['cost']

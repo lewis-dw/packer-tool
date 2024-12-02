@@ -12,7 +12,7 @@ debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 # load env variables and set if using live or test
 load_dotenv()
 prefix = 'TEST_'
-prefix = ''
+# prefix = ''
 
 # get the url parts
 auth_url = os.getenv(f'{prefix}FEDEX_OAUTH_URL')
@@ -48,7 +48,7 @@ def format_items(data):
     all_items = []
     for invoice_line in data:
         # we need to only add commodity items for actual products not the shipping
-        if verify_line(invoice_line['product_name']):
+        if verify_line(invoice_line['product_sku']):
             item_dict = {
                 "name": invoice_line["product_sku"][:35],
                 "description": invoice_line["product_name"][:35],
@@ -81,7 +81,7 @@ def format_parcels(data, order_id):
     all_parcels = []
     for invoice_line in data:
         # we need to only create parcels for actual products not the shipping
-        if verify_line(invoice_line['product_name']):
+        if verify_line(invoice_line['product_sku']):
             # loop over the number of parcels that a required for the invoice line
             parcels_extend = []
             for _ in range(int(float(invoice_line['product_demand_qty']))):
