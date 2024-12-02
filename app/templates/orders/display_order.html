@@ -19,6 +19,7 @@
         <h1>Order Details [{{ order.order_name }}]</h1>
         <form method="POST" action="{{ url_for('orders.save_order') }}">
             <input type="hidden" name="order_id" value="{{ order.order_name }}">
+            <input type="hidden" id="action_type" name="action_type" value="not set">
 
             <!-- customer details -->
             <div>
@@ -64,7 +65,7 @@
             <!-- shipping details -->
             <div>
                 <p>Carrier: {{ order.order_carrier_name or '' }}</p>
-                <p>Customer Paid Shipping: {{ order.shipping_cost or '' }}</p>
+                <p>Customer Paid Shipping: £{{ order.shipping_cost or '0.0' }}</p>
 
                 <label for="order_total">Total Cost of Order:</label>
                 <input type="text" id="order_total" name="order_total" value="{{ order.order_total or '' }}">
@@ -159,8 +160,21 @@
                     <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}">
                     {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
 
-                    <label for="line-line_price_{{ loop.index }}">Line Price:</label>
-                    <input type="text" id="line-line_price_{{ loop.index }}" name="line-line_price_{{ loop.index }}" value="{{ line.line_price or '' }}">
+                    <label for="line-unit_weight_{{ loop.index }}">Unit Weight:</label>
+                    <input type="text" id="line-unit_weight_{{ loop.index }}" name="line-unit_weight_{{ loop.index }}" value="{{ line.unit_weight or '' }}">
+                    {% if errors.get('line-unit_weight_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+
+                    <label for="line-product_height_{{ loop.index }}">Unit Height:</label>
+                    <input type="text" id="line-product_height_{{ loop.index }}" name="line-product_height_{{ loop.index }}" value="{{ line.product_height or '' }}">
+                    {% if errors.get('line-product_height_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+
+                    <label for="line-product_width_{{ loop.index }}">Unit Width:</label>
+                    <input type="text" id="line-product_width_{{ loop.index }}" name="line-product_width_{{ loop.index }}" value="{{ line.product_width or '' }}">
+                    {% if errors.get('line-product_width_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+
+                    <label for="line-product_length_{{ loop.index }}">Unit Length:</label>
+                    <input type="text" id="line-product_length_{{ loop.index }}" name="line-product_length_{{ loop.index }}" value="{{ line.product_length or '' }}">
+                    {% if errors.get('line-product_length_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
 
                     <label for="line-parcel_insurance_{{ loop.index }}">Parcel Insurance:</label>
                     <input type="text" id="line-parcel_insurance_{{ loop.index }}" name="line-parcel_insurance_{{ loop.index }}" value=0>
@@ -169,11 +183,20 @@
                     <p>No items found</p>
                 {% endfor %}
             </div>
-            <button type="submit">Quote</button>
+            <button type="submit" onclick="setActionType('quote')">Quote</button>
+            <button type="submit" onclick="setActionType('ship')">Ship</button>
         </form>
     </div>
 
     <script>
+        // Function to set the action type based on which button was clicked when submitting the form
+        function setActionType(action) {
+            const actionTypeField = document.getElementById('action_type');
+            actionTypeField.value = action;
+        }
+
+
+        // Function for toggling the visibility of a div
         function toggleSection(sectionId) {
             // Hide all sections
             const sections = document.querySelectorAll('.section');
@@ -184,6 +207,8 @@
             section.style.display = 'block';
         }
 
+
+        // Function for closing a section
         function closeSection() {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.style.display = 'none');

@@ -212,14 +212,14 @@ def quote_order(data):
         json.dump(res.json(), f, indent=4)
 
     # parse the result and return
-    quotes = parse_response(res.json())
+    quotes = parse_quote_response(res.json())
     return quotes
 
 
 
 
 
-def parse_response(res):
+def parse_quote_response(res):
     # check if we have errors
     if res.get('response', '') != '':
         errors = []
@@ -240,3 +240,7 @@ def parse_response(res):
                 'cost': method["NegotiatedRateCharges"]["TotalCharge"]["MonetaryValue"]
             })
         return {'state':'Success', 'value':quotes}
+
+
+###########################################################################################################################################
+# Shipping

@@ -1,10 +1,15 @@
 from flask import Blueprint, request, redirect, render_template, session, url_for, flash
 from app.odoo.api import get_orders, get_specific_order, clean_data
+from app.shipper import shipping_functions
 
 """
 These routes are used for when getting orders from odoo
 """
 orders = Blueprint('orders', __name__, template_folder='templates/orders', static_folder='static')
+
+
+# we want to load our yamls into json format
+state_codes = shipping_functions.get_all_yamls('state_codes')
 
 
 
@@ -66,33 +71,77 @@ def get_manual_entry():
 
 
 """
+Allow user to select the correct statecode for country code
+"""
+@orders.route('/select_statecode')
+def select_statecode():
+    data = session.get('partial_order_data', {})
+
+    # if data exists then load the page and pass in all the statecodes to choose from
+    if data:
+        return render_template('select_statecode.html', codes=state_codes)
+    else:
+        return redirect('/')
+
+
+
+
+
+"""
 Clean the order data before saving it to current session
 """
-@orders.route('/load_order')
+@orders.route('/load_order', methods=['GET', 'POST'])
 def load_order():
-    # get the order_id from query
-    order_id = request.args.get('order_id')
+    # load the data in via an api call and attempt to do the initial clean
+    if request.method == 'GET':
+        # get the order_id from query
+        order_id = request.args.get('order_id')
 
-    # attempt to load the data on the order via its id
-    status, data = get_specific_order(order_id)
+        # attempt to load the data on the order via its id
+        status, data = get_specific_order(order_id)
 
-    # on success then we need to run some cleaning functions on it before storing it in a flask session
-    if status == 'Success':
-        # rename the items key as it causes issues
-        data['order_items'] = data.pop('items')
+        # on success then we need to run some cleaning functions on it before storing it in a flask session
+        if status == 'Success':
+            # rename the items key as it causes issues
+            data['order_items'] = data.pop('items')
 
-        # clean the data up
-        data = clean_data(data)
+            # clean the data up
+            data = clean_data(data)
 
-        # set session 'data' to the order data
-        session['order_data'] = data
+            # if the statecode retrieval failed then the user needs to do it manually
+            if data['shipping_statecode'] == 'manual':
+                session['partial_order_data'] = data
+                return redirect(url_for('orders.select_statecode'))
 
-        # finally redirect them to the display order page
-        return redirect(url_for('orders.display_order'))
+        # on fail we want to display to the user the error of their ways
+        else:
+            return render_template('no_order_found.html', order_id=order_id)
 
-    # if it errored then redirect to the no order found error page
+
+    # alternatively if the method to access this page was via a post request then it means they are already after the initial clean but the statecode retrieval failed
+    elif request.method == 'POST':
+        # load the partial_order_data back and get the selected statecode
+        data = session.get('partial_order_data', {})
+
+        # if there was no data then redirect user to dashboard
+        if not data:
+            session.clear()
+            return redirect('/')
+
+        # if there was data then save the selected statecode and continue
+        else:
+            data['shipping_statecode'] = request.form.get('state_code')
+
+
+    # not sure how the user would trigger this but we need to catch it before we continue
     else:
-        return render_template('no_order_found.html', order_id=order_id)
+        return redirect('/')
+
+
+    # once the data is all cleaned and stuff we want to clear the current session data and save the data
+    session.clear()
+    session['order_data'] = data
+    return redirect(url_for('orders.display_order'))
 
 
 
@@ -132,16 +181,22 @@ def save_order():
 
         # invoice lines
         'product_sku': '',
-        'unit_price': ''
+        'unit_price': '',
+        'unit_weight':'',
+        'product_height':'',
+        'product_width':'',
+        'product_length':'',
+
     }
     missing_vals = False
 
     # we will update the session data with what we got returned from the post form
     data = session.get('order_data', {})
+    action_type = request.form.get('action_type')
 
 
     # if there is not session order data then we want to redirect but if there is we can proceed
-    if data:
+    if data and action_type != 'not set':
         for key, value in request.form.items():
             # format value to correct data type that it should be eg str(1.0) -> int(1)
             value = str(value)
@@ -169,20 +224,17 @@ def save_order():
                 missing_vals = True
                 key_cols[key] = 'Required'
 
+        # update session order data regardless if they are missing data or not
+        session.clear()
+        session['order_data'] = data
 
         # if there were missing values then we need to re-render the page with the missing cols highlighted
         if missing_vals:
             session['required_fields'] = key_cols
-            session['order_data'] = data
-            for field, message in key_cols.items():
-                if message == 'Required':
-                    flash(f"{field.replace('_', ' ').capitalize()} is required.", "error")
             return redirect(url_for('orders.display_order'))
 
         # if all required fields were entered then delete all current order data and resave the updated data and redirect user
         else:
-            session.clear()
-            session['order_data'] = data
-            return redirect(url_for('shipping.quote_order'))
+            return redirect(url_for('shipping.process_data', action_type=action_type))
     else:
         return redirect('/')

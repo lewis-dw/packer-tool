@@ -4,6 +4,8 @@ import os
 import pathlib
 from dotenv import load_dotenv
 import re
+from pgeocode import Nominatim
+from app.shipper import shipping_functions
 
 
 # load .env variables
@@ -15,6 +17,10 @@ main_headers = {"api_key": os.getenv('API_KEY')}
 # vars
 cur_dir = pathlib.Path(__file__).parent
 debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
+
+
+# load yamls
+province_lookup = shipping_functions.get_all_yamls('province_lookup')
 
 
 ###########################################################################################################################################
@@ -143,10 +149,76 @@ def parse_product_description(description):
 
 
 
+def get_eircode(postcode):
+    """
+    Returns the Irish county for a given postcode
+    """
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
+
+    # get session key for eircode website
+    url = "https://api-finder.eircode.ie/Latest/findergetidentity"
+    res = requests.get(url, headers=headers)
+    key = res.json().get('key', '')
+
+    # send post code to the eircode website
+    if key:
+        payload = {
+            "key": key,
+            "address": postcode,
+            "language": "en",
+            "geographicAddress": "true",
+            "clientVersion": "388603cc"
+        }
+        url = "https://api-finder.eircode.ie/Latest/finderfindaddress"
+        response = requests.get(url, payload, headers=headers)
+
+        # try to get the postal address from the response
+        try:
+            postal = response.json()["postalAddress"]
+            county = str(postal[-1]).upper().replace("CO. ", "")
+            county = re.sub(r'\d+', '', county).strip()
+            return {'state':'Success', 'value':county}
+
+        # bad request error (key invalid or got blocked) are caught with this
+        except Exception:
+            return {'state':'Error', 'value':'eircode failed'}
+
+
+def get_statecode(country, post_code):
+    """
+    Returns the USA/Canada state code for a given post code
+    """
+    nomi = Nominatim(country)
+    result = nomi.query_postal_code(post_code)
+    state_code = str(result["state_code"])
+    if state_code != "nan":
+        return {'state':'Success', 'value':state_code}
+    else:
+        return {'state':'Error', 'value':'pgeocode failed'}
+
+
 
 
 
 def clean_data(data):
+    # if the data needs a statecode then attempt to find it automatically
+    if not data.get('shipping_statecode', ''):
+        if data['shipping_country_id'] in ['IE']: # ireland
+            result = get_eircode(data['shipping_postcode'])
+            state_code = province_lookup[result['value']]
+        elif data['shipping_country_id'] in ['US', 'CA']: # usa/canada
+            result = get_statecode(data['shipping_country_id'], data['shipping_postcode'])
+            state_code = result['value']
+        else:
+            result = {'state':'Success', 'value':'This will never see the light of day'}
+
+        # if the statecode was found then set it 
+        if result['state'] == 'Success':
+            data['shipping_statecode'] = state_code
+        elif result['state'] == 'Error':
+            data['shipping_statecode'] = 'manual'
+
+
     # loop over commerical invoice items and clean them up
     commercial_invoice = []
     for line in data['commercial_invoice_lines']:

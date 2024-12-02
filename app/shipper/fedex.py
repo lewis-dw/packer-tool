@@ -200,14 +200,14 @@ def quote_order(data):
         json.dump(res.json(), f, indent=4)
 
     # parse the result and return
-    quotes = parse_response(res.json())
+    quotes = parse_quote_response(res.json())
     return quotes
 
 
 
 
 
-def parse_response(res):
+def parse_quote_response(res):
     # check if we have errors
     if res.get('errors', '') != '':
         errors = []
@@ -234,7 +234,7 @@ def parse_response(res):
 # Shipping
 
 
-def create_ship_payload(data, shipping_code, size, items, parcels):
+def create_ship_payload(data, shipping_code, label_size, items, parcels):
     payload = {
         "labelResponseOptions": "URL_ONLY",
         "requestedShipment": {
@@ -286,7 +286,7 @@ def create_ship_payload(data, shipping_code, size, items, parcels):
                 "imageType": "ZPLII",
                 "labelFormatType": "COMMON2D",
                 "labelOrder": "SHIPPING_LABEL_FIRST",
-                "labelStockType": size,
+                "labelStockType": label_size,
                 "labelRotation": "UPSIDE_DOWN",
                 "labelPrintingOrientation": "TOP_EDGE_OF_TEXT_FIRST",
                 "customerSpecifiedDetail": {
@@ -364,3 +364,51 @@ def create_ship_payload(data, shipping_code, size, items, parcels):
     if data['shipping_country_id'] in ['IE', 'US', 'CA']:
         payload["requestedShipment"]["recipient"]["address"]["stateOrProvinceCode"] = data.get('shipping_statecode', '')
     return payload
+
+
+
+
+
+def ship_order(data, shipping_code, printer_size):
+    # translate the label size
+    size_translate = {
+        '4x675':'STOCK_4X675_LEADING_DOC_TAB',
+        '4x6':'STOCK_4X6'
+    }
+
+    # first check if our auth is valid still (or create a new one upon first run)
+    token = get_auth()
+
+    # generate parcels and items before creating payload
+    items = format_items(data['commercial_invoice_lines'])
+    parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
+    label_size = size_translate.get(printer_size, 'STOCK_4X6')
+
+    # create the payload and header
+    payload = create_ship_payload(data, shipping_code, label_size, items, parcels)
+    headers = {
+        'Content-Type': "application/json",
+        'X-locale': "en_US",
+        'Authorization': f"Bearer {token}"
+    }
+
+    # ship the order
+    spayload = json.dumps(payload)
+    res = requests.post(quote_url, data=spayload, headers=headers)
+
+    # we want to dump the payload and response for debugging
+    with open(os.path.join(debug_dir, 'quote', 'fedex', 'payload.json'), 'w') as f:
+        json.dump(payload, f, indent=4)
+    with open(os.path.join(debug_dir, 'quote', 'fedex', 'response.json'), 'w') as f:
+        json.dump(res.json(), f, indent=4)
+
+    # parse the result and return
+    labels = parse_ship_response(res.json())
+    return labels
+
+
+
+
+
+def parse_ship_response(res):
+    print(res)

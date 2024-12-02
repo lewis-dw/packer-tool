@@ -1,11 +1,7 @@
-from pgeocode import Nominatim
-import requests
-import re
 from datetime import datetime, timedelta
 import os
 import pathlib
 import yaml
-import pandas as pd
 
 
 # find the data dir
@@ -62,94 +58,14 @@ def get_shipping_date(end_time, days_penalty, date_format):
 
 
 
-def get_eircode(postcode):
-    """
-    Returns the Irish county for a given postcode
-    """
-    header = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
-
-    # get session key for eircode website
-    url = "https://api-finder.eircode.ie/Latest/findergetidentity"
-    response = requests.get(url, headers=header)
-    try:
-        key = response.json()["key"]
-    except KeyError:
-        return "Error: No key available from eircode"
-
-    # send post code to the eircode website
-    payload = {
-        "key": key,
-        "address": postcode,
-        "language": "en",
-        "geographicAddress": "true",
-        "clientVersion": "388603cc"
-    }
-    url = "https://api-finder.eircode.ie/Latest/finderfindaddress"
-    response = requests.get(url, payload, headers=header)
-
-
-
-    try:  # try to get the postal address from the response
-        postal = response.json()["postalAddress"]
-        county = str(postal[-1]).upper().replace("CO. ", "")
-        county = re.sub(r'\d+', '', county).strip()
-        return {'state':'Success', 'value':county}
-
-    except Exception:
-        # bad request error (key invalid or got blocked) are caught with this
-        return {'state':'Error', 'value':'eircode failed'}
-
-
-
-
-
-def get_statecode(country, post_code):
-    """
-    Returns the USA/Canada state code for a given post code
-    """
-    nomi = Nominatim(country)
-    result = nomi.query_postal_code(post_code)
-    state_code = str(result["state_code"])
-    if state_code != "nan":
-        return {'state':'Success', 'value':state_code}
-    else:
-        return {'state':'Error', 'value':'pgeocode failed'}
-
-
-
-
-
-def find_statecode(data):
-    """
-    Depending on the country code, it will run the relevant 'get state code' function
-    """
-    # extract vars
-    postcode = data['shipping_postcode']
-    country_code = data['shipping_country_id']
-
-    # run the country specific functions for statecode
-    result = {'state':'Error', 'value':f'Invalid country code: {country_code}'}
-    if country_code in ['IE']: # ireland
-        result = get_eircode(postcode)
-
-    elif country_code in ['US', 'CA']: # usa/canada
-        result = get_statecode(country_code, postcode)
-
-    return result
-
-
-
-
-
 def get_country_code(country):
     """
-    Returns the country code for a given country
+    Returns the country code for a given country for the invoice items
     """
     # maybe inefficient but load the country_codes from yaml and search for the given country in there
     country_codes = get_all_yamls('country_codes')
     country_code = country_codes.get(country, country) # if it doesnt exist then just return the country
     return country_code
-
 
 
 
@@ -209,10 +125,8 @@ def parse_quotes(data):
         quote_content = '<p>No quotes succeeded</p>'
 
 
-
     # parse errors
     if data['errors']:
-        print(data['errors'])
         # one liner to construct the error table - hard to debug? just never get an error
         table_html = [f"<tr><td>{error['courier']}</td><td>{error['error']}</td></tr>" for error in data['errors']]
         error_content = ''.join([
