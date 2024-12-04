@@ -14,12 +14,11 @@
 
 {% block main %}
 <body>
-    <div>
-        <!-- Display the info about the order -->
+    <!-- display all order data info div -->
+    <div id="order-details">
         <h1>Order Details [{{ order.order_name }}]</h1>
         <form method="POST" action="{{ url_for('orders.save_order') }}">
             <input type="hidden" name="order_id" value="{{ order.order_name }}">
-            <input type="hidden" id="action_type" name="action_type" value="not set">
 
             <!-- customer details -->
             <div>
@@ -155,6 +154,7 @@
 
                     <label for="line-product_demand_qty_{{ loop.index }}">Quantity:</label>
                     <input type="text" id="line-product_demand_qty_{{ loop.index }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}">
+                    {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
 
                     <label for="line-unit_price_{{ loop.index }}">Unit Price:</label>
                     <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}">
@@ -183,17 +183,33 @@
                     <p>No items found</p>
                 {% endfor %}
             </div>
-            <button type="submit" onclick="setActionType('quote')">Quote</button>
-            <button type="submit" onclick="setActionType('ship')">Ship</button>
+            <button type="submit" onclick="showGif()">Quote</button>
         </form>
     </div>
 
+
+
+    <!-- loading gif div -->
+    <div id="loading-gif">
+        <div class="loading-content">
+            <img src="{{ url_for('static', filename='images/default_loading.gif') }}" alt="Loading...">
+            <p>Processing your request... Please wait.</p>
+        </div>
+    </div>
+
+
+
+    <!-- scripts -->
     <script>
-        // Function to set the action type based on which button was clicked when submitting the form
-        function setActionType(action) {
-            const actionTypeField = document.getElementById('action_type');
-            actionTypeField.value = action;
-        }
+        // event listener for when the page is loaded
+        window.addEventListener('pageshow', function (event) {
+            // Check if the page is loaded from the cache (persisted state)
+            if (event.persisted) {
+                document.getElementById('loading-gif').style.display = 'none'; // Hide the loading div
+                document.body.style.overflow = ''; // Re-enable scrolling
+            }
+        });
+
 
 
         // Function for toggling the visibility of a div
@@ -212,6 +228,14 @@
         function closeSection() {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.style.display = 'none');
+        }
+
+
+        // need some separate code for setting the gif to be visible due to display flexbox
+        function showGif() {
+            const section = document.getElementById('loading-gif');
+            section.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
     </script>
 </body>

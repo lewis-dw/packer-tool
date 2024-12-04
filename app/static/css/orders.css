@@ -1,17 +1,32 @@
+/* - - - - - - - - - - - - - - - - */
+/* - - - - all_orders.html - - - - */
+/* - - - - - - - - - - - - - - - - */
+
+/* Table to display all orders */
 table {
     width: 100%;
     border-collapse: collapse;
 }
+
 th, td {
     border: 1px solid #ddd;
     padding: 8px;
 }
+
 tr:hover {
     background-color: #f1f1f1;
     cursor: pointer;
 }
 
 
+
+
+
+/* - - - - - - - - - - - - - - - - */
+/* - - - display_order.html  - - - */
+/* - - - - - - - - - - - - - - - - */
+
+/* Visibility toggle sections */
 .section {
     display: none;
     position: fixed;
@@ -25,7 +40,39 @@ tr:hover {
     padding: 20px;
     box-sizing: border-box;
 }
+
 .missing{
     color: red;
     font-size: 0.9em;
+}
+
+
+
+/* Order details display stuff */
+#order-details {
+    position: relative;
+    z-index: 1;
+}
+
+
+
+/* Loading gif stuff */
+#loading-gif {
+    /* margin-top: 0 !important; */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full width of the viewport */
+    height: 100vh; /* Full height of the viewport */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999; /* ensure it's above everything else */
+    display: none; /* center the content */
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+    font-size: 1.5em;
 }

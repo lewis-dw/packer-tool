@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import os
 import pathlib
 import yaml
+import html
 
 
 # find the data dir
@@ -102,17 +103,16 @@ def parse_quotes(data):
         # loop over the quotes after sorting and build up a html table
         table_html = []
         for quote in quotes:
-            print(quote)
-            courier = quote['courier'].upper()
-            method_name = quote['method_name']
-            cost = quote['cost']
-            html_row = (
-                f'<tr onclick="rowClicked(\'{courier}, {method_name}\')>'
-                f'<td>{courier}</td><td>{method_name}</td><td>{cost}</td></tr>'
-            )
+            courier = html.escape(quote['courier'].upper())
+            method_name = html.escape(quote['method_name'])
+            cost = html.escape(str(quote['cost']))
+            html_row = ''.join([
+                f'<tr onclick="rowClicked(\'{courier}\', \'{method_name}\')">',
+                f'<td>{courier}</td><td>{method_name}</td><td>{cost}</td>',
+                '</tr>'
+            ])
             table_html.append(html_row)
 
-        # finalize the html format
         quote_content = ''.join([
             '<table>',
             '<thead><tr><th>Courier</th><th>Method</th><th>Cost</th></tr></thead>',

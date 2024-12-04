@@ -15,14 +15,12 @@ province_lookup = shipping_functions.get_all_yamls('province_lookup')
 
 
 """
-Process the data before taking the desired action on the data
+Process the data before quoting the data with every courier
 """
 @shipping.route('/process_data')
 def process_data():
     # get the currently loaded data from flask session
     data = session.get('order_data', {})
-    action_type = request.args.get('action_type')
-    print(action_type)
 
 
     # if there is data then proceed
@@ -40,7 +38,7 @@ def process_data():
             else:
                 all_errors.extend(quote['value'])
 
-        # parse the quote results
+        # parse the quote results then display to the user
         quote_content, error_content = shipping_functions.parse_quotes({'quotes':all_quotes, 'errors':all_errors})
         data = {
             'order_id': data['order_name'],
@@ -48,14 +46,22 @@ def process_data():
             'quote_content': quote_content,
             'error_content': error_content
         }
+        return render_template('quote_order.html', data=data)
 
-        # if the action type was just to quote the order then just display it to the user
-        if action_type == 'quote':
-            return render_template('quote_order.html', data=data)
+    # else just redirect them back to the homepage they shouldnt be here
+    else:
+        return redirect('/')
 
-        # if the action type was to quote the order then
-        elif action_type == 'ship':
-            return render_template('error.html', error_reason='HELLOO')
 
-    # all other hanging else statements should lead to here
-    return redirect('/')
+
+
+
+"""
+This page handles the user selecting a shipping method from the quote page
+"""
+@shipping.route('/select_method')
+def select_method():
+    courier = request.args.get('courier')
+    method = request.args.get('method')
+
+    return {'courier': courier, 'method': method}

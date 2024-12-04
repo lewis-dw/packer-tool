@@ -201,7 +201,8 @@ def get_statecode(country, post_code):
 
 
 def clean_data(data):
-    # if the data needs a statecode then attempt to find it automatically
+    # if the data is missing it's statecode then try to find it automatically based on the country
+    # else just give it a random value because if it isnt explicitly being told to get a value then it isnt required
     if not data.get('shipping_statecode', ''):
         if data['shipping_country_id'] in ['IE']: # ireland
             result = get_eircode(data['shipping_postcode'])
@@ -210,7 +211,8 @@ def clean_data(data):
             result = get_statecode(data['shipping_country_id'], data['shipping_postcode'])
             state_code = result['value']
         else:
-            result = {'state':'Success', 'value':'This will never see the light of day'}
+            result = {'state':'Success'}
+            state_code = 'This will never see the light of day'
 
         # if the statecode was found then set it 
         if result['state'] == 'Success':
@@ -225,6 +227,10 @@ def clean_data(data):
         # need to extract the product options from the product description
         line['product_options'] = parse_product_description(line['line_description'])
 
+        """
+        This code here needs to be updated when we change the format we get our odoo orders back as, this should be used as a backup for compatibility with old orders.
+        They will likely be fine though as the shipping items we want to set as 'False shippable' will also update for them too
+        """
         # need to remove the shipping method from the commercial invoice
         if line['product_name'] != data['order_carrier_name']:
             commercial_invoice.append(line)

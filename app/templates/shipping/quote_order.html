@@ -5,6 +5,7 @@ Quote Order
 {% endblock %}
 
 {% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shipper.css') }}">
 {% endblock %}
 
 {% block header %}
@@ -14,6 +15,8 @@ Quote Order
 {% block main %}
 <body>
     <h1>Quoted [{{ data.order_id }}] to {{ data.country_to }}</h1>
+
+    <p>Customer paid: £{{ data.shipping_cost  or 0.0 }}</p>
 
     <div>
         <h2>Quotes</h2>
@@ -27,9 +30,9 @@ Quote Order
 </body>
 <script>
     function rowClicked(courier, methodName) {
-        console.log("Courier:", courier);
-        console.log("Method Name:", methodName);
-        window.location.href = `/`;
+        const baseUrl = "{{ url_for('shipping.select_method')}}";
+        const queryParams = `?courier=${encodeURIComponent(courier)}&method=${encodeURIComponent(methodName)}`;
+        window.location.href = baseUrl + queryParams;
     }
 </script>
 {% endblock %}

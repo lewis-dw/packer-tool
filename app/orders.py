@@ -181,6 +181,7 @@ def save_order():
 
         # invoice lines
         'product_sku': '',
+        'product_demand_qty':'',
         'unit_price': '',
         'unit_weight':'',
         'product_height':'',
@@ -192,11 +193,10 @@ def save_order():
 
     # we will update the session data with what we got returned from the post form
     data = session.get('order_data', {})
-    action_type = request.form.get('action_type')
 
 
     # if there is not session order data then we want to redirect but if there is we can proceed
-    if data and action_type != 'not set':
+    if data:
         for key, value in request.form.items():
             # format value to correct data type that it should be eg str(1.0) -> int(1)
             value = str(value)
@@ -233,8 +233,8 @@ def save_order():
             session['required_fields'] = key_cols
             return redirect(url_for('orders.display_order'))
 
-        # if all required fields were entered then delete all current order data and resave the updated data and redirect user
+        # if all required fields were entered then redirect user
         else:
-            return redirect(url_for('shipping.process_data', action_type=action_type))
+            return redirect(url_for('shipping.process_data'))
     else:
         return redirect('/')
