@@ -92,6 +92,12 @@
                     <label for="shipping_country_id">Country ID:</label>
                     <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
                 </p>
+
+                <!-- Checkbox for if the address needs EDT -->
+                <p>
+                    <label for="etd_required">EDT Required:</label>
+                    <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
+                </p>
             </div>
 
 

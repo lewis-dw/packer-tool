@@ -225,6 +225,9 @@ def save_order():
                 missing_vals = True
                 key_cols[key] = 'Required'
 
+        # this needs to be separate due to checkbox behaviour
+        data['etd_required'] = request.form.get('etd_required', 'off')
+
         # update session order data regardless if they are missing data or not
         session.clear()
         session['order_data'] = data

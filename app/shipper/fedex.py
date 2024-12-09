@@ -343,16 +343,6 @@ def create_ship_payload(data, shipping_code, label_size, items, parcels):
                     }
                 }
             },
-            "shipmentSpecialServices": {
-                "etdDetail": {
-                    "requestedDocumentTypes": [
-                        "COMMERCIAL_INVOICE"
-                    ]
-                },
-                "specialServiceTypes": [
-                    "ELECTRONIC_TRADE_DOCUMENTS"
-                ]
-            },
             "requestedPackageLineItems": parcels
         },
         "accountNumber": {
@@ -363,6 +353,19 @@ def create_ship_payload(data, shipping_code, label_size, items, parcels):
     # if the country code is in this list then it needs state_code which should be present due to earlier data verification
     if data['shipping_country_id'] in ['IE', 'US', 'CA']:
         payload["requestedShipment"]["recipient"]["address"]["stateOrProvinceCode"] = data.get('shipping_statecode', '')
+
+    # if etd is required then add it in
+    if data['etd_required'] == 'on':
+        payload['requestedShipment']['shipmentSpecialServices'] = {
+            "etdDetail": {
+                "requestedDocumentTypes": [
+                    "COMMERCIAL_INVOICE"
+                ]
+            },
+            "specialServiceTypes": [
+                "ELECTRONIC_TRADE_DOCUMENTS"
+            ]
+        }
     return payload
 
 
