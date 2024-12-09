@@ -3,6 +3,7 @@ import os
 import pathlib
 import yaml
 import html
+from app.logger import update_log
 
 
 # find the data dir
@@ -127,8 +128,17 @@ def parse_quotes(data):
 
     # parse errors
     if data['errors']:
-        # one liner to construct the error table - hard to debug? just never get an error
-        table_html = [f"<tr><td>{error['courier']}</td><td>{error['error']}</td></tr>" for error in data['errors']]
+        # construct the error table content
+        table_html = []
+        for error in data['errors']:
+            courier = error['courier'].upper()
+            message = error['error']
+
+            # construct table line and log the error
+            table_html.append(f"<tr><td>{courier}</td><td>{message}</td></tr>")
+            update_log.create_log_line(f"{courier} | {message}")
+
+        # construct the whole error table
         error_content = ''.join([
             '<table>',
             '<thead><tr><th>Courier</th><th>Error</th></tr></thead>',
