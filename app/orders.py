@@ -200,8 +200,9 @@ def save_order():
         for key, value in request.form.items():
             # format value to correct data type that it should be eg str(1.0) -> int(1)
             value = str(value)
-            if value.replace('.', '').replace(' ', '').isdigit():
-                value = float(value)
+            temp_val = value.replace('.', '').replace(' ', '')
+            if temp_val.isdigit():
+                value = float(temp_val)
                 if value.is_integer():
                     value = int(value)
 
