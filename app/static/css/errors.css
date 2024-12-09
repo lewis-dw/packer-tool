@@ -3,19 +3,19 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: rgba(244, 244, 244, 1);
 }
 h1 {
     font-size: 3rem;
-    color: #ff6f61;
+    color: rgba(255, 111, 97, 1);
 }
 p {
     font-size: 1.2rem;
-    color: #555;
+    color: rgba(85, 85, 85, 1);
 }
 a {
     text-decoration: none;
-    color: #007bff;
+    color: rgba(0, 123, 255, 1);
 }
 a:hover {
     text-decoration: underline;

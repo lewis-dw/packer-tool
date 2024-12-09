@@ -21,64 +21,104 @@
             <input type="hidden" name="order_id" value="{{ order.order_name }}">
 
             <!-- customer details -->
-            <div>
-                <label for="shipping_name">Customer Name:</label>
-                <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or '' }}">
+            <div id="customer-details">
+                <!-- Customer name -->
+                <p>
+                    <label for="shipping_name">Customer Name:</label>
+                    <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or '' }}">
+                </p>
 
+                <!-- Customer is a trader or not -->
                 <p>Customer Type: {{ order.customer_pricelist or '' }}</p>
 
-                <label for="customer_email">Customer Email:</label>
-                <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or '' }}">
+                <!-- Customer email -->
+                <p>
+                    <label for="customer_email">Customer Email:</label>
+                    <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or '' }}">
+                </p>
 
-                <label for="shipping_telephone">Customer Phone Number:</label>
-                <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
+                <!-- Customer phone number -->
+                <p>
+                    <label for="shipping_telephone">Customer Phone Number:</label>
+                    <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
+                </p>
 
-                <label for="shipping_company">Company:</label>
-                <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or '' }}">
+                <!-- Customer's company -->
+                <p>
+                    <label for="shipping_company">Company:</label>
+                    <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or '' }}">
+                </p>
 
-                <label for="shipping_street">Streetline 1:</label>
-                <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
-                {% if errors.get('shipping_street') %}<span class="missing">Required</span>{% endif %}
+                <!-- Streetline 1 -->
+                <p>
+                    <label for="shipping_street">Streetline 1:</label>
+                    <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
+                    {% if errors.get('shipping_street') %}<span class="missing">Required</span>{% endif %}
+                </p>
 
-                <label for="shipping_street2">Streetline 2:</label>
-                <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
+                <!-- Streetline 2 -->
+                <p>
+                    <label for="shipping_street2">Streetline 2:</label>
+                    <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
+                </p>
 
-                <label for="shipping_locality">Locality:</label>
-                <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
+                <!-- Locality (Contains city) -->
+                <p>
+                    <label for="shipping_locality">Locality:</label>
+                    <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
+                </p>
 
-                <label for="shipping_region">Region:</label>
-                <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
+                <!-- Region (Used as streetline 3) -->
+                <p>
+                    <label for="shipping_region">Region:</label>
+                    <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
+                </p>
 
-                <label for="shipping_postcode">Postcode:</label>
-                <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
-                {% if errors.get('shipping_postcode') %}<span class="missing">Required</span>{% endif %}
+                <!-- Postcode -->
+                <p>
+                    <label for="shipping_postcode">Postcode:</label>
+                    <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
+                    {% if errors.get('shipping_postcode') %}<span class="missing">Required</span>{% endif %}
+                </p>
 
-                <label for="shipping_country">Country:</label>
-                <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
+                <!-- Country -->
+                <p>
+                    <label for="shipping_country">Country:</label>
+                    <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
+                </p>
 
-                <label for="shipping_country_id">Country ID:</label>
-                <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
+                <!-- Country ID -->
+                <p>
+                    <label for="shipping_country_id">Country ID:</label>
+                    <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
+                </p>
             </div>
 
 
             <!-- shipping details -->
-            <div>
+            <div id="shipping-details">
                 <p>Carrier: {{ order.order_carrier_name or '' }}</p>
                 <p>Customer Paid Shipping: £{{ order.shipping_cost or '0.0' }}</p>
 
-                <label for="order_total">Total Cost of Order:</label>
-                <input type="text" id="order_total" name="order_total" value="{{ order.order_total or '' }}">
+                <p>
+                    <label for="order_total">Total Cost of Order:</label>
+                    <input type="text" id="order_total" name="order_total" value="{{ order.order_total or '' }}">
+                </p>
 
-                <label for="order_total_tax">Order Tax:</label>
-                <input type="text" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or '' }}">
+                <p>
+                    <label for="order_total_tax">Order Tax:</label>
+                    <input type="text" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or '' }}">
+                </p>
 
-                <label for="order_total_inc_tax">Total Cost inc Tax:</label>
-                <input type="text" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '' }}">
+                <p>
+                    <label for="order_total_inc_tax">Total Cost inc Tax:</label>
+                    <input type="text" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '' }}">
+                </p>
             </div>
 
 
             <!-- additional details -->
-            <div>
+            <div id="shipping-notes">
                 <p>Picking Internal Note: {{ order.picking_internal_note or '' }}</p>
                 <p>Customer Note: {{ order.picking_customer_note or '' }}</p>
             </div>
@@ -137,47 +177,80 @@
                 <h2>Invoice Info</h2>
                 {% for line in order.commercial_invoice_lines %}
                 <div>
-                    <label for="line-product_sku_{{ loop.index }}">Product SKU:</label>
-                    <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}">
-                    {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    <!-- Product SKU -->
+                    <p>
+                        <label for="line-product_sku_{{ loop.index }}">Product SKU:</label>
+                        <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}">
+                        {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
 
-                    <label for="line-product_name_{{ loop.index }}">Product Name:</label>
-                    <input type="text" id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}" value="{{ line.product_name or '' }}">
+                    <!-- Product name -->
+                    <p>
+                        <label for="line-product_name_{{ loop.index }}">Product Name:</label>
+                        <input type="text" id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}" value="{{ line.product_name or '' }}">
+                    </p>
 
                     <p>Options: {{ line.product_options or '' }}</p>
 
-                    <label for="line-commodity_code_{{ loop.index }}">Commodity Code:</label>
-                    <input type="text" id="line-commodity_code_{{ loop.index }}" name="line-commodity_code_{{ loop.index }}" value="{{ line.commodity_code or '' }}">
+                    <!-- Commodity code -->
+                    <p>
+                        <label for="line-commodity_code_{{ loop.index }}">Commodity Code:</label>
+                        <input type="text" id="line-commodity_code_{{ loop.index }}" name="line-commodity_code_{{ loop.index }}" value="{{ line.commodity_code or '' }}">
+                    </p>
 
-                    <label for="line-country_of_manufacture_{{ loop.index }}">Country of Manufacture:</label>
-                    <input type="text" id="line-country_of_manufacture_{{ loop.index }}" name="line-country_of_manufacture_{{ loop.index }}" value="{{ line.country_of_manufacture or '' }}">
+                    <!-- Country of manufacture -->
+                    <p>
+                        <label for="line-country_of_manufacture_{{ loop.index }}">Country of Manufacture:</label>
+                        <input type="text" id="line-country_of_manufacture_{{ loop.index }}" name="line-country_of_manufacture_{{ loop.index }}" value="{{ line.country_of_manufacture or '' }}">
+                    </p>
 
-                    <label for="line-product_demand_qty_{{ loop.index }}">Quantity:</label>
-                    <input type="text" id="line-product_demand_qty_{{ loop.index }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}">
-                    {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    <!-- Quantity -->
+                    <p>
+                        <label for="line-product_demand_qty_{{ loop.index }}">Quantity:</label>
+                        <input type="text" id="line-product_demand_qty_{{ loop.index }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}">
+                        {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
 
-                    <label for="line-unit_price_{{ loop.index }}">Unit Price:</label>
-                    <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}">
-                    {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    <!-- Unit price -->
+                    <p>
+                        <label for="line-unit_price_{{ loop.index }}">Unit Price:</label>
+                        <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}">
+                        {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
 
-                    <label for="line-unit_weight_{{ loop.index }}">Unit Weight:</label>
-                    <input type="text" id="line-unit_weight_{{ loop.index }}" name="line-unit_weight_{{ loop.index }}" value="{{ line.unit_weight or '' }}">
-                    {% if errors.get('line-unit_weight_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    <!-- Unit weight -->
+                    <p>
+                        <label for="line-unit_weight_{{ loop.index }}">Unit Weight:</label>
+                        <input type="text" id="line-unit_weight_{{ loop.index }}" name="line-unit_weight_{{ loop.index }}" value="{{ line.unit_weight or '' }}">
+                        {% if errors.get('line-unit_weight_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
 
-                    <label for="line-product_height_{{ loop.index }}">Unit Height:</label>
-                    <input type="text" id="line-product_height_{{ loop.index }}" name="line-product_height_{{ loop.index }}" value="{{ line.product_height or '' }}">
-                    {% if errors.get('line-product_height_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    <!-- Product height -->
+                    <p>
+                        <label for="line-product_height_{{ loop.index }}">Unit Height:</label>
+                        <input type="text" id="line-product_height_{{ loop.index }}" name="line-product_height_{{ loop.index }}" value="{{ line.product_height or '' }}">
+                        {% if errors.get('line-product_height_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
 
-                    <label for="line-product_width_{{ loop.index }}">Unit Width:</label>
-                    <input type="text" id="line-product_width_{{ loop.index }}" name="line-product_width_{{ loop.index }}" value="{{ line.product_width or '' }}">
-                    {% if errors.get('line-product_width_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    <!-- Unit width -->
+                    <p>
+                        <label for="line-product_width_{{ loop.index }}">Unit Width:</label>
+                        <input type="text" id="line-product_width_{{ loop.index }}" name="line-product_width_{{ loop.index }}" value="{{ line.product_width or '' }}">
+                        {% if errors.get('line-product_width_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
 
-                    <label for="line-product_length_{{ loop.index }}">Unit Length:</label>
-                    <input type="text" id="line-product_length_{{ loop.index }}" name="line-product_length_{{ loop.index }}" value="{{ line.product_length or '' }}">
-                    {% if errors.get('line-product_length_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    <!-- Unit length -->
+                    <p>
+                        <label for="line-product_length_{{ loop.index }}">Unit Length:</label>
+                        <input type="text" id="line-product_length_{{ loop.index }}" name="line-product_length_{{ loop.index }}" value="{{ line.product_length or '' }}">
+                        {% if errors.get('line-product_length_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
 
-                    <label for="line-parcel_insurance_{{ loop.index }}">Parcel Insurance:</label>
-                    <input type="text" id="line-parcel_insurance_{{ loop.index }}" name="line-parcel_insurance_{{ loop.index }}" value=0>
+                    <!-- Parcel insurance -->
+                    <p>
+                        <label for="line-parcel_insurance_{{ loop.index }}">Parcel Insurance:</label>
+                        <input type="text" id="line-parcel_insurance_{{ loop.index }}" name="line-parcel_insurance_{{ loop.index }}" value=0>
+                    </p>
                 </div>
                 {% else %}
                     <p>No items found</p>

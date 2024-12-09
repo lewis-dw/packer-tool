@@ -9,7 +9,7 @@ table {
 }
 
 th, td {
-    border: 1px solid #ddd;
+    border: 1px solid rgba(221, 221, 221, 1);
     padding: 8px;
 }
 
@@ -34,31 +34,24 @@ tr:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: white;
     overflow: auto;
     z-index: 1000;
     padding: 20px;
     box-sizing: border-box;
+    background-color: var(--bg-color-1);
 }
 
 .missing{
-    color: red;
+    color: rgba(255, 0, 0, 1);
     font-size: 0.9em;
 }
 
 
 
 /* Order details display stuff */
-#order-details {
+#customer-details {
     position: relative;
     z-index: 1;
-}
-
-
-
-/* Pop up divs */
-#billing-info, #items-info, #invoice-info {
-    background-color: var(--bg-color-1);
 }
 
 
@@ -80,6 +73,6 @@ tr:hover {
 
 .loading-content {
     text-align: center;
-    color: white;
+    color: rgba(255, 255, 255, 1);
     font-size: 1.5em;
 }
