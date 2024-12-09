@@ -1,10 +1,72 @@
+
+:root {
+    color-scheme: dark;
+
+    /* Background colours */
+    --bg-color-1: rgba(32, 33, 35, 255);
+    --bg-color-2: rgba(43, 44, 47, 255);
+    --bg-color-3: rgba(162, 165, 170, 255);
+}
+
+
+
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+
+
+
+body {
+    background-color: var(--bg-color-1);
+    color: rgba(255, 255, 255, 255);
+}
+
+
+
+
+
+
+
+
+/* Default tags */
 h1 {
     font-size: 20px;
+}
+
+
+
+
+/* Button default */
+button {
+    background-color: rgba(255, 113, 13, 255);
+    color: rgba(255,255,255,255);
+    font-size: 16px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1); Subtle shadow */
+}
+
+button:hover {
+    background-color: rgba(251, 48, 3, 255);
+    /* box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); Slightly deeper shadow */
+    transform: translateY(-2px); /* Lift effect */
+}
+
+button:active {
+    background-color: #be2300;
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); Pressed shadow */
+    transform: translateY(0); /* Reset lift */
+    }
+
+button:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Accessible focus ring */
 }
 

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Metadata variables
-__version__ = '1.6.6'  # Semantic versioning: [MAJOR|MINOR|PATCH]
+__version__ = '1.6.7'  # Semantic versioning: [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 

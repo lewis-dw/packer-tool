@@ -7,6 +7,6 @@ th, td {
     padding: 8px;
 }
 tr:hover {
-    background-color: #f1f1f1;
+    background-color: var(--bg-color-2);
     cursor: pointer;
 }
