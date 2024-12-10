@@ -1,8 +1,25 @@
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body {
+    display: flex;
+}
+
+
 .dashboard-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: flex;
+    /* grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); */
+    /* justify-content: center;
+    align-items: center; */
     gap: 10px;
     padding: 10px;
+    height: 50vh;
+    width: 100vh;
+
+    border: 3px solid green;
 }
 
 .dashboard-icon {
