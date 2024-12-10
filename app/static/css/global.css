@@ -1,4 +1,4 @@
-
+/* force dark mode and set some vars */
 :root {
     color-scheme: dark;
 
@@ -8,9 +8,7 @@
     --bg-color-3: rgba(162, 165, 170, 1);
 }
 
-
-
-
+/* reset default styling */
 * {
     margin: 0;
     padding: 0;
@@ -19,11 +17,20 @@
 
 
 
-
 body {
     background-color: var(--bg-color-1);
     color: rgba(255, 255, 255, 1);
+    height: 100vh;
+    flex-direction: column;
 }
+
+
+main {
+    flex: 1;
+    border: 3px solid red;
+    flex-direction: column;
+}
+
 
 
 
@@ -85,3 +92,13 @@ button:focus {
     background-color: rgba(40, 40, 40, 1);
 }
 
+
+
+/* Footer */
+footer {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    border: 3px solid red;
+}
