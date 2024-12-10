@@ -199,13 +199,7 @@ def save_order():
     if data:
         for key, value in request.form.items():
             # format value to correct data type that it should be eg str(1.0) -> int(1)
-            value = str(value)
-            temp_val = value.replace('.', '').replace(' ', '')
-            if temp_val.isdigit():
-                value = float(temp_val)
-                if value.is_integer():
-                    value = int(value)
-
+            value = str(value).strip()
 
             # order commercial invoice lines
             if key.startswith('line-'):

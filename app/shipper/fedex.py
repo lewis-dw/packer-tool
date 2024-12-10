@@ -51,14 +51,14 @@ def format_items(data):
             "name": invoice_line["product_sku"][:35],
             "description": invoice_line["product_name"][:35],
             "countryOfManufacture": get_country_code(invoice_line["country_of_manufacture"]),
-            "quantity": int(float(invoice_line["product_demand_qty"])),
+            "quantity": invoice_line['product_demand_qty'],
             "quantityUnits": "PCS",
             "unitPrice": {
                 "amount": invoice_line["unit_price"],
                 "currency": "UKL"
             },
             "customsValue": {
-                "amount": float(invoice_line["product_demand_qty"]) * float(invoice_line["unit_price"]),
+                "amount": invoice_line['product_demand_qty'] * invoice_line["unit_price"],
                 "currency": "UKL"
             },
             "weight": {
@@ -80,7 +80,7 @@ def format_parcels(data, order_id):
     for invoice_line in data:
         # loop over the number of parcels that a required for the invoice line
         parcels_extend = []
-        for _ in range(int(float(invoice_line['product_demand_qty']))):
+        for _ in range(invoice_line['product_demand_qty']):
             # generate the parcel
             parcel_dict = {
                 "customerReferenceType": [
@@ -91,19 +91,19 @@ def format_parcels(data, order_id):
                 ],
                 "groupPackageCount": 1,
                 "weight": {
-                    "value": max(float(invoice_line['unit_weight']), 1),
+                    "value": invoice_line['unit_weight'],
                     "units": "KG"
                 },
                 "dimensions": {
-                    "length": max(float(invoice_line['product_length']), 1),
-                    "width": max(float(invoice_line['product_width']), 1),
-                    "height": max(float(invoice_line['product_height']), 1),
+                    "length": invoice_line['product_length'],
+                    "width": invoice_line['product_width'],
+                    "height": invoice_line['product_height'],
                     "units": "CM"
                 }
             }
 
             # if there is insurance on the parcel add it in
-            if float(invoice_line['parcel_insurance']) > 0.0:
+            if invoice_line['parcel_insurance'] > 0.0:
                 parcel_dict["PackageServiceOptions"] = {
                     "DeclaredValue": {
                         "Type": {
@@ -117,6 +117,44 @@ def format_parcels(data, order_id):
             parcels_extend.append(parcel_dict)
         all_parcels.extend(parcels_extend)
     return all_parcels
+
+
+
+
+
+def clean_data(data):
+    # regular data
+    data['shipping_cost'] = round(float(data['shipping_cost']), 2)
+
+    # clean commercial invoice lines
+    for c, invoice_line in enumerate(data['commercial_invoice_lines']):
+        data['commercial_invoice_lines'][c]['product_demand_qty'] = round(float(invoice_line['product_demand_qty']))
+
+        # product dimensions
+        data['commercial_invoice_lines'][c]['product_height'] = max(float(invoice_line['product_height']), 1)
+        data['commercial_invoice_lines'][c]['product_width'] = max(float(invoice_line['product_width']), 1)
+        data['commercial_invoice_lines'][c]['product_length'] = max(float(invoice_line['product_length']), 1)
+        data['commercial_invoice_lines'][c]['unit_weight'] = max(float(invoice_line["unit_weight"]), 1)
+
+        # costs
+        data['commercial_invoice_lines'][c]['unit_price'] = float(invoice_line["unit_price"])
+        data['commercial_invoice_lines'][c]['parcel_insurance'] = float(invoice_line['parcel_insurance'])
+    return data
+
+
+
+
+
+def send_payload(url, payload):
+    # get auth token then init headers
+    token = get_auth()
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}"
+    }
+
+    # send the payload and return
+    return requests.post(url, data=payload, headers=headers)
 
 
 ###########################################################################################################################################
@@ -174,24 +212,17 @@ def create_quote_payload(data, items, parcels):
 
 
 def quote_order(data):
-    # first check if our auth is valid still (or create a new one upon first run)
-    token = get_auth()
+    # clean the data
+    data = clean_data(data)
 
     # generate parcels and items before creating payload
     items = format_items(data['commercial_invoice_lines'])
     parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
-
-    # create the payload and header
     payload = create_quote_payload(data, items, parcels)
-    headers = {
-        'Content-Type': "application/json",
-        'X-locale': "en_US",
-        'Authorization': f"Bearer {token}"
-    }
 
     # quote the payload
     spayload = json.dumps(payload)
-    res = requests.post(quote_url, data=spayload, headers=headers)
+    res = send_payload(quote_url, spayload)
 
     # we want to dump the payload and response for debugging
     with open(os.path.join(debug_dir, 'quote', 'fedex', 'payload.json'), 'w') as f:
@@ -224,7 +255,7 @@ def parse_quote_response(res):
         for method in res['output']['rateReplyDetails']:
             quotes.append({
                 'courier': 'fedex',
-                'method_name': method['serviceType'],
+                'shipping_code': method['serviceType'],
                 'cost': method["ratedShipmentDetails"][0]["totalNetCharge"]
             })
         return {'state':'Success', 'value':quotes}
@@ -258,7 +289,7 @@ def create_ship_payload(data, shipping_code, label_size, items, parcels):
                 {
                     "contact": {
                         "personName": data['shipping_name'],
-                        "phoneNumber": data['customer_telephone'],
+                        "phoneNumber": data['shipping_telephone'],
                         "companyName": data['shipping_company'],
                         "emailAddress": data['customer_email']
                     },
@@ -313,7 +344,7 @@ def create_ship_payload(data, shipping_code, label_size, items, parcels):
                     "comments": ["Commercial invoice for items dispatched from Driftworks Ltd"],
                     "declarationStatement": "I declare all the information contained in this invoice to be true and correct.",
                     "freightCharge": {
-                        "amount": round(float(data['shipping_cost']), 2),
+                        "amount": data['shipping_cost'],
                         "currency": "UKL"
                     }
                 },
@@ -379,25 +410,18 @@ def ship_order(data, shipping_code, printer_size):
         '4x6':'STOCK_4X6'
     }
 
-    # first check if our auth is valid still (or create a new one upon first run)
-    token = get_auth()
+    # clean the data
+    data = clean_data(data)
 
     # generate parcels and items before creating payload
     items = format_items(data['commercial_invoice_lines'])
     parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
     label_size = size_translate.get(printer_size, 'STOCK_4X6')
-
-    # create the payload and header
     payload = create_ship_payload(data, shipping_code, label_size, items, parcels)
-    headers = {
-        'Content-Type': "application/json",
-        'X-locale': "en_US",
-        'Authorization': f"Bearer {token}"
-    }
 
     # ship the order
     spayload = json.dumps(payload)
-    res = requests.post(quote_url, data=spayload, headers=headers)
+    res = send_payload(label_url, spayload)
 
     # we want to dump the payload and response for debugging
     with open(os.path.join(debug_dir, 'quote', 'fedex', 'payload.json'), 'w') as f:
@@ -414,4 +438,24 @@ def ship_order(data, shipping_code, printer_size):
 
 
 def parse_ship_response(res):
-    print(res)
+    # check if we have errors
+    if res.get('errors', '') != '':
+        errors = []
+        for error in res['errors']:
+            errors.append({
+                'courier': 'fedex',
+                'error': f"{error['code']} - {error['message']}"
+            })
+        return {'state':'Error', 'value':errors}
+
+    # no errors? lets go parsing!
+    else:
+        print(res.json())
+        # quotes = []
+        # for method in res['output']['rateReplyDetails']:
+        #     quotes.append({
+        #         'courier': 'fedex',
+        #         'method_name': method['serviceType'],
+        #         'cost': method["ratedShipmentDetails"][0]["totalNetCharge"]
+        #     })
+        # return {'state':'Success', 'value':quotes}

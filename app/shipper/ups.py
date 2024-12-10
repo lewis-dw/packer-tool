@@ -62,7 +62,7 @@ def format_items(data):
             "OriginCountryCode": get_country_code(invoice_line["country_of_manufacture"]),
             "PackageWeight": {
                 "UnitOfMeasurement": "KGS",
-                "Weight": max(float(invoice_line["unit_weight"]), 1)
+                "Weight": invoice_line["unit_weight"]
             },
         }
         all_items.append(item_dict)
@@ -82,35 +82,35 @@ def format_parcels(data, _extra=''):
             # generate the parcel
             parcel_dict = {
                 "Description": "Products from Driftworks",
-                f"PackagingType{_extra}": {
+                f"Packaging{_extra}": {
                     "Code": "02",
                     "Description": ""
                 },
                 "Dimensions": {
                     "UnitOfMeasurement": {
-                        "Description": "Dimensions",
+                        "Description": "Centimetres",
                         "Code": "CM"
                     },
-                    "Length": str(float(invoice_line['product_length'])),
-                    "Width": str(float(invoice_line['product_width'])),
-                    "Height": str(float(invoice_line['product_height']))
+                    "Length": invoice_line['product_length'],
+                    "Width": invoice_line['product_width'],
+                    "Height": invoice_line['product_height']
                 },
                 "PackageWeight": {
                     "UnitOfMeasurement": {
                         "Description": "Kilograms",
                         "Code": "KGS"
                     },
-                    "Weight": str(float(invoice_line['unit_weight']))
+                    "Weight": invoice_line['unit_weight']
                 }
             }
 
             # if there is insurance on the parcel add it in
-            if invoice_line['parcel_insurance'] > 0.0:
+            if float(invoice_line['parcel_insurance']) > 0.0:
                 parcel_dict["PackageServiceOptions"] = {
                     "DeclaredValue": {
-                        "Type": {
-                            "Code": "01"
-                        },
+                        # "Type": {
+                        #     "Code": "01"
+                        # },
                         "MonetaryValue": invoice_line['parcel_insurance'],
                         "CurrencyCode": "GBP"
                     }
@@ -121,61 +121,98 @@ def format_parcels(data, _extra=''):
     return all_parcels
 
 
+
+
+
+def clean_data(data):
+    # regular data
+    data['shipping_cost'] = round(float(data['shipping_cost']), 2)
+
+    # clean commercial invoice lines
+    for c, invoice_line in enumerate(data['commercial_invoice_lines']):
+        # product dimensions
+        data['commercial_invoice_lines'][c]['product_height'] = str(round(float(invoice_line['product_height']), 2))
+        data['commercial_invoice_lines'][c]['product_width'] = str(round(float(invoice_line['product_width']), 2))
+        data['commercial_invoice_lines'][c]['product_length'] = str(round(float(invoice_line['product_length']), 2))
+        data['commercial_invoice_lines'][c]['unit_weight'] = str(max(float(invoice_line["unit_weight"]), 1))
+
+        # costs
+        data['commercial_invoice_lines'][c]['parcel_insurance'] = str(round(float(invoice_line['parcel_insurance']), 2))
+
+    # return the cleaned data
+    return data
+
+
+
+
+
+def send_payload(url, payload):
+    # get auth token then init headers
+    token = get_auth()
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}"
+    }
+
+    # send the payload and return
+    return requests.post(url, json=payload, headers=headers)
+
+
 ###########################################################################################################################################
 # Quoting
 
 
 def create_quote_payload(data, parcels):
     payload = {
-            "RateRequest": {
-                "Request": {
-                    "RequestOption": "Shop",
-                    "TransactionReference": {
-                        "CustomerContext": "CustomerContext"
+        "RateRequest": {
+            "Request": {
+                "RequestOption": "Shop",
+                "TransactionReference": {
+                    "CustomerContext": "CustomerContext"
+                }
+            },
+            "Shipment": {
+                "Shipper": {
+                    "Name": "Driftworks",
+                    "ShipperNumber": account_id,
+                    "Address": {
+                        "AddressLine": ["Driftworks", "Unit 7"],
+                        "City": "Birmingham",
+                        "PostalCode": "B112LQ",
+                        "CountryCode": "GB"
                     }
                 },
-                "Shipment": {
-                    "Shipper": {
-                        "Name": "Driftworks",
-                        "ShipperNumber": account_id,
-                        "Address": {
-                            "AddressLine": ["Driftworks", "Unit 7"],
-                            "City": "Birmingham",
-                            "PostalCode": "B112LQ",
-                            "CountryCode": "GB"
-                        }
-                    },
-                    "ShipTo": {
-                        "Name": data['shipping_company'],
-                        "Address": {
-                            "AddressLine": [
-                                data['shipping_street'],
-                                data['shipping_street2'],
-                                data['shipping_region']
-                            ],
-                            "City": data['shipping_locality'],
-                            "PostalCode": data['shipping_postcode'],
-                            "CountryCode": data['shipping_country_id']
-                        }
-                    },
-                    "ShipFrom": {
-                        "Name": "DRIFTWORKS LTD",
-                        "Address": {
-                            "AddressLine": ["Driftworks", "Unit 7"],
-                            "City": "Birmingham",
-                            "PostalCode": "B112LQ",
-                            "CountryCode": "GB"
-                        }
-                    },
-                    "NumOfPieces": len(parcels),
-                    "Package": parcels,
-                    "ShipmentRatingOptions": {
-                        "NegotiatedRatesIndicator": {}
-                    },
-                    "ShipmentServiceOptions": {} # this has some weird SAT indicator mischief going into it but for now just ignore
-                }
+                "ShipTo": {
+                    "Name": data['shipping_company'],
+                    "Address": {
+                        "AddressLine": [
+                            data['shipping_street'],
+                            data['shipping_street2'],
+                            data['shipping_region']
+                        ],
+                        "City": data['shipping_locality'],
+                        "PostalCode": data['shipping_postcode'],
+                        "CountryCode": data['shipping_country_id']
+                    }
+                },
+                "ShipFrom": {
+                    "Name": "DRIFTWORKS LTD",
+                    "Address": {
+                        "AddressLine": ["Driftworks", "Unit 7"],
+                        "City": "Birmingham",
+                        "PostalCode": "B112LQ",
+                        "CountryCode": "GB"
+                    }
+                },
+                "NumOfPieces": len(parcels),
+                "Package": parcels,
+                "ShipmentRatingOptions": {
+                    "NegotiatedRatesIndicator": {}
+                },
+                "ShipmentServiceOptions": {} # this has some weird SAT indicator mischief going into it but for now just ignore
             }
         }
+    }
 
     # if the country code is in this list then it needs state_code which should be present due to earlier data verification
     if data['shipping_country_id'] in ['IE', 'US', 'CA']:
@@ -187,23 +224,15 @@ def create_quote_payload(data, parcels):
 
 
 def quote_order(data):
-    # first check if our auth is valid still (or create a new one upon first run)
-    token = get_auth()
+    # clean the data
+    data = clean_data(data)
 
-    # generate parcels and items before creating payload
-    parcels = format_parcels(data['commercial_invoice_lines'])
-
-    # create the payload and header
+    # generate parcels before creating payload
+    parcels = format_parcels(data['commercial_invoice_lines'], 'Type')
     payload = create_quote_payload(data, parcels)
-    headers = {
-        'Content-Type': "application/json",
-        'X-locale': "en_US",
-        'Authorization': f"Bearer {token}"
-    }
 
-    # quote the payload
-    spayload = json.dumps(payload)
-    res = requests.post(quote_url, data=spayload, headers=headers)
+    # quote the order
+    res = send_payload(quote_url, payload)
 
     # we want to dump the payload and response for debugging
     with open(os.path.join(debug_dir, 'quote', 'ups', 'payload.json'), 'w') as f:
@@ -236,7 +265,7 @@ def parse_quote_response(res):
         for method in res["RateResponse"]["RatedShipment"]:
             quotes.append({
                 'courier': 'ups',
-                'method_name': method["Service"]["Code"],
+                'shipping_code': method["Service"]["Code"],
                 'cost': method["NegotiatedRateCharges"]["TotalCharge"]["MonetaryValue"]
             })
         return {'state':'Success', 'value':quotes}
@@ -244,3 +273,197 @@ def parse_quote_response(res):
 
 ###########################################################################################################################################
 # Shipping
+
+
+def create_ship_payload(data, shipping_code, parcels, items):
+    payload = {
+        "ShipmentRequest": {
+            "Shipment": {
+                "Description": "Thanks for your order!",
+                "ReferenceNumber": {
+                    "Code": "IK",
+                    "Value": data['order_name']
+                },
+                "Shipper": {
+                    "Name": "Driftworks",
+                    "AttentionName": "Logistics",
+                    "CompanyDisplayableName": "DW",
+                    "TaxIdentificationNumber": "GB862889662",
+                    "Phone": {
+                        "Number": "441217922000"
+                    },
+                    "ShipperNumber": account_id,
+                    "EMailAddress": "logistics@driftworks.com",
+                    "Address": {
+                        "AddressLine": ["Driftworks", "Unit 7"],
+                        "City": "Birmingham",
+                        "PostalCode": "B112LQ",
+                        "CountryCode": "GB"
+                    }
+                },
+                "ShipTo": {
+                    "Name": data['shipping_company'],
+                    "AttentionName": data['shipping_name'],
+                    "Phone": {
+                        "Number": data['shipping_telephone'],
+                    },
+                    "EMailAddress": data['customer_email'],
+                    "Address": {
+                        "AddressLine": [
+                            data['shipping_street'],
+                            data['shipping_street2'],
+                            data['shipping_region']
+                        ],
+                        "City": data['shipping_locality'],
+                        "CountryCode": data['shipping_country_id'],
+                        "PostalCode": data['shipping_postcode'],
+                        "ResidentialAddressIndicator": {}
+                    }
+                },
+                "ShipFrom": {
+                    "Address": {
+                        "AddressLine": "Driftworks, Unit 7",
+                        "City": "Birmingham",
+                        "CountryCode": "GB",
+                        "PostalCode": "B112LQ"
+                    },
+                    "AttentionName": "Nick Biggerstaff",
+                    "Name": "DRIFTWORKS LTD",
+                    "EMailAddress": "logistics@driftworks.com",
+                    "Phone": {
+                        "Number": "441217922000"
+                    }
+                },
+                "PaymentInformation": {
+                    "ShipmentCharge": {
+                        "Type": "01",
+                        "BillShipper": {
+                            "AccountNumber": account_id
+                        }
+                    }
+                },
+                "Service": {
+                    "Code": shipping_code,
+                    "Description": ""
+                },
+                "Package": parcels,
+                "ShipmentServiceOptions": {
+                    "DeliveryConfirmation": {
+                        "DCISType": 1
+                    }
+                },
+                "ShipmentRatingOptions": {
+                    "NegotiatedRatesIndicator": {},
+                    "UserLevelDiscountIndicator": {},
+                    "RateChartIndicator": {}
+                },
+            },
+            "LabelSpecification": {
+                "LabelImageFormat": {
+                    "Code": "ZPL",
+                    "Description": "ZPL Label"
+                },
+                "HTTPUserAgent": "Mozilla/4.5",
+                "LabelStockSize": {
+                    "Height": "6",
+                    "Width": "4"
+                }
+            }
+        }
+    }
+
+
+    # # if saturday then add saturday indicator
+    # if SHIPPING_DATA.shipping_service_code == "SAT":
+    #     payload["ShipmentRequest"]["Shipment"]["ShipmentServiceOptions"]["SaturdayDeliveryIndicator"] = {}
+    #     payload["ShipmentRequest"]["Shipment"]["Service"] = "11"
+
+
+    # if not gb then add the invoice
+    if data['shipping_country_id'] != "GB":
+        payload["ShipmentRequest"]["Shipment"]["ShipmentServiceOptions"]["InternationalForms"] = {
+            "AdditionalDocumentIndicator": {},
+            "Contacts": {
+                "SoldTo": {
+                    "Name": data['shipping_name'],
+                    "EMailAddress": data['customer_email'],
+                    "Phone": {
+                        "Number": data['shipping_telephone']
+                    },
+                    "Address": {
+                        "AddressLine": [
+                            data['shipping_street'],
+                            data['shipping_street2'],
+                            data['shipping_region']
+                        ],
+                        "City": data['shipping_locality'],
+                        "CountryCode": data['shipping_country_id'],
+                    }
+                }
+            },
+            "FormType": "01",
+            "InvoiceNumber": data['order_name'],
+            "InvoiceDate": get_shipping_date('16:00', 1, r'%Y%m%d'),
+            "TermsOfShipment": "DAP",
+            "ReasonForExport": "Sale",
+            "Comments": "Commercial invoice for items dispatched from Driftworks Ltd",
+            "DeclarationStatement": "I declare all the information contained in this invoice to be true and correct.",
+            "CurrencyCode": "GBP",
+            "FreightCharges": {
+                "MonetaryValue": data['shipping_cost']
+            },
+            "Product": items,
+        }
+
+
+    # if they have provided a tax eori then add it in and label them as a business consumer
+    if data['billing_vat_id'] and 1==0:
+        payload['ShipmentRequest']['Shipment']['GlobalTaxInformation'] = {
+            "ShipperTypeValue": "01",
+            "AgentTaxIdentificationNumber": {
+                "TaxIdentificationNumber": {
+                    "IdentificationNumber": data['billing_vat_id']
+                    # "IDNumberEncryptionIndicator": "0"
+                }
+            }
+        }
+
+
+    # if the country code is in this list then it needs state_code which should be present due to earlier data verification
+    if data['shipping_country_id'] in ['IE', 'US', 'CA']:
+        payload["ShipmentRequest"]["Shipment"]["ShipTo"]["Address"]["StateProvinceCode"] = data.get('shipping_statecode', '')
+        payload["ShipmentRequest"]["Shipment"]["ShipmentServiceOptions"]["InternationalForms"]["Contacts"]["SoldTo"]["Address"]["StateProvinceCode"] = data.get('shipping_statecode', '')
+    return payload
+
+
+
+
+
+def ship_order(data, shipping_code):
+    # clean the data
+    data = clean_data(data)
+
+    # generate parcels and items before creating payload
+    items = format_items(data['commercial_invoice_lines'])
+    parcels = format_parcels(data['commercial_invoice_lines'])
+    payload = create_ship_payload(data, shipping_code, parcels, items)
+
+    # ship the order
+    res = send_payload(label_url, payload)
+
+    # we want to dump the payload and response for debugging
+    with open(os.path.join(debug_dir, 'ship', 'ups', 'payload.json'), 'w') as f:
+        json.dump(payload, f, indent=4)
+    with open(os.path.join(debug_dir, 'ship', 'ups', 'response.json'), 'w') as f:
+        json.dump(res.json(), f, indent=4)
+
+    # parse the result and return
+    labels = parse_ship_response(res.json())
+    return labels
+
+
+
+
+
+def parse_ship_response(res):
+    return res

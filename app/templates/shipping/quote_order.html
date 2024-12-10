@@ -29,9 +29,9 @@ Quote Order
     </div>
 </body>
 <script>
-    function rowClicked(courier, methodName) {
+    function rowClicked(courier, shipping_code) {
         const baseUrl = "{{ url_for('shipping.select_method')}}";
-        const queryParams = `?courier=${encodeURIComponent(courier)}&method=${encodeURIComponent(methodName)}`;
+        const queryParams = `?courier=${encodeURIComponent(courier)}&shipping_code=${encodeURIComponent(shipping_code)}`;
         window.location.href = baseUrl + queryParams;
     }
 </script>

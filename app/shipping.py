@@ -1,5 +1,6 @@
 from flask import Blueprint, request, redirect, render_template, session, url_for
 from app.shipper import fedex, ups, shipping_functions
+from app.logger import update_log
 
 """
 These routes are used for quoting and shipping an order
@@ -38,6 +39,9 @@ def process_data():
             else:
                 all_errors.extend(quote['value'])
 
+        # log the successful quotes
+        update_log.create_log_line(f'Successful quotes: {all_quotes}')
+
         # parse the quote results then display to the user
         quote_content, error_content = shipping_functions.parse_quotes({'quotes':all_quotes, 'errors':all_errors})
         data = {
@@ -46,6 +50,7 @@ def process_data():
             'quote_content': quote_content,
             'error_content': error_content
         }
+
         return render_template('quote_order.html', data=data)
 
     # else just redirect them back to the homepage they shouldnt be here
@@ -61,7 +66,32 @@ This page handles the user selecting a shipping method from the quote page
 """
 @shipping.route('/select_method')
 def select_method():
-    courier = request.args.get('courier')
-    method = request.args.get('method')
+    # get the args and set vars
+    data = session.get('order_data', {})
+    courier = request.args.get('courier').upper()
+    shipping_code = request.args.get('shipping_code')
+    res = {'state': 'Error', 'value': 'Missing order data'}
 
-    return {'courier': courier, 'method': method}
+
+    # only proceed if there is currently data
+    if data:
+        # log the action
+        update_log.create_log_line(f'Attempting to ship with {courier} using {shipping_code}')
+
+        # ups
+        if courier == 'UPS':
+            res = ups.ship_order(data, shipping_code)
+
+        # fedex
+        elif courier == 'FEDEX':
+            res = fedex.ship_order(data, shipping_code, '4x6')
+
+
+    # handle the result
+    if res['state'] == 'Error':
+        print(res['value'])
+
+
+    # log the action
+    update_log.create_log_line(res['value'])
+    return redirect('/')

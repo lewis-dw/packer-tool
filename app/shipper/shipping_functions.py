@@ -33,7 +33,7 @@ def get_shipping_date(end_time, days_penalty, date_format):
 
     Expected:
         FedEx           12:00, 1, %Y-%m-%d
-        UPS:            16:00, 1, ---
+        UPS:            16:00, 1, %Y%m%d
         Royal Mail:     16:00, 1, ---
         Free Shipping:  00:01, 2, ---
 
@@ -105,11 +105,11 @@ def parse_quotes(data):
         table_html = []
         for quote in quotes:
             courier = html.escape(quote['courier'].upper())
-            method_name = html.escape(quote['method_name'])
+            shipping_code = html.escape(quote['shipping_code'])
             cost = html.escape(str(quote['cost']))
             html_row = ''.join([
-                f'<tr onclick="rowClicked(\'{courier}\', \'{method_name}\')">',
-                f'<td>{courier}</td><td>{method_name}</td><td>{cost}</td>',
+                f'<tr onclick="rowClicked(\'{courier}\', \'{shipping_code}\')">',
+                f'<td>{courier}</td><td>{shipping_code}</td><td>{cost}</td>',
                 '</tr>'
             ])
             table_html.append(html_row)
