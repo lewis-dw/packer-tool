@@ -6,10 +6,22 @@ All Orders
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
+<script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
 {% endblock %}
 
 {% block header %}
 <a href="/">Back to dashboard</a>
+
+<!-- Display who is currently shipping and allow user to change -->
+<div>
+    <form>
+        <label for="current-shipper">Current shipper:</label>
+        <select id="current-shipper" name="current-shipper">
+            <!-- Options will be dynamically populated here -->
+        </select>
+        <button type="button" onclick="updateShipper()">Change</button>
+    </form>
+</div>
 {% endblock %}
 
 {% block main %}

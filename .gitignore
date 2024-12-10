@@ -4,11 +4,13 @@
 /instance/
 /testing odoo/
 /ssl/
-/debugging/
 /.venv/
 
+# ignore files in debugging but keep the folders
+/debugging/**/*.json
+/debugging/**/*.txt
+
 # ignore these files
-onefile.txt
 .env
 plan.md
 desktop.ini
