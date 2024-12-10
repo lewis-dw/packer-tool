@@ -119,7 +119,8 @@ def load_order():
             return render_template('no_order_found.html', order_id=order_id)
 
 
-    # alternatively if the method to access this page was via a post request then it means they are already after the initial clean but the statecode retrieval failed
+    # alternatively if the method to access this page was via a post request,
+    # then it means they are already after the initial clean but the statecode retrieval failed
     elif request.method == 'POST':
         # load the partial_order_data back and get the selected statecode
         data = session.get('partial_order_data', {})

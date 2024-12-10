@@ -293,8 +293,8 @@
     </div>
 
 
-
-    <!-- scripts -->
+    <!-- SCRIPTS -->
+    <!-- event listener for when the page is loaded -->
     <script>
         // event listener for when the page is loaded
         window.addEventListener('pageshow', function (event) {
@@ -304,9 +304,11 @@
                 document.body.style.overflow = ''; // Re-enable scrolling
             }
         });
+    </script>
 
 
-
+    <!-- div visibility -->
+    <script>
         // Function for toggling the visibility of a div
         function toggleSection(sectionId) {
             // Hide all sections
@@ -324,22 +326,27 @@
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.style.display = 'none');
         }
+    </script>
 
 
+    <!-- loading gif visibility -->
+    <script>
         // need some separate code for setting the gif to be visible due to display flexbox
         function showGif() {
             const section = document.getElementById('loading-gif');
             section.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
+    </script>
 
 
-        // submit clickup report task
+    <!-- submit clickup report task -->
+    <script>
         function submitReport() {
             const report_url = "{{ url_for('orders.report_issue') }}";
             const sku = document.getElementById('report-product-sku').value;
             const message = document.getElementById('report-message').value;
-            
+
             fetch(report_url, {
                 method: 'POST',
                 headers: {

@@ -26,3 +26,6 @@ Combined functionality of the scraper tool and the shipper tool.
 
 ### 10-12-2024 - v1.8
 - Added ability to report an issue with clickup from the application
+
+### 10-12-2024 - v1.9
+- Added ability to change the currently selected shipper

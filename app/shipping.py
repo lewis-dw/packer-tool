@@ -95,3 +95,18 @@ def select_method():
     # log the action
     update_log.create_log_line(res['value'])
     return redirect('/')
+
+
+
+
+
+"""
+Handles switching which person is currently shipping
+"""
+@shipping.route('/switch_shipper', methods=['POST'])
+def switch_shipper():
+    data = request.json
+    print(data)
+    # res = create_task(data['sku'], data['message'])
+    # set cookie here
+    # return jsonify({"response": res})

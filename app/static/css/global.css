@@ -2,6 +2,11 @@
 :root {
     color-scheme: dark;
 
+    /* Driftworks colours */
+    --dw-orange-1: rgba(255, 113, 13, 1);
+    --dw-orange-2: rgba(251, 48, 3, 1);
+    --dw-orange-3: rgba(190, 35, 0, 1);
+
     /* Background colours */
     --bg-color-1: rgba(32, 33, 35, 1);
     --bg-color-2: rgba(43, 44, 47, 1);
@@ -17,6 +22,8 @@
 
 
 
+
+
 body {
     background-color: var(--bg-color-1);
     color: rgba(255, 255, 255, 1);
@@ -24,16 +31,11 @@ body {
     flex-direction: column;
 }
 
-
 main {
     flex: 1;
     border: 3px solid red;
     flex-direction: column;
 }
-
-
-
-
 
 
 
@@ -47,9 +49,10 @@ h1 {
 
 
 
+
 /* Button default */
 button {
-    background-color: rgba(255, 113, 13, 1);
+    background-color: var(--dw-orange-1);
     color: rgba(255, 255, 255, 1);
     font-size: 16px;
     padding: 5px 10px;
@@ -57,18 +60,15 @@ button {
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
-    /* box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1); Subtle shadow */
 }
 
 button:hover {
-    background-color: rgba(251, 48, 3, 1);
-    /* box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); Slightly deeper shadow */
+    background-color: var(--dw-orange-2);
     transform: translateY(-2px); /* Lift effect */
 }
 
 button:active {
-    background-color: rgba(190, 35, 0, 1);
-    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); Pressed shadow */
+    background-color: var(--dw-orange-3);
     transform: translateY(0); /* Reset lift */
 }
 
@@ -76,6 +76,17 @@ button:focus {
     outline: none; /* Remove default outline */
     box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.7); /* Accessible focus ring */
 }
+
+
+
+
+
+/* Clear session button */
+#current-shipper {
+    border: 1px solid var(--dw-orange-2);
+}
+
+
 
 
 
@@ -91,6 +102,8 @@ button:focus {
 #clear-session:active {
     background-color: rgba(40, 40, 40, 1);
 }
+
+
 
 
 

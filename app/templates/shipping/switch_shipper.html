@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Switch Shipper
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block header %}
+<a href="/">Back to dashboard</a>
+{% endblock %}
+
+{% block main %}
+<body>
+    <form method="POST" action="{{ url_for('shipping.switch_shipper') }}">
+        <button type="submit" name="user" value="user_1">User 1</button>
+        <button type="submit" name="user" value="user_2">User 2</button>
+    </form>
+</body>
+{% endblock %}
