@@ -23,3 +23,6 @@ Combined functionality of the scraper tool and the shipper tool.
 ### 10-12-2024 - v1.7
 - Forgot to update this in 1.6 but mainly just finished implementing UPS and FEDEX quoting + shipping
 - Added logging for debugging
+
+### 10-12-2024 - v1.8
+- Added ability to report an issue with clickup from the application
