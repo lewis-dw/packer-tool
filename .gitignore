@@ -1,0 +1,14 @@
+# ignore these folders
+/old code/
+**/__pycache__/
+/instance/
+/testing odoo/
+/ssl/
+/debugging/
+/.venv/
+
+# ignore these files
+onefile.txt
+.env
+plan.md
+desktop.ini

@@ -19,3 +19,7 @@ Combined functionality of the scraper tool and the shipper tool.
   - UPS Quoting
 - Project versioning is a bit chaotic as I am solo developing this (the other collaborator is my personal GitHub)
 - I will try to update this log as development continues as I have been making large progress with few commits and no updates to this log. (Each Minor update I will update this)
+
+### 10-12-2024 - v1.7
+- Forgot to update this in 1.6 but mainly just finished implementing UPS and FEDEX quoting + shipping
+- Added logging for debugging
