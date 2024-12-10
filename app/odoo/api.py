@@ -10,8 +10,8 @@ from app.shipper import shipping_functions
 
 # load .env variables
 load_dotenv()
-api_base_url = os.getenv('API_BASE_URL')
-main_headers = {"api_key": os.getenv('API_KEY')}
+api_base_url = os.getenv('ODOO_API_BASE_URL')
+main_headers = {"api_key": os.getenv('ODOO_API_KEY')}
 
 
 # vars

@@ -263,7 +263,23 @@
                 {% endfor %}
             </div>
             <button type="submit" onclick="showGif()">Quote</button>
+            <button type="button" onclick="toggleSection('report-issue')">Report</button>
         </form>
+
+        <!-- Report section -->
+        <div id="report-issue" class="section">
+            <button type="button" onclick="closeSection()">Close</button>
+            <p>
+                <label for="report-product-sku">Product SKU:</label>
+                <input type="text" id="report-product-sku" name="report-product-sku">
+            </p>
+            <p>
+                <label for="report-message">Describe the issue:</label>
+                <textarea id="report-message" name="report-message"></textarea>
+            </p>
+            <button type="button" onclick="submitReport()">Submit</button>
+            <p id="response"></p>
+        </div>
     </div>
 
 
@@ -315,6 +331,29 @@
             const section = document.getElementById('loading-gif');
             section.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+        }
+
+
+        // submit clickup report task
+        function submitReport() {
+            const report_url = "{{ url_for('orders.report_issue') }}";
+            const sku = document.getElementById('report-product-sku').value;
+            const message = document.getElementById('report-message').value;
+            
+            fetch(report_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sku: sku,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = `Server response: ${data.response}`;
+            })
         }
     </script>
 </body>

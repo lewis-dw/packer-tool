@@ -7,12 +7,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Metadata variables
-__version__ = '1.7.5'  # Semantic versioning: [MAJOR|MINOR|PATCH]
+__version__ = '1.8.0'  # Semantic versioning: [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 
 
-def create_app(mode):
+def create_app():
     """
     Factory function to create and configure the Flask application
     """
@@ -20,12 +20,9 @@ def create_app(mode):
     app = Flask(__name__)
 
 
-    # if user requested testing mode then dont try load up the config or any env vars
-    if mode == 'TEST':
-        app.secret_key = 'test'
-    else:
-        app.config.from_object('config.Config') # config
-        app.secret_key = os.getenv('SECRET_KEY') # secret key for session storage
+    # load up the config and env vars
+    app.config.from_object('config.Config') # app config
+    app.secret_key = os.getenv('SECRET_KEY') # secret key for session storage
 
 
     # configure Talisman for security

@@ -1,6 +1,7 @@
-from flask import Blueprint, request, redirect, render_template, session, url_for, flash
+from flask import Blueprint, request, redirect, render_template, session, url_for, jsonify
 from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.shipper import shipping_functions
+from app.clickup.api import create_task
 
 """
 These routes are used for when getting orders from odoo
@@ -201,6 +202,7 @@ def save_order():
             # format value to correct data type that it should be eg str(1.0) -> int(1)
             value = str(value).strip()
 
+
             # order commercial invoice lines
             if key.startswith('line-'):
                 # extract the key name and index from the key
@@ -214,10 +216,12 @@ def save_order():
                 true_key = key
                 data[key] = value
 
+
             # if the key was a key col and the value was empty then need to update the missing cols
             if true_key in key_cols.keys() and value == '':
                 missing_vals = True
                 key_cols[key] = 'Required'
+
 
         # this needs to be separate due to checkbox behaviour
         data['etd_required'] = request.form.get('etd_required', 'off')
@@ -225,6 +229,7 @@ def save_order():
         # update session order data regardless if they are missing data or not
         session.clear()
         session['order_data'] = data
+
 
         # if there were missing values then we need to re-render the page with the missing cols highlighted
         if missing_vals:
@@ -236,3 +241,16 @@ def save_order():
             return redirect(url_for('shipping.process_data'))
     else:
         return redirect('/')
+
+
+
+
+
+"""
+Submit the report task to clickup
+"""
+@orders.route('/report_issue', methods=['POST'])
+def report_issue():
+    data = request.json
+    res = create_task(data['sku'], data['message'])
+    return jsonify({"response": res})
