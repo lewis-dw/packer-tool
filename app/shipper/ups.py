@@ -225,11 +225,11 @@ def create_quote_payload(data, parcels):
 
 def quote_order(data):
     # clean the data
-    data = clean_data(data)
+    c_data = clean_data(data)
 
     # generate parcels before creating payload
-    parcels = format_parcels(data['commercial_invoice_lines'], 'Type')
-    payload = create_quote_payload(data, parcels)
+    parcels = format_parcels(c_data['commercial_invoice_lines'], 'Type')
+    payload = create_quote_payload(c_data, parcels)
 
     # quote the order
     res = send_payload(quote_url, payload)
@@ -441,12 +441,12 @@ def create_ship_payload(data, shipping_code, parcels, items):
 
 def ship_order(data, shipping_code):
     # clean the data
-    data = clean_data(data)
+    c_data = clean_data(data)
 
     # generate parcels and items before creating payload
-    items = format_items(data['commercial_invoice_lines'])
-    parcels = format_parcels(data['commercial_invoice_lines'])
-    payload = create_ship_payload(data, shipping_code, parcels, items)
+    items = format_items(c_data['commercial_invoice_lines'])
+    parcels = format_parcels(c_data['commercial_invoice_lines'])
+    payload = create_ship_payload(c_data, shipping_code, parcels, items)
 
     # ship the order
     res = send_payload(label_url, payload)
@@ -466,4 +466,5 @@ def ship_order(data, shipping_code):
 
 
 def parse_ship_response(res):
-    return res
+    print(res)
+    return {'state':'Error', 'value':'temp'}

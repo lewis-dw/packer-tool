@@ -26,6 +26,25 @@ function populateShippers() {
 
 
 
+// Send an AJAX request to Flask backend to log the event
+function logEvent(eventName) {
+    fetch('/log_event', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ event: eventName }),
+    }).then(response => {
+        if (!response.ok) {
+            console.error('Failed to log event');
+        }
+    }).catch(error => {
+        console.error('Error logging event:', error);
+    });
+}
+
+
+
 // Set a cookie
 function setCookie(name, value, days) {
     let expires = "";
@@ -34,7 +53,8 @@ function setCookie(name, value, days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toUTCString();
     }
-    document.cookie = name + "=" + encodeURIComponent(value || "") + expires + "; path=/";
+    value = encodeURIComponent(value || "");
+    document.cookie = `${name}=${value};${expires};path=/`;
 }
 
 // Update the current shipper cookie
@@ -42,6 +62,9 @@ function updateShipper() {
     const dropdown = document.getElementById('current-shipper');
     const selectedShipper = dropdown.value;
     setCookie("currentShipper", selectedShipper, 1);
+
+    // Log the shipper update event
+    logEvent(`Shipper updated to: ${selectedShipper}`);
 }
 
 

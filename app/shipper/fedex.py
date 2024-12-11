@@ -213,12 +213,12 @@ def create_quote_payload(data, items, parcels):
 
 def quote_order(data):
     # clean the data
-    data = clean_data(data)
+    c_data = clean_data(data)
 
     # generate parcels and items before creating payload
-    items = format_items(data['commercial_invoice_lines'])
-    parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
-    payload = create_quote_payload(data, items, parcels)
+    items = format_items(c_data['commercial_invoice_lines'])
+    parcels = format_parcels(c_data['commercial_invoice_lines'], c_data['order_name'])
+    payload = create_quote_payload(c_data, items, parcels)
 
     # quote the payload
     spayload = json.dumps(payload)
@@ -411,13 +411,13 @@ def ship_order(data, shipping_code, printer_size):
     }
 
     # clean the data
-    data = clean_data(data)
+    c_data = clean_data(data)
 
     # generate parcels and items before creating payload
-    items = format_items(data['commercial_invoice_lines'])
-    parcels = format_parcels(data['commercial_invoice_lines'], data['order_name'])
+    items = format_items(c_data['commercial_invoice_lines'])
+    parcels = format_parcels(c_data['commercial_invoice_lines'], c_data['order_name'])
     label_size = size_translate.get(printer_size, 'STOCK_4X6')
-    payload = create_ship_payload(data, shipping_code, label_size, items, parcels)
+    payload = create_ship_payload(c_data, shipping_code, label_size, items, parcels)
 
     # ship the order
     spayload = json.dumps(payload)
@@ -450,12 +450,5 @@ def parse_ship_response(res):
 
     # no errors? lets go parsing!
     else:
-        print(res.json())
-        # quotes = []
-        # for method in res['output']['rateReplyDetails']:
-        #     quotes.append({
-        #         'courier': 'fedex',
-        #         'method_name': method['serviceType'],
-        #         'cost': method["ratedShipmentDetails"][0]["totalNetCharge"]
-        #     })
-        # return {'state':'Success', 'value':quotes}
+        print(res)
+        return {'state':'Error', 'value':'temp'}

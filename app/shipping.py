@@ -1,4 +1,6 @@
-from flask import Blueprint, request, redirect, render_template, session, url_for
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from copy import deepcopy
+from flask import Blueprint, request, redirect, render_template, session
 from app.shipper import fedex, ups, shipping_functions
 from app.logger import update_log
 
@@ -26,18 +28,35 @@ def process_data():
 
     # if there is data then proceed
     if data:
-        # after verification proceed to quote the order
-        fedex_result = fedex.quote_order(data)
-        ups_result = ups.quote_order(data)
-
-        # loop over all quotes and join the successful ones
+        # after verification proceed to quote the order using concurrent futures
         all_quotes = []
         all_errors = []
-        for quote in [fedex_result, ups_result]:
-            if quote['state'] == 'Success':
-                all_quotes.extend(quote['value'])
-            else:
-                all_errors.extend(quote['value'])
+        with ThreadPoolExecutor() as executor:
+            future_to_service = {
+                executor.submit(fedex.quote_order, deepcopy(data)): 'FedEx',
+                executor.submit(ups.quote_order, deepcopy(data)): 'UPS'
+            }
+
+            # process results as they complete
+            for future in as_completed(future_to_service):
+                service_name = future_to_service[future]
+                print(service_name)
+                quote = future.result()
+                if quote['state'] == 'Success':
+                    all_quotes.extend(quote['value'])
+                else:
+                    all_errors.extend(quote['value'])
+        # fedex_result = fedex.quote_order(data)
+        # ups_result = ups.quote_order(data)
+
+        # # loop over all quotes and join the successful ones
+        # all_quotes = []
+        # all_errors = []
+        # for quote in [fedex_result, ups_result]:
+        #     if quote['state'] == 'Success':
+        #         all_quotes.extend(quote['value'])
+        #     else:
+        #         all_errors.extend(quote['value'])
 
         # log the successful quotes
         update_log.create_log_line(f'Successful quotes: {all_quotes}')
