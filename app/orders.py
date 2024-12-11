@@ -190,9 +190,19 @@ def save_order():
         'product_height':'',
         'product_width':'',
         'product_length':'',
-
     }
     missing_vals = False
+
+    # these are key cols that need to have a warning if they change
+    change_cols = {
+        # shipping info
+        'shipping_postcode':'',
+
+        # invoice lines
+        'product_demand_qty':''
+    }
+    changed_vals = False
+
 
     # we will update the session data with what we got returned from the post form
     data = session.get('order_data', {})
@@ -211,12 +221,31 @@ def save_order():
                 true_key, index = key.rsplit('_', 1)
                 true_key = true_key.split('-')[1]
                 index = int(index) - 1
+
+                # set vars
+                if true_key not in ['parcel_insurance']:
+                    old_value = data['commercial_invoice_lines'][index][true_key]
                 data['commercial_invoice_lines'][index][true_key] = value
+                message_if_changed = f"`{true_key}` from invoice line {index+1} has changed, originally: `{old_value}`, new: `{value}`"
 
             # all other values
             else:
+                # set vars
                 true_key = key
+                if key != 'etd_required': # temp - remove when etd req country thing implemented
+                    old_value = data[key]
                 data[key] = value
+                message_if_changed = f"`{true_key}` has changed, originally: `{old_value}`, new: `{value}`"
+
+
+            # if the key was a warn of change key and it has changed value then warn the user
+            if true_key in change_cols.keys():
+                if old_value != value:
+                    # value has changed so log and warn
+                    changed_vals = True
+                    shipper = request.cookies.get('current_shipper')
+                    update_log.create_log_line('results', f"`{shipper}` in [{data['order_name']}]: {message_if_changed}")
+                    change_cols[true_key] = message_if_changed
 
 
             # if the key was a key col and the value was empty then need to update the missing cols
@@ -240,6 +269,9 @@ def save_order():
 
         # if all required fields were entered then redirect user
         else:
+            if not changed_vals:
+                change_cols = {'none': 'No major changes made'}
+            session['changed_vals'] = change_cols
             return redirect(url_for('shipping.process_data'))
     else:
         return redirect('/')

@@ -30,6 +30,16 @@ Quote Order
 
     <p>Customer paid: £{{ data.shipping_cost or '0.0' }}</p>
 
+    <!-- Dynamically generate the changes made on previous page -->
+    <div>
+        <h2>Changes</h2>
+        {% for change_message in changes.values() %}
+            {% if change_message %}
+                <p>{{ change_message }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+
     <div>
         <h2>Quotes</h2>
         {{ data.quote_content|safe }}

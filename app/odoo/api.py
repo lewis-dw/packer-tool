@@ -203,10 +203,10 @@ def get_statecode(country, post_code):
 def clean_data(data):
     # COMPANY
     """
-    If company:
-        do stuff
+    If country in req_etd
+        set etd to on
     Else:
-        do other stuff
+        set etd to off
     """
 
 
@@ -262,3 +262,25 @@ def clean_data(data):
     data['commercial_invoice_lines'] = commercial_invoice
 
     return data
+
+
+###########################################################################################################################################
+# Stage 4 - Send odoo a response
+
+
+def send_message(order_key, courier, tracking_no):
+    # generate url
+    url = join_url(api_base_url, 'dwapi', 'v1', 'orders', order_key, 'ship')
+
+    # generate payload
+    payload = {
+        'tracking_ref': f'{courier}:{tracking_no}',
+        'comment': 'test'
+    }
+
+    # get res and parse
+    res = requests.post(url, headers=main_headers, json=payload).json()
+    if res.get('error', '') != '':
+        print(res)
+    else:
+        print(res)

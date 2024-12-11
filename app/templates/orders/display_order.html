@@ -155,17 +155,19 @@
             <div id="billing-info" class="section">
                 <button type="button" onclick="closeSection()">Close</button>
                 <h2>Billing Info</h2>
-                <p>Company: {{ order.billing_company or '' }}</p>
-                <p>Name: {{ order.billing_name or '' }}</p>
-                <p>Streetline 1: {{ order.billing_street or '' }}</p>
-                <p>Streetline 2: {{ order.billing_street2 or '' }}</p>
-                <p>Locality: {{ order.billing_locality or '' }}</p>
-                <p>Region: {{ order.billing_region or '' }}</p>
-                <p>Postcode: {{ order.billing_postcode or '' }}</p>
-                <p>Country: {{ order.billing_country or '' }}</p>
-                <p>Country ID: {{ order.billing_country_id or '' }}</p>
-                <p>Telephone: {{ order.billing_telephone or '' }}</p>
-                <p>VAT ID: {{ order.billing_vat_id or '' }}</p>
+                <div id="order-info-block">
+                    <p>Company: {{ order.billing_company or '' }}</p>
+                    <p>Name: {{ order.billing_name or '' }}</p>
+                    <p>Streetline 1: {{ order.billing_street or '' }}</p>
+                    <p>Streetline 2: {{ order.billing_street2 or '' }}</p>
+                    <p>Locality: {{ order.billing_locality or '' }}</p>
+                    <p>Region: {{ order.billing_region or '' }}</p>
+                    <p>Postcode: {{ order.billing_postcode or '' }}</p>
+                    <p>Country: {{ order.billing_country or '' }}</p>
+                    <p>Country ID: {{ order.billing_country_id or '' }}</p>
+                    <p>Telephone: {{ order.billing_telephone or '' }}</p>
+                    <p>VAT ID: {{ order.billing_vat_id or '' }}</p>
+                </div>
             </div>
 
 
@@ -174,7 +176,7 @@
                 <button type="button" onclick="closeSection()">Close</button>
                 <h2>Items Info</h2>
                 {% for item in order.order_items %}
-                <div>
+                <div id="order-info-block">
                     <p>Product SKU: {{ item.product_sku or '' }}</p>
                     <p>Product Name: {{ item.product_name or '' }}</p>
                     <p>Description: {{ item.line_description or '' }}</p>
@@ -194,7 +196,7 @@
                 <button type="button" onclick="closeSection()">Close</button>
                 <h2>Invoice Info</h2>
                 {% for line in order.commercial_invoice_lines %}
-                <div>
+                <div id="order-info-block">
                     <!-- Product SKU -->
                     <p>
                         <label for="line-product_sku_{{ loop.index }}">Product SKU:</label>

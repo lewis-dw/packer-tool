@@ -24,6 +24,7 @@ Process the data before quoting the data with every courier
 def process_data():
     # get the currently loaded data from flask session
     data = session.get('order_data', {})
+    changes = session.pop('changed_vals', {})
     shipper = request.cookies.get('current_shipper')
 
 
@@ -62,7 +63,7 @@ def process_data():
             'error_content': error_content
         }
 
-        return render_template('quote_order.html', data=data)
+        return render_template('quote_order.html', data=data, changes=changes)
 
     # else just redirect them back to the homepage they shouldnt be here
     else:
