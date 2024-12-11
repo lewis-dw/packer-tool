@@ -24,12 +24,13 @@ Process the data before quoting the data with every courier
 def process_data():
     # get the currently loaded data from flask session
     data = session.get('order_data', {})
+    shipper = request.cookies.get('current_shipper')
 
 
     # if there is data then proceed
     if data:
         # after verification proceed to quote the order using concurrent futures
-        update_log.create_log_line(f"Attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
+        update_log.create_log_line(f"{shipper} attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
         all_quotes = []
         all_errors = []
         with ThreadPoolExecutor() as executor:
@@ -40,8 +41,7 @@ def process_data():
 
             # process results as they complete
             for future in as_completed(future_to_service):
-                service_name = future_to_service[future]
-                print(service_name)
+                service_name = future_to_service[future] # pull this in case i want to debug which has completed
                 quote = future.result()
                 if quote['state'] == 'Success':
                     all_quotes.extend(quote['value'])
@@ -82,8 +82,9 @@ def select_method():
     data = session.get('order_data', {})
     courier = request.args.get('courier').upper()
     shipping_code = request.args.get('shipping_code')
+    printer_loc = request.args.get('printer_loc')
+    label_size = request.args.get('label_size')
     shipper = request.cookies.get('current_shipper')
-    res = {'state': 'Error', 'value': 'Missing order data'}
 
 
     # only proceed if there is currently data
@@ -97,19 +98,40 @@ def select_method():
 
         # fedex
         elif courier == 'FEDEX':
-            res = fedex.ship_order(data, shipping_code, '4x6')
+            res = fedex.ship_order(data, shipping_code, label_size)
+
+    # if they access the page with no data redirect them back to the dashboard
+    else:
+        return redirect('/')
 
 
-    # handle the result
+    # deal with result of a successful ship and log a message respective of what happened
     if res['state'] == 'Error':
         errors = res['value']
         ship_result = f'Failed with {courier}. Error/s: {errors}'
-
+        update_log.create_log_line(ship_result)
     else:
         master_id = res['value']['master_id']
+        labels = res['value']['labels']
         ship_result = f'Successfully shipped with {courier}. Tracking number: {master_id}'
+        update_log.create_log_line(ship_result)
 
 
-    # log the action
-    update_log.create_log_line(ship_result)
-    return redirect('/')
+    # if success then we need to also print the labels out
+    if res['state'] == 'Success':
+        # loop over labels
+        for label_id, label_data in enumerate(labels):
+            # print the label
+            label_id += 1
+            label_name = f'{master_id}_{label_id}.zpl'
+            print_res = shipping_functions.print_label(label_data, printer_loc, label_size, label_name)
+
+            # deal with result of printing the label
+            initial_message = f'Label {label_id}/{len(labels)} for {master_id}'
+            if print_res['state'] == 'Error':
+                update_log.create_log_line(f'{initial_message} failed to print. Reason: {print_res['value']}')
+            else:
+                update_log.create_log_line(f'{initial_message} succeeded in printing.')
+
+    # render the results to the user
+    return render_template('ship_order.html', data=ship_result)

@@ -33,6 +33,15 @@ Quote Order
     <div>
         <h2>Quotes</h2>
         {{ data.quote_content|safe }}
+
+        <select id="printer-loc" name="printer-loc">
+            <!-- Options will be dynamically populated here -->
+            <option value="loc-1">Main room</option> <!-- temporary so it works for now -->
+        </select>
+        <select id="label-size" name="label-size">
+            <option value="4x6">4x6</option>
+            <option value="4x675">4x6.75</option>
+        </select>
     </div>
 
     <div>
@@ -42,9 +51,21 @@ Quote Order
 </body>
 <script>
     function rowClicked(courier, shipping_code) {
+        // Get values
         const baseUrl = "{{ url_for('shipping.select_method')}}";
-        const queryParams = `?courier=${encodeURIComponent(courier)}&shipping_code=${encodeURIComponent(shipping_code)}`;
-        window.location.href = baseUrl + queryParams;
+        const printerLoc = document.getElementById('printer-loc').value;
+        const labelSize = document.getElementById('label-size').value;
+
+        // Build the query params with encoding
+        const queryParams = new URLSearchParams({
+            courier: courier,
+            shipping_code: shipping_code,
+            printer_loc: printerLoc,
+            label_size: labelSize
+        }).toString();
+
+        // Redirect with the query params
+        window.location.href = `${baseUrl}?${queryParams}`;
     }
 </script>
 {% endblock %}

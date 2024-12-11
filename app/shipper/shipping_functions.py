@@ -150,3 +150,22 @@ def parse_quotes(data):
         error_content = '<p>No errors during quoting</p>'
 
     return quote_content, error_content
+
+
+
+
+
+def print_label(label_data, printer_loc, label_size, label_name):
+    """
+    Prints a label to a specified printer
+    """
+    # save the zpl as a file in a current day dir
+
+    # check if printer loc and size are valid
+    #   - this is fine if it isnt as it can be retried on the next page after redirect
+
+    # then try to connect
+
+    # then try to print
+
+    return {'state': 'Error', 'value': 'Still in development'}
