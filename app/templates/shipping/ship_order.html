@@ -26,25 +26,6 @@ Quote Order
 
 {% block main %}
 <body>
-    <h1>Quoted [{{ data.order_id }}] to {{ data.country_to }}</h1>
 
-    <p>Customer paid: £{{ data.shipping_cost or '0.0' }}</p>
-
-    <div>
-        <h2>Quotes</h2>
-        {{ data.quote_content|safe }}
-    </div>
-
-    <div>
-        <h2>Errors</h2>
-        {{ data.error_content|safe }}
-    </div>
 </body>
-<script>
-    function rowClicked(courier, shipping_code) {
-        const baseUrl = "{{ url_for('shipping.select_method')}}";
-        const queryParams = `?courier=${encodeURIComponent(courier)}&shipping_code=${encodeURIComponent(shipping_code)}`;
-        window.location.href = baseUrl + queryParams;
-    }
-</script>
 {% endblock %}

@@ -46,20 +46,12 @@ def process_data():
                     all_quotes.extend(quote['value'])
                 else:
                     all_errors.extend(quote['value'])
-        # fedex_result = fedex.quote_order(data)
-        # ups_result = ups.quote_order(data)
 
-        # # loop over all quotes and join the successful ones
-        # all_quotes = []
-        # all_errors = []
-        # for quote in [fedex_result, ups_result]:
-        #     if quote['state'] == 'Success':
-        #         all_quotes.extend(quote['value'])
-        #     else:
-        #         all_errors.extend(quote['value'])
 
-        # log the successful quotes
+        # log the quoting results
         update_log.create_log_line(f'Successful quotes: {all_quotes}')
+        if all_errors:
+            update_log.create_log_line(f'Errors: {all_errors}')
 
         # parse the quote results then display to the user
         quote_content, error_content = shipping_functions.parse_quotes({'quotes':all_quotes, 'errors':all_errors})
@@ -108,24 +100,14 @@ def select_method():
 
     # handle the result
     if res['state'] == 'Error':
-        print(res['value'])
+        errors = res['value']
+        ship_result = f'Failed with {courier}. Error/s: {errors}'
+
+    else:
+        master_id = res['value']['master_id']
+        ship_result = f'Successfully shipped with {courier}. Tracking number: {master_id}'
 
 
     # log the action
-    update_log.create_log_line(res['value'])
+    update_log.create_log_line(ship_result)
     return redirect('/')
-
-
-
-
-
-"""
-Handles switching which person is currently shipping
-"""
-@shipping.route('/switch_shipper', methods=['POST'])
-def switch_shipper():
-    data = request.json
-    print(data)
-    # res = create_task(data['sku'], data['message'])
-    # set cookie here
-    # return jsonify({"response": res})

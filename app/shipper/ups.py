@@ -5,6 +5,7 @@ from app.shipper.shipping_functions import get_shipping_date, get_country_code
 import json
 import requests
 from requests.auth import HTTPBasicAuth
+import base64
 
 # generate root_dir for outputting debug files
 cur_dir = pathlib.Path(__file__).parent
@@ -466,5 +467,32 @@ def ship_order(data, shipping_code):
 
 
 def parse_ship_response(res):
-    print(res)
-    return {'state':'Error', 'value':'temp'}
+    # check if we have errors
+    if res.get('ShipmentResponse', '') == '':
+        print(res)
+        return {'state':'Error', 'value':'ERRRROR'}
+
+    # no errors? lets go parsing!
+    else:
+        # extract key values
+        main_res = res['ShipmentResponse']['ShipmentResults']
+        master_id = main_res['ShipmentIdentificationNumber']
+        labels = main_res['PackageResults']
+
+        # loop over the labels to extract the zpl data
+        zpls = []
+        for label in labels:
+            # grab graphic image and decode it to get zpl data
+            graphic_image = label["ShippingLabel"]["GraphicImage"]
+            label_data = base64.b64decode(graphic_image)
+            zpl_data = label_data.decode('latin-1').replace('\n', '')
+            zpls.append(zpl_data)
+
+        # return the data
+        return {
+            'state': 'Success',
+            'value': {
+                'master_id': master_id,
+                'labels': zpls
+            }
+        }

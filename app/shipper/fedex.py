@@ -442,10 +442,8 @@ def parse_ship_response(res):
     if res.get('errors', '') != '':
         errors = []
         for error in res['errors']:
-            errors.append({
-                'courier': 'fedex',
-                'error': f"{error['code']} - {error['message']}"
-            })
+            errors.append(f"{error['code']} - {error['message']}")
+        errors = '||'.join(errors)
         return {'state':'Error', 'value':errors}
 
     # no errors? lets go parsing!
