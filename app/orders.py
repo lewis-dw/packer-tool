@@ -2,6 +2,7 @@ from flask import Blueprint, request, redirect, render_template, session, url_fo
 from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.shipper import shipping_functions
 from app.clickup.api import create_task
+from app.logger import update_log
 
 """
 These routes are used for when getting orders from odoo
@@ -252,6 +253,12 @@ Submit the report task to clickup
 """
 @orders.route('/report_issue', methods=['POST'])
 def report_issue():
-    data = request.json
-    res = create_task(data['sku'], data['message'])
+    # extract the data from the request
+    sku = request.json['sku']
+    message = request.json['message']
+    shipper = request.cookies.get('current_shipper')
+
+    # send the report and log the event
+    res = create_task(sku, shipper, message)
+    update_log.create_log_line(f"{shipper} tried to report `{sku} - {message}`. Response: {res}")
     return jsonify({"response": res})

@@ -1,6 +1,5 @@
 # import the create_app function from __init__.py
 from app import create_app
-# from flask import session
 
 # if running in main then create the application and run it
 if __name__ == '__main__':

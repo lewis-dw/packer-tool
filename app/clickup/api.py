@@ -46,7 +46,7 @@ def next_friday():
 
 
 
-def create_task(sku, message):
+def create_task(sku, shipper, message):
     """
     Creates a clickup task with the inputted sku and message
 
@@ -59,6 +59,12 @@ def create_task(sku, message):
     """
     # send the task creation if data is valid
     if sku:
+        # generate the message content
+        message = [
+            message,
+            f'~ {shipper}'
+        ]
+        message = '\n'.join(message)
         # generate payload
         payload = {
             "name": f'Product SKU: {sku}',

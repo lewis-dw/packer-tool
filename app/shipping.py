@@ -29,6 +29,7 @@ def process_data():
     # if there is data then proceed
     if data:
         # after verification proceed to quote the order using concurrent futures
+        update_log.create_log_line(f"Attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
         all_quotes = []
         all_errors = []
         with ThreadPoolExecutor() as executor:
@@ -81,13 +82,14 @@ def select_method():
     data = session.get('order_data', {})
     courier = request.args.get('courier').upper()
     shipping_code = request.args.get('shipping_code')
+    shipper = request.cookies.get('current_shipper')
     res = {'state': 'Error', 'value': 'Missing order data'}
 
 
     # only proceed if there is currently data
     if data:
         # log the action
-        update_log.create_log_line(f'Attempting to ship with {courier} using {shipping_code}')
+        update_log.create_log_line(f'{shipper} attempting to ship with {courier} using {shipping_code}.')
 
         # ups
         if courier == 'UPS':

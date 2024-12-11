@@ -1,8 +1,10 @@
 // List of shippers
 const shippers = [
-    { value: "user1", text: "User 1" },
-    { value: "user2", text: "User 2" },
-    { value: "user3", text: "User 3" }
+    { value: "josh", text: "Josh" },
+    { value: "webby", text: "Webby" },
+    { value: "hayden", text: "Hayden" },
+    { value: "matt", text: "Matt" },
+    { value: "other", text: "Other" }
 ];
 
 // Populate the dropdown with shipper options
@@ -61,7 +63,7 @@ function setCookie(name, value, days) {
 function updateShipper() {
     const dropdown = document.getElementById('current-shipper');
     const selectedShipper = dropdown.value;
-    setCookie("currentShipper", selectedShipper, 1);
+    setCookie("current_shipper", selectedShipper, 1);
 
     // Log the shipper update event
     logEvent(`Shipper updated to: ${selectedShipper}`);
@@ -83,7 +85,7 @@ window.onload = function() {
     populateShippers();
 
     // Then change the option currently selected
-    const currentShipper = getCookie("currentShipper");
+    const currentShipper = getCookie("current_shipper");
     if (currentShipper) {
         const dropdown = document.getElementById('current-shipper');
         dropdown.value = currentShipper;
