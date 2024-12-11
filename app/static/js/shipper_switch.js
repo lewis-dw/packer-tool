@@ -29,13 +29,13 @@ function populateShippers() {
 
 
 // Send an AJAX request to Flask backend to log the event
-function logEvent(eventName) {
+function logEvent(logLoc, eventMessage) {
     fetch('/log_event', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ event: eventName }),
+        body: JSON.stringify({ location: logLoc, event: eventMessage }),
     }).then(response => {
         if (!response.ok) {
             console.error('Failed to log event');
@@ -66,7 +66,7 @@ function updateShipper() {
     setCookie("current_shipper", selectedShipper, 1);
 
     // Log the shipper update event
-    logEvent(`Shipper updated to: ${selectedShipper}`);
+    logEvent(`actions`, `Shipper updated to: ${selectedShipper}`);
 }
 
 

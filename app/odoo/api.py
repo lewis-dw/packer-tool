@@ -201,6 +201,31 @@ def get_statecode(country, post_code):
 
 
 def clean_data(data):
+    # COMPANY
+    """
+    If company:
+        do stuff
+    Else:
+        do other stuff
+    """
+
+
+    # TRADER
+    """
+    If trader:
+        do stuff
+    Else:
+        do other stuff
+    """
+
+
+    # POSTCODE
+    """
+    strip hyphens out
+    - maybe upgrade this to strip any nonalphanumerical and non spaces out? [^a-zA-Z0-9 ]
+    """
+
+
     # if the data is missing it's statecode then try to find it automatically based on the country
     # else just give it a random value because if it isnt explicitly being told to get a value then it isnt required
     if not data.get('shipping_statecode', ''):

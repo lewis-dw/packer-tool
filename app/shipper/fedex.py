@@ -1,7 +1,8 @@
 import os
 import pathlib
 from dotenv import load_dotenv
-from app.shipper.shipping_functions import get_shipping_date, get_country_code
+from app.shipper.shipping_functions import get_shipping_date, get_country_code, download_with_retries
+from app.logger import update_log
 import json
 import requests
 
@@ -424,14 +425,14 @@ def ship_order(data, shipping_code, printer_size):
     res = send_payload(label_url, spayload)
 
     # we want to dump the payload and response for debugging
-    with open(os.path.join(debug_dir, 'quote', 'fedex', 'payload.json'), 'w') as f:
+    with open(os.path.join(debug_dir, 'ship', 'fedex', 'payload.json'), 'w') as f:
         json.dump(payload, f, indent=4)
-    with open(os.path.join(debug_dir, 'quote', 'fedex', 'response.json'), 'w') as f:
+    with open(os.path.join(debug_dir, 'ship', 'fedex', 'response.json'), 'w') as f:
         json.dump(res.json(), f, indent=4)
 
     # parse the result and return
-    labels = parse_ship_response(res.json())
-    return labels
+    res = parse_ship_response(res.json())
+    return res
 
 
 
@@ -448,5 +449,50 @@ def parse_ship_response(res):
 
     # no errors? lets go parsing!
     else:
-        print(res)
-        return {'state':'Error', 'value':'temp'}
+        # extract key values
+        main_res = res['output']['transactionShipments']
+        master_id = main_res['masterTrackingNumber']
+        commerical_invoice_url = main_res['shipmentDocuments'][0]['url']
+        labels = main_res['pieceResponses']
+
+
+        # attempt to download the commericial invoice and return result
+        res = download_with_retries(commerical_invoice_url, delay=1, max_retry=100)
+        value = res['value']
+        if res['state'] == 'Error':
+            update_log.create_log_line('results', f'Commercial invoice download failed: {value}. Available at: {commerical_invoice_url}')
+        else:
+            """Send the pdf to database"""
+            print(value)
+
+
+        # loop over the labels to extract the zpl data
+        zpls = []
+        for label in labels:
+            # grab label name
+            label_name = label['trackingNumber']
+
+            # grab label url and download it to get zpl data
+            label_data_url = label['packageDocuments'][0]['url']
+            res = download_with_retries(label_data_url, delay=1, max_retry=100)
+            value = res['value']
+            if res['state'] == 'Error':
+                update_log.create_log_line('results', f'ZPL file {label_name} download failed: {value}. Available at: {label_data_url}')
+            else:
+                print(value)
+
+            # append raw zpl data to the labels list
+            zpls.append({
+                'label_name': label_name,
+                'label_data': 'x'
+            })
+
+
+        # return the data
+        return {
+            'state': 'Success',
+            'value': {
+                'master_id': master_id,
+                'labels': zpls
+            }
+        }

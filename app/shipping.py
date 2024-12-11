@@ -30,7 +30,7 @@ def process_data():
     # if there is data then proceed
     if data:
         # after verification proceed to quote the order using concurrent futures
-        update_log.create_log_line(f"{shipper} attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
+        update_log.create_log_line('actions', f"`{shipper}` attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
         all_quotes = []
         all_errors = []
         with ThreadPoolExecutor() as executor:
@@ -50,9 +50,8 @@ def process_data():
 
 
         # log the quoting results
-        update_log.create_log_line(f'Successful quotes: {all_quotes}')
-        if all_errors:
-            update_log.create_log_line(f'Errors: {all_errors}')
+        update_log.create_log_line('actions', f'{len(all_quotes)} valid. {len(all_errors)} errors.')
+
 
         # parse the quote results then display to the user
         quote_content, error_content = shipping_functions.parse_quotes({'quotes':all_quotes, 'errors':all_errors})
@@ -90,7 +89,7 @@ def select_method():
     # only proceed if there is currently data
     if data:
         # log the action
-        update_log.create_log_line(f'{shipper} attempting to ship with {courier} using {shipping_code}.')
+        update_log.create_log_line('actions', f'`{shipper}` attempting to ship with {courier} using {shipping_code}.')
 
         # ups
         if courier == 'UPS':
@@ -109,29 +108,30 @@ def select_method():
     if res['state'] == 'Error':
         errors = res['value']
         ship_result = f'Failed with {courier}. Error/s: {errors}'
-        update_log.create_log_line(ship_result)
     else:
         master_id = res['value']['master_id']
         labels = res['value']['labels']
         ship_result = f'Successfully shipped with {courier}. Tracking number: {master_id}'
-        update_log.create_log_line(ship_result)
+
+    # log the event
+    update_log.create_log_line('actions', res['state'])
+    update_log.create_log_line('results', ship_result)
 
 
     # if success then we need to also print the labels out
     if res['state'] == 'Success':
         # loop over labels
-        for label_id, label_data in enumerate(labels):
+        for label_id, label_dict in enumerate(labels):
             # print the label
-            label_id += 1
-            label_name = f'{master_id}_{label_id}.zpl'
-            print_res = shipping_functions.print_label(label_data, printer_loc, label_size, label_name)
+            print_res = shipping_functions.print_label(label_dict['label_data'], printer_loc, label_size, label_dict['label_name'])
 
             # deal with result of printing the label
             initial_message = f'Label {label_id}/{len(labels)} for {master_id}'
             if print_res['state'] == 'Error':
-                update_log.create_log_line(f'{initial_message} failed to print. Reason: {print_res['value']}')
+                update_log.create_log_line('results', f"{initial_message} failed to print. Reason: {print_res['value']}")
             else:
-                update_log.create_log_line(f'{initial_message} succeeded in printing.')
+                update_log.create_log_line('results', f'{initial_message} succeeded in printing.')
+
 
     # render the results to the user
     return render_template('ship_order.html', data=ship_result)

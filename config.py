@@ -5,6 +5,7 @@ load_dotenv()
 
 class Config:
     # get environment variables
+    prefix = os.getenv('DB_PREFIX')
     username = os.getenv('DB_USERNAME')
     password = os.getenv('DB_PASSWORD')
     host = os.getenv('DB_HOST')
@@ -12,6 +13,6 @@ class Config:
     name = os.getenv('DB_NAME')
 
     # SECRET_KEY = 'your_secret_key'
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{username}:{password}@{host}:{port}/{name}"
+    SQLALCHEMY_DATABASE_URI = f"{prefix}://{username}:{password}@{host}:{port}/{name}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False

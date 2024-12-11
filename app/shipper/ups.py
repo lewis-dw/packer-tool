@@ -479,14 +479,24 @@ def parse_ship_response(res):
         master_id = main_res['ShipmentIdentificationNumber']
         labels = main_res['PackageResults']
 
+
         # loop over the labels to extract the zpl data
         zpls = []
-        for label in labels:
+        for label_id, label in enumerate(labels):
+            # create label name
+            label_name = f'{master_id}_{label_id+1}'
+
             # grab graphic image and decode it to get zpl data
             graphic_image = label["ShippingLabel"]["GraphicImage"]
             label_data = base64.b64decode(graphic_image)
             zpl_data = label_data.decode('latin-1').replace('\n', '')
-            zpls.append(zpl_data)
+
+            # append raw zpl data to the labels list
+            zpls.append({
+                'label_name': label_name,
+                'label_data': zpl_data
+            })
+
 
         # return the data
         return {

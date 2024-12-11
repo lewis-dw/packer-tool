@@ -1,13 +1,17 @@
 from flask import Flask, render_template, send_from_directory, g
 from flask_talisman import Talisman
+from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# load environment variables
 load_dotenv()
 
-# Metadata variables
-__version__ = '1.9.5'  # Semantic versioning: [MAJOR|MINOR|PATCH]
+# create the database
+db = SQLAlchemy()
+
+# metadata variables
+__version__ = '1.9.6'  # semantic versioning: [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 
@@ -23,6 +27,10 @@ def create_app():
     # load up the config and env vars
     app.config.from_object('config.Config') # app config
     app.secret_key = os.getenv('SECRET_KEY') # secret key for session storage
+
+
+    # initialize db extensions
+    db.init_app(app)
 
 
     # configure Talisman for security

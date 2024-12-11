@@ -6,9 +6,6 @@ from datetime import datetime
 cur_dir = pathlib.Path(__file__).parent
 debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 
-# main log
-main_log = os.path.join(debug_dir, 'logs', 'log.txt')
-
 
 
 def file_exists(file_path):
@@ -19,12 +16,15 @@ def file_exists(file_path):
 
 
 
-def create_log_line(message):
+def create_log_line(file_name, message):
+    # define which log file to write to
+    log_file = os.path.join(debug_dir, 'logs', f'{file_name}.txt')
+
     # create the log line
     cur_time = datetime.now().strftime(r'%d-%m-%Y %H:%M:%S')
     log_line = f'{cur_time} - {message}\n'
 
     # update the log
-    file_exists(main_log)
-    with open(main_log, 'a') as f:
+    file_exists(log_file)
+    with open(log_file, 'a') as f:
         f.write(log_line)

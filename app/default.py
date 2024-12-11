@@ -39,6 +39,6 @@ def log_event():
     data = request.get_json()
     if data:
         # log the data received
-        update_log.create_log_line(data['event'])
+        update_log.create_log_line(data['location'], data['event'])
         return '', 204
     return 'Missing data', 400

@@ -260,5 +260,5 @@ def report_issue():
 
     # send the report and log the event
     res = create_task(sku, shipper, message)
-    update_log.create_log_line(f"{shipper} tried to report `{sku} - {message}`. Response: {res}")
+    update_log.create_log_line('actions', f"`{shipper}` tried to report `{sku} - {message}`. Response: {res}")
     return jsonify({"response": res})

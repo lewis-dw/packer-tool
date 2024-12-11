@@ -3,6 +3,8 @@ import os
 import pathlib
 import yaml
 import html
+import requests
+import time
 from app.logger import update_log
 
 
@@ -107,12 +109,15 @@ def parse_quotes(data):
             courier = html.escape(quote['courier'].upper())
             shipping_code = html.escape(quote['shipping_code'])
             cost = html.escape(str(quote['cost']))
+
+            # construct table line and log to success
             html_row = ''.join([
                 f'<tr onclick="rowClicked(\'{courier}\', \'{shipping_code}\')">',
                 f'<td>{courier}</td><td>{shipping_code}</td><td>{cost}</td>',
                 '</tr>'
             ])
             table_html.append(html_row)
+            update_log.create_log_line('results', f'Success: {courier} - {shipping_code} - {cost}')
 
         quote_content = ''.join([
             '<table>',
@@ -136,7 +141,7 @@ def parse_quotes(data):
 
             # construct table line and log the error
             table_html.append(f"<tr><td>{courier}</td><td>{message}</td></tr>")
-            update_log.create_log_line(f"{courier} | {message}")
+            update_log.create_log_line('results', f'Fail: {courier} - {message}')
 
         # construct the whole error table
         error_content = ''.join([
@@ -150,6 +155,23 @@ def parse_quotes(data):
         error_content = '<p>No errors during quoting</p>'
 
     return quote_content, error_content
+
+
+
+
+
+def download_with_retries(url, delay=0.5, max_retry=10):
+    """
+    Download the content from a url and keep retrying until successful up to a limit.
+    Returns the raw content from the url.
+    """
+
+    for attempt in range(max_retry):
+        time.sleep(delay)
+        res = requests.get(url)
+        if res.status_code == 200:
+            return {'state': 'Success', 'value': res}
+    return {'state': 'Error', 'value': f'Max retries hit ({max_retry})'}
 
 
 
