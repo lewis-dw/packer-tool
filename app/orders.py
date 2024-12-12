@@ -22,15 +22,15 @@ Get and display all current valid orders
 """
 @orders.route('/all_orders')
 def all_orders():
-    result, data = get_orders()
+    res = get_orders()
 
     # show the valid orders to user
-    if result == 'Success':
-        return render_template('all_orders.html', orders=data)
+    if res['state'] == 'Success':
+        return render_template('all_orders.html', orders=res['value'])
 
     # need to redirect them to a page they can use to refresh which will reload this page
-    elif result == 'Fail':
-        return render_template('error.html', error_reason=data)
+    elif res['state'] == 'Error':
+        return render_template('error.html', error_reason=res['value'])
 
 
 
@@ -48,25 +48,31 @@ def manual_search():
 
 
 """
-Receive the order id from the row click
+Receive the order id from however the user has entered it
 """
-@orders.route('/get_order_id/<order_id>')
-def get_order_id(order_id):
-    # Redirect directly to the desired URL
-    return redirect(url_for('orders.load_order', order_id=order_id))
+@orders.route('/get_order_id', methods=['GET', 'POST'])
+def get_order_id():
+    # get the order id however it was passed in and handle anything else
+    if request.method == 'POST':
+        order_id = request.form.get('order_id')
+    elif request.method == 'GET':
+        order_id = request.args.get('order_id')
+    else:
+        return redirect('/')
 
 
+    # search for the order id obtained
+    res = get_specific_order(order_id)
 
+    # on fail we want to display to the user the error of their ways
+    if res['state'] == 'Error':
+        return render_template('no_order_found.html', order_id=order_id)
 
-
-"""
-Receive the order id from the manual entry/rdt scan in
-"""
-@orders.route('/get_manual_entry', methods=['POST'])
-def get_manual_entry():
-    order_id = request.form.get('order_id')
-    # Redirect directly to the desired URL
-    return redirect(url_for('orders.load_order', order_id=order_id))
+    # if it succeeded then load it into the session
+    else:
+        session['partial_order_data'] = res['value']
+        # Redirect directly to the desired URL
+        return redirect(url_for('orders.load_order'))
 
 
 
@@ -96,14 +102,15 @@ Clean the order data before saving it to current session
 def load_order():
     # load the data in via an api call and attempt to do the initial clean
     if request.method == 'GET':
-        # get the order_id from query
-        order_id = request.args.get('order_id')
+        # load in the order_data
+        data = request.args.pop('partial_order_data', {})
 
-        # attempt to load the data on the order via its id
-        status, data = get_specific_order(order_id)
+        # can only proceed if there is data
+        if not data:
+            session.clear()
+            return redirect('/')
 
-        # on success then we need to run some cleaning functions on it before storing it in a flask session
-        if status == 'Success':
+        else:
             # rename the items key as it causes issues
             data['order_items'] = data.pop('items')
 
@@ -114,10 +121,6 @@ def load_order():
             if data['shipping_statecode'] == 'manual':
                 session['partial_order_data'] = data
                 return redirect(url_for('orders.select_statecode'))
-
-        # on fail we want to display to the user the error of their ways
-        else:
-            return render_template('no_order_found.html', order_id=order_id)
 
 
     # alternatively if the method to access this page was via a post request,
@@ -142,7 +145,7 @@ def load_order():
 
 
     # once the data is all cleaned and stuff we want to clear the current session data and save the data
-    session.clear()
+    session.pop('order_data', None)
     session['order_data'] = data
     return redirect(url_for('orders.display_order'))
 
@@ -261,7 +264,6 @@ def save_order():
 
 
         # update session order data regardless if they are missing data or not
-        session.clear()
         session['order_data'] = data
 
 

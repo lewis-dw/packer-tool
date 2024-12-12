@@ -13,10 +13,13 @@ from app import db
 from app.models import Countries
 
 
+prefix='TEST_'
+
+
 # load .env variables
 load_dotenv()
-api_base_url = os.getenv('ODOO_API_BASE_URL')
-main_headers = {"api_key": os.getenv('ODOO_API_KEY')}
+api_base_url = os.getenv(f'{prefix}ODOO_API_BASE_URL')
+main_headers = {"api_key": os.getenv(f'{prefix}ODOO_API_KEY')}
 
 
 # vars
@@ -29,19 +32,9 @@ province_lookup = shipping_functions.get_all_yamls('province_lookup')
 
 
 ###########################################################################################################################################
-# Helper functions
 
-
-def request_url(url, headers={}, data={}):
-    """
-    Simple function to hit a URL and return the result or the error code if it failed.
-    Accepts headers and json data to pass in as well but they also have default values.
-    """
-    res = requests.get(url, headers=headers, json=data)
-    if res.status_code == 200:
-        return res.json()
-    else:
-        return {'error':res.status_code}
+###########################################################################################################################################
+# Helper functions for general use
 
 
 def join_url(*url_parts):
@@ -55,7 +48,9 @@ def join_url(*url_parts):
 
 
 ###########################################################################################################################################
-# stage 1 - getting all orders
+
+###########################################################################################################################################
+# Functions for getting all orders
 
 
 def get_valid_orders(content):
@@ -72,50 +67,70 @@ def get_valid_orders(content):
 
 def get_orders():
     """Request all current orders and return the first one that wants to be processed."""
+
+    # build url and query it
     url = join_url(api_base_url, 'dwapi', 'orders')
-    res = request_url(url, main_headers)
+    res = requests.get(url, headers=main_headers)
+
+    # dump response for debugging
     with open(os.path.join(debug_dir, 'orders', 'all_orders_dump.json'), 'w') as f:
         json.dump(res, f, indent=4)
 
-    # handle the response
-    if res.get('error', 'no') == 'no':
-        valid_orders = get_valid_orders(res['result'])
+    # handle response
+    if res.status_code == 200:
+        valid_orders = get_valid_orders(res.json()['result'])
         if valid_orders:
-            return 'Success', valid_orders
+            return {
+                'state': 'Success',
+                'value': valid_orders
+            }
         else:
-            return 'Fail', 'No valid orders'
+            return {
+                'state': 'Error',
+                'value': 'No valid orders'
+            }
+
     else:
-        return 'Fail', res['error']
+        return {
+            'state': 'Error',
+            'value': res.json()['error']
+        }
 
 
 ###########################################################################################################################################
-# stage 2 - find the first valid order and return the values
+# Functions for searching a specific order id
 
 
 def get_specific_order(order_id):
-    # get the additional info about the order
+    """Search for a specific order id and return all the data"""
+
+    # build url and query it
     url = join_url(api_base_url, 'dwapi', 'order', order_id)
-    res = request_url(url, main_headers)
+    res = requests.get(url, headers=main_headers)
+
+    # dump response for debugging
+    with open(os.path.join(debug_dir, 'orders', 'order_dump.json'), 'w') as f:
+        json.dump(res, f, indent=4)
 
     # if a success then save the result and dump the response to a json
-    if res.get('error', 'no') == 'no':
-        status = 'Success'
-        data = res['result']
-
-        with open(os.path.join(debug_dir, 'orders', 'order_dump.json'), 'w') as f:
-            json.dump(res, f, indent=4)
+    if res.get('error', '') == '':
+        return {
+            'status': 'Error',
+            'value': res['error']
+        }
 
     # if a fail then save the error
     else:
-        status = 'Fail'
-        data = res['error']
-
-    # return the status of the request and the response
-    return status, data
+        return {
+            'status': 'Success',
+            'value': res['result']
+        }
 
 
 ###########################################################################################################################################
-# stage 3 - cleaning functions for the data
+
+###########################################################################################################################################
+# Helper functions for cleaning order data
 
 
 description_translate = {
@@ -202,7 +217,8 @@ def get_statecode(country, post_code):
         return {'state':'Error', 'value':'pgeocode failed'}
 
 
-
+###########################################################################################################################################
+# Function for cleaning order data
 
 
 def clean_data(data):
@@ -285,10 +301,12 @@ def clean_data(data):
 
 
 ###########################################################################################################################################
-# Stage 4 - Send odoo a response
+
+###########################################################################################################################################
+# Functions for sending response back to odoo
 
 
-def send_message(order_key, courier, tracking_no):
+def send_ship_message(order_key, courier, tracking_no):
     # generate url
     url = join_url(api_base_url, 'dwapi', 'v1', 'orders', order_key, 'ship')
 
@@ -304,3 +322,35 @@ def send_message(order_key, courier, tracking_no):
         print(res)
     else:
         print(res)
+
+
+
+# def send_pack_message(order_key, items):
+#     # generate url
+#     url = join_url(api_base_url, 'dwapi', 'v1', 'orders', order_key, 'pack')
+
+#     # generate payload
+#     picking_id = items.get("picking_id")
+#     if len(items) <= 1:
+#         body_data = {
+#             "comment": f"IBAM2001 says:I (%whospacking%) have packed the following: {picking_id}",
+#             "complete": True
+#         }
+#     else:
+#         body_data = {
+#             "comment": f"IBAM2001 says:I (%whospacking%) have packed the following: {picking_id}",
+#             "complete": False,
+#             "items": [
+#                 {
+#                     "product_id": key,
+#                     "qty_shipped": value
+#                 }
+#                 for key, value in items.items() if key != "picking_id"
+#             ]
+#         }
+#     print(body_data)
+#     response = requests.post(url, headers=main_headers, json=body_data)
+#     if response.status_code == 200:
+#         return f"DONE: {response.json()}"
+#     else:
+#         return f"ERROR: {response}"
