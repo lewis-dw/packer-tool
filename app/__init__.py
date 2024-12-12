@@ -11,7 +11,7 @@ load_dotenv()
 db = SQLAlchemy()
 
 # metadata variables
-__version__ = '1.9.11'  # semantic versioning: [MAJOR|MINOR|PATCH]
+__version__ = '1.9.12'  # semantic versioning: [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 
