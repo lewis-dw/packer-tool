@@ -159,6 +159,8 @@ def display_order():
     data = session.get('order_data', {})
     errors = session.pop('required_fields', {})
 
+    print(data['etd_required'])
+
     # if there is data then display it to user
     if data:
         return render_template('display_order.html', order=data, errors=errors)
@@ -223,8 +225,7 @@ def save_order():
                 index = int(index) - 1
 
                 # set vars
-                if true_key not in ['parcel_insurance']:
-                    old_value = data['commercial_invoice_lines'][index][true_key]
+                old_value = data['commercial_invoice_lines'][index][true_key]
                 data['commercial_invoice_lines'][index][true_key] = value
                 message_if_changed = f"`{true_key}` from invoice line {index+1} has changed, originally: `{old_value}`, new: `{value}`"
 
@@ -232,8 +233,7 @@ def save_order():
             else:
                 # set vars
                 true_key = key
-                if key != 'etd_required': # temp - remove when etd req country thing implemented
-                    old_value = data[key]
+                old_value = data[key]
                 data[key] = value
                 message_if_changed = f"`{true_key}` has changed, originally: `{old_value}`, new: `{value}`"
 
@@ -256,6 +256,9 @@ def save_order():
 
         # this needs to be separate due to checkbox behaviour
         data['etd_required'] = request.form.get('etd_required', 'off')
+
+        print(data['etd_required'])
+
 
         # update session order data regardless if they are missing data or not
         session.clear()

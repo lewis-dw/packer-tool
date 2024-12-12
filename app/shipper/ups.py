@@ -343,7 +343,7 @@ def create_ship_payload(data, shipping_code, parcels, items):
                         }
                     }
                 },
-                "Service": {
+                "ServiceXXX": {
                     "Code": shipping_code,
                     "Description": ""
                 },
@@ -468,9 +468,18 @@ def ship_order(data, shipping_code):
 
 def parse_ship_response(res):
     # check if we have errors
-    if res.get('ShipmentResponse', '') == '':
+    if res.get('response', '') == '':
         print(res)
         return {'state':'Error', 'value':'ERRRROR'}
+    
+
+    # if res.get('errors', '') != '':
+    #     errors = []
+    #     for error in res['errors']:
+    #         errors.append(f"{error['code']} - {error['message']}")
+    #     errors = '||'.join(errors)
+    #     return {'state':'Error', 'value':errors}
+
 
     # no errors? lets go parsing!
     else:

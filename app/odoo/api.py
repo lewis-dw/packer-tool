@@ -6,6 +6,11 @@ from dotenv import load_dotenv
 import re
 from pgeocode import Nominatim
 from app.shipper import shipping_functions
+from app.logger import update_log
+
+# database
+from app import db
+from app.models import Countries
 
 
 # load .env variables
@@ -201,13 +206,16 @@ def get_statecode(country, post_code):
 
 
 def clean_data(data):
-    # COMPANY
-    """
-    If country in req_etd
-        set etd to on
-    Else:
-        set etd to off
-    """
+    # query db with country code, if not in then log this and let user know
+    country_data = Countries.query.filter(Countries.country_name == data['shipping_country']).first()
+    if country_data is not None: # match
+        data['shipping_country_id'] = country_data.country_code # update shipping country code
+        data['etd_required'] = 'on' if country_data.etd_required else 'off' # set on/off based on bool value of etd_required
+    else: # no match
+        data['etd_required'] = 'off'
+        update_log.create_log_line('results', f"`{data['shipping_country']}` is missing from `Countries` database.")
+
+
 
 
     # TRADER
@@ -219,11 +227,15 @@ def clean_data(data):
     """
 
 
+
+
     # POSTCODE
     """
     strip hyphens out
     - maybe upgrade this to strip any nonalphanumerical and non spaces out? [^a-zA-Z0-9 ]
     """
+
+
 
 
     # if the data is missing it's statecode then try to find it automatically based on the country
@@ -246,11 +258,19 @@ def clean_data(data):
             data['shipping_statecode'] = 'manual'
 
 
+
+
     # loop over commerical invoice items and clean them up
     commercial_invoice = []
     for line in data['commercial_invoice_lines']:
         # need to extract the product options from the product description
         line['product_options'] = parse_product_description(line['line_description'])
+
+
+        # set parcel insurance if it doesnt exist
+        if line.get('parcel_insurance', '') == '':
+            line['parcel_insurance'] = 0
+
 
         """
         This code here needs to be updated when we change the format we get our odoo orders back as, this should be used as a backup for compatibility with old orders.

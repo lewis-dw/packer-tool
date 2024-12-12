@@ -36,3 +36,16 @@ class Orders(db.Model):
 
     def __repr__(self):
         return f'<Order {self.order_id}>'
+
+
+
+class Countries(db.Model):
+    __tablename__ = 'countries'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    country_name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
+    country_code = db.Column(db.String(4), nullable=False) # VARCHAR(4) NOT NULL
+    shipping_country_code = db.Column(db.String(4), nullable=False) # VARCHAR(4) NOT NULL
+    etd_required = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
+
+    def __repr__(self):
+        return f'<Country {self.country_name}>'

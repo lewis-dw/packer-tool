@@ -105,10 +105,14 @@
                     <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
                 </p>
 
-                <!-- Checkbox for if the address needs EDT -->
+                <!-- Checkbox for if the address needs ETD -->
                 <p>
                     <label for="etd_required">ETD Required:</label>
-                    <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
+                    {% if order.etd_required == 'on' %}
+                        <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
+                    {% else %}
+                        <input type="checkbox" id="etd_required" name="etd_required" value="on">
+                    {% endif %}
                 </p>
             </div>
 
