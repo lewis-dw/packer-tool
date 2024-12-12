@@ -343,7 +343,7 @@ def create_ship_payload(data, shipping_code, parcels, items):
                         }
                     }
                 },
-                "ServiceXXX": {
+                "Service": {
                     "Code": shipping_code,
                     "Description": ""
                 },
@@ -468,17 +468,13 @@ def ship_order(data, shipping_code):
 
 def parse_ship_response(res):
     # check if we have errors
-    if res.get('response', '') == '':
-        print(res)
-        return {'state':'Error', 'value':'ERRRROR'}
-    
+    if res.get('response', '') != '': # this may break at some point because the json is clearly differently formatted for errors than successes
+        errors = []                   # this leads me to believe that they may change it at some point but i can act quickly on it
+        for error in res['response']['errors']:
+            errors.append(f"{error['code']} - {error['message']}")
+        errors = '||'.join(errors)
+        return {'state':'Error', 'value':errors}
 
-    # if res.get('errors', '') != '':
-    #     errors = []
-    #     for error in res['errors']:
-    #         errors.append(f"{error['code']} - {error['message']}")
-    #     errors = '||'.join(errors)
-    #     return {'state':'Error', 'value':errors}
 
 
     # no errors? lets go parsing!

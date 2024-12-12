@@ -447,6 +447,8 @@ def parse_ship_response(res):
         errors = '||'.join(errors)
         return {'state':'Error', 'value':errors}
 
+
+
     # no errors? lets go parsing!
     else:
         # extract key values
