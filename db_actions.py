@@ -115,4 +115,4 @@ with app.app_context():
 
     # perm functions
     # save_countries()
-    save_shipping()
+    # save_shipping()

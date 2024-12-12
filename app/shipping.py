@@ -30,19 +30,32 @@ def process_data():
     # if there is data then proceed
     if data:
         # need to make a copy of data where sat indicator is false so we can see those values too
-        no_sat_data = data.copy()
-        no_sat_data['sat_indicator'] = ''
+        # if sat indicator is already not there so we dont need to create a no sat quote
+        if data['sat_indicator'] == '':
+            do_no_sat = False
+
+        # if sat indicator isnt already there then create a no sat quote as well
+        else:
+            do_no_sat = True
+            no_sat_data = data.copy()
+            no_sat_data['sat_indicator'] = ''
 
         # after verification proceed to quote the order using concurrent futures
         update_log.create_log_line('actions', f"`{shipper}` attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
         all_quotes = []
         all_errors = []
         with ThreadPoolExecutor() as executor:
+            # create the futures to commit map
             future_to_service = {
                 executor.submit(fedex.quote_order, deepcopy(data)): 'FedEx',
-                executor.submit(ups.quote_order, deepcopy(data)): 'UPS SAT:1',
-                executor.submit(ups.quote_order, deepcopy(no_sat_data)): 'UPS SAT:0',
+                executor.submit(ups.quote_order, deepcopy(data)): 'UPS',
             }
+
+            # if sat indicator exists then also submit the no sat data as well
+            if do_no_sat:
+                future_to_service[
+                    executor.submit(ups.quote_order, deepcopy(no_sat_data))
+                ] = 'UPS - No SAT'
 
             # process results as they complete
             for future in as_completed(future_to_service):

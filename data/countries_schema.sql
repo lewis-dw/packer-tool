@@ -70,7 +70,7 @@ INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_r
 INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (57, 'Montenegro', 'ME', 'ME', True, False);
 INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (58, 'Netherlands', 'NL', 'NL', True, False);
 INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (59, 'New Zealand', 'NZ', 'NZ', True, False);
-INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (60, 'Norway', '0', '0', True, False);
+INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (60, 'Norway', 'NO', 'NO', True, False);
 INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (61, 'Panama', 'PA', 'PA', True, False);
 INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (62, 'Peru', 'PE', 'PE', True, False);
 INSERT INTO orders (id, country_name, country_code, shipping_country_code, etd_required, sat_indicator) VALUES (63, 'Philippines', 'PH', 'PH', True, False);
