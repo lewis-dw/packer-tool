@@ -210,10 +210,14 @@ def create_quote_payload(data, parcels):
                 "ShipmentRatingOptions": {
                     "NegotiatedRatesIndicator": {}
                 },
-                "ShipmentServiceOptions": {} # this has some weird SAT indicator mischief going into it but for now just ignore
+                "ShipmentServiceOptions": {}
             }
         }
     }
+
+    # if SAT indicator exists then add the indicator in
+    if data.get('sat_indicator', '') != '':
+        payload["RateRequest"]["Shipment"]["ShipmentServiceOptions"]["SaturdayDeliveryIndicator"] = {}
 
     # if the country code is in this list then it needs state_code which should be present due to earlier data verification
     if data['shipping_country_id'] in ['IE', 'US', 'CA']:
@@ -242,14 +246,14 @@ def quote_order(data):
         json.dump(res.json(), f, indent=4)
 
     # parse the result and return
-    quotes = parse_quote_response(res.json())
+    quotes = parse_quote_response(res.json(), data['sat_indicator'])
     return quotes
 
 
 
 
 
-def parse_quote_response(res):
+def parse_quote_response(res, sat_indicator):
     # check if we have errors
     if res.get('response', '') != '':
         errors = []
@@ -267,7 +271,8 @@ def parse_quote_response(res):
             quotes.append({
                 'courier': 'ups',
                 'shipping_code': method["Service"]["Code"],
-                'cost': method["NegotiatedRateCharges"]["TotalCharge"]["MonetaryValue"]
+                'cost': method["NegotiatedRateCharges"]["TotalCharge"]["MonetaryValue"],
+                'sat_indicator': sat_indicator
             })
         return {'state':'Success', 'value':quotes}
 
@@ -276,7 +281,7 @@ def parse_quote_response(res):
 # Shipping
 
 
-def create_ship_payload(data, shipping_code, parcels, items):
+def create_ship_payload(data, shipping_code, parcels, items, sat_indicator):
     payload = {
         "ShipmentRequest": {
             "Shipment": {
@@ -374,10 +379,9 @@ def create_ship_payload(data, shipping_code, parcels, items):
     }
 
 
-    # # if saturday then add saturday indicator
-    # if SHIPPING_DATA.shipping_service_code == "SAT":
-    #     payload["ShipmentRequest"]["Shipment"]["ShipmentServiceOptions"]["SaturdayDeliveryIndicator"] = {}
-    #     payload["ShipmentRequest"]["Shipment"]["Service"] = "11"
+    # if saturday then add saturday indicator
+    if sat_indicator:
+        payload["ShipmentRequest"]["Shipment"]["ShipmentServiceOptions"]["SaturdayDeliveryIndicator"] = {}
 
 
     # if not gb then add the invoice
@@ -440,14 +444,14 @@ def create_ship_payload(data, shipping_code, parcels, items):
 
 
 
-def ship_order(data, shipping_code):
+def ship_order(data, shipping_code, sat_indicator):
     # clean the data
     c_data = clean_data(data)
 
     # generate parcels and items before creating payload
     items = format_items(c_data['commercial_invoice_lines'])
     parcels = format_parcels(c_data['commercial_invoice_lines'])
-    payload = create_ship_payload(c_data, shipping_code, parcels, items)
+    payload = create_ship_payload(c_data, shipping_code, parcels, items, sat_indicator)
 
     # ship the order
     res = send_payload(label_url, payload)

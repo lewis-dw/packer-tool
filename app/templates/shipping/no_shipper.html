@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Quote Order
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shipper.css') }}">
+<script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
+{% endblock %}
+
+{% block header %}
+<a href="/">Back to dashboard</a>
+{% endblock %}
+
+{% block main %}
+<body>
+    <h1>No shipper is currently selected!</h1>
+
+    <p>Who are you? Select a shipper:</p>
+
+    <!-- Display who is currently shipping and allow user to change -->
+    <div>
+        <form>
+            <label for="current-shipper">Current shipper:</label>
+            <select id="current-shipper" name="current-shipper">
+                <!-- Options will be dynamically populated here -->
+            </select>
+            <button type="button" onclick="updateShipper()">Change</button>
+        </form>
+    </div>
+</body>
+{% endblock %}

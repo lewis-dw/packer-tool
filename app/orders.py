@@ -233,8 +233,6 @@ def save_order():
         # this needs to be separate due to checkbox behaviour
         data['etd_required'] = request.form.get('etd_required', 'off')
 
-        print(data['etd_required'])
-
 
         # update session order data regardless if they are missing data or not
         session['order_data'] = data

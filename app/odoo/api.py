@@ -230,8 +230,10 @@ def clean_data(data):
     if country_data is not None: # match
         data['shipping_country_id'] = country_data.country_code # update shipping country code
         data['etd_required'] = 'on' if country_data.etd_required else 'off' # set on/off based on bool value of etd_required
+        data['sat_indicator'] = 'Yes' if country_data.sat_indicator else '' # set on/off based on bool value of etd_required
     else: # no match
         data['etd_required'] = 'off'
+        data['sat_indicator'] = ''
         update_log.create_log_line('results', f"`{data['shipping_country']}` is missing from `Countries` database.")
 
 

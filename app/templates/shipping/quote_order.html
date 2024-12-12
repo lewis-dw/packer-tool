@@ -50,7 +50,7 @@ Quote Order
     </div>
 </body>
 <script>
-    function rowClicked(courier, shipping_code) {
+    function rowClicked(courier, shipping_code, sat_indicator) {
         // Get values
         const baseUrl = "{{ url_for('shipping.select_method')}}";
         const printerLoc = document.getElementById('printer-loc').value;
@@ -60,6 +60,7 @@ Quote Order
         const queryParams = new URLSearchParams({
             courier: courier,
             shipping_code: shipping_code,
+            sat_indicator: sat_indicator,
             printer_loc: printerLoc,
             label_size: labelSize
         }).toString();

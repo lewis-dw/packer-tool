@@ -29,6 +29,10 @@ def process_data():
 
     # if there is data then proceed
     if data:
+        # need to make a copy of data where sat indicator is false so we can see those values too
+        no_sat_data = data.copy()
+        no_sat_data['sat_indicator'] = ''
+
         # after verification proceed to quote the order using concurrent futures
         update_log.create_log_line('actions', f"`{shipper}` attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
         all_quotes = []
@@ -36,12 +40,14 @@ def process_data():
         with ThreadPoolExecutor() as executor:
             future_to_service = {
                 executor.submit(fedex.quote_order, deepcopy(data)): 'FedEx',
-                executor.submit(ups.quote_order, deepcopy(data)): 'UPS'
+                executor.submit(ups.quote_order, deepcopy(data)): 'UPS SAT:1',
+                executor.submit(ups.quote_order, deepcopy(no_sat_data)): 'UPS SAT:0',
             }
 
             # process results as they complete
             for future in as_completed(future_to_service):
                 service_name = future_to_service[future] # pull this in case i want to debug which has completed
+                # print(f'Completed: {service_name}')
                 quote = future.result()
                 if quote['state'] == 'Success':
                     all_quotes.extend(quote['value'])
@@ -51,6 +57,8 @@ def process_data():
 
         # log the quoting results
         update_log.create_log_line('actions', f'{len(all_quotes)} valid. {len(all_errors)} errors.')
+        update_log.create_log_line('results', f'Successful quotes: {len(all_quotes)}')
+        update_log.create_log_line('results', f'Errors: {all_errors}')
 
 
         # parse the quote results then display to the user
@@ -81,6 +89,7 @@ def select_method():
     data = session.get('order_data', {})
     courier = request.args.get('courier').upper()
     shipping_code = request.args.get('shipping_code')
+    sat_indicator = request.args.get('sat_indicator')
     printer_loc = request.args.get('printer_loc')
     label_size = request.args.get('label_size')
     shipper = request.cookies.get('current_shipper')
@@ -88,16 +97,24 @@ def select_method():
 
     # only proceed if there is currently data
     if data:
-        # log the action
-        update_log.create_log_line('actions', f'`{shipper}` attempting to ship with {courier} using {shipping_code}.')
+        if shipper:
+            # log the action
+            sat_msg = 'Yes' if sat_indicator else 'No'
+            update_log.create_log_line('actions', f'`{shipper}` attempting to ship with {courier} using {shipping_code}, SAT: {sat_msg}.')
 
-        # ups
-        if courier == 'UPS':
-            res = ups.ship_order(data, shipping_code)
+            # ups
+            if courier == 'UPS':
+                res = ups.ship_order(data, shipping_code, sat_indicator)
 
-        # fedex
-        elif courier == 'FEDEX':
-            res = fedex.ship_order(data, shipping_code, label_size)
+            # fedex
+            elif courier == 'FEDEX':
+                res = fedex.ship_order(data, shipping_code, label_size)
+
+
+        # if they access with no shipper selected then redirect to a page telling them this
+        else:
+            update_log.create_log_line('actions', f'No shipper selected redirecting them to a selection page.')
+            return render_template('no_shipper.html')
 
     # if they access the page with no data redirect them back to the dashboard
     else:
@@ -126,7 +143,7 @@ def select_method():
             print_res = shipping_functions.print_label(label_dict['label_data'], printer_loc, label_size, label_dict['label_name'])
 
             # deal with result of printing the label
-            initial_message = f'Label {label_id}/{len(labels)} for {master_id}'
+            initial_message = f'Label {label_id+1}/{len(labels)} for {master_id}'
             if print_res['state'] == 'Error':
                 update_log.create_log_line('results', f"{initial_message} failed to print. Reason: {print_res['value']}")
             else:

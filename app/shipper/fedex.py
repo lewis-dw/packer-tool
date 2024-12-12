@@ -257,7 +257,8 @@ def parse_quote_response(res):
             quotes.append({
                 'courier': 'fedex',
                 'shipping_code': method['serviceType'],
-                'cost': method["ratedShipmentDetails"][0]["totalNetCharge"]
+                'cost': method["ratedShipmentDetails"][0]["totalNetCharge"],
+                'sat_indicator': ''
             })
         return {'state':'Success', 'value':quotes}
 

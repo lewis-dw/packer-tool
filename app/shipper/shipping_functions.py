@@ -7,6 +7,10 @@ import requests
 import time
 from app.logger import update_log
 
+# database
+from app import db
+from app.models import ShippingCodes
+
 
 # find the data dir
 cur_dir = pathlib.Path(__file__).parent
@@ -106,18 +110,27 @@ def parse_quotes(data):
         # loop over the quotes after sorting and build up a html table
         table_html = []
         for quote in quotes:
+            # extract data
             courier = html.escape(quote['courier'].upper())
             shipping_code = html.escape(quote['shipping_code'])
             cost = html.escape(str(quote['cost']))
+            sat_indicator = html.escape(str(quote['sat_indicator']))
+
+            # need to translate the shipping code
+            code_query = ShippingCodes.query.filter(ShippingCodes.shipping_code == f'{shipping_code}{sat_indicator}').first()
+            if code_query is not None: # match
+                friendly_code = code_query.friendly_code
+            else: # no match
+                friendly_code = shipping_code
 
             # construct table line and log to success
             html_row = ''.join([
-                f'<tr onclick="rowClicked(\'{courier}\', \'{shipping_code}\')">',
-                f'<td>{courier}</td><td>{shipping_code}</td><td>{cost}</td>',
+                f'<tr onclick="rowClicked(\'{courier}\', \'{shipping_code}\', \'{sat_indicator}\')">',
+                f'<td>{courier}</td><td>{friendly_code}</td><td>{cost}</td>',
                 '</tr>'
             ])
             table_html.append(html_row)
-            update_log.create_log_line('results', f'Success: {courier} - {shipping_code} - {cost}')
+            update_log.create_log_line('results', f'Success: {courier} - {shipping_code} - {cost} - {sat_indicator}')
 
         quote_content = ''.join([
             '<table>',
