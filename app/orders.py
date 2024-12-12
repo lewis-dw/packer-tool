@@ -71,6 +71,7 @@ def get_order_id():
     # if it succeeded then load it into the session
     else:
         session['partial_order_data'] = res['value']
+        session['original_order_data'] = res['value']
         # Redirect directly to the desired URL
         return redirect(url_for('orders.load_order'))
 
@@ -103,7 +104,7 @@ def load_order():
     # load the data in via an api call and attempt to do the initial clean
     if request.method == 'GET':
         # load in the order_data
-        data = request.args.pop('partial_order_data', {})
+        data = session.pop('partial_order_data', {})
 
         # can only proceed if there is data
         if not data:
@@ -161,8 +162,6 @@ def display_order():
     # get the currently loaded data from flask session
     data = session.get('order_data', {})
     errors = session.pop('required_fields', {})
-
-    print(data['etd_required'])
 
     # if there is data then display it to user
     if data:

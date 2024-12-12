@@ -70,15 +70,16 @@ def get_orders():
 
     # build url and query it
     url = join_url(api_base_url, 'dwapi', 'orders')
-    res = requests.get(url, headers=main_headers)
+    res = requests.get(url, headers=main_headers, json={})
+    data = res.json()
 
     # dump response for debugging
     with open(os.path.join(debug_dir, 'orders', 'all_orders_dump.json'), 'w') as f:
-        json.dump(res, f, indent=4)
+        json.dump(data, f, indent=4)
 
     # handle response
     if res.status_code == 200:
-        valid_orders = get_valid_orders(res.json()['result'])
+        valid_orders = get_valid_orders(data['result'])
         if valid_orders:
             return {
                 'state': 'Success',
@@ -93,7 +94,7 @@ def get_orders():
     else:
         return {
             'state': 'Error',
-            'value': res.json()['error']
+            'value': data['error']
         }
 
 
@@ -106,25 +107,27 @@ def get_specific_order(order_id):
 
     # build url and query it
     url = join_url(api_base_url, 'dwapi', 'order', order_id)
-    res = requests.get(url, headers=main_headers)
+    res = requests.get(url, headers=main_headers, json={})
+    data = res.json()
 
     # dump response for debugging
     with open(os.path.join(debug_dir, 'orders', 'order_dump.json'), 'w') as f:
-        json.dump(res, f, indent=4)
+        json.dump(data, f, indent=4)
 
-    # if a success then save the result and dump the response to a json
-    if res.get('error', '') == '':
+    # handle success
+    if res.status_code == 200:
         return {
-            'status': 'Error',
-            'value': res['error']
+            'state': 'Success',
+            'value': data['result']
         }
 
-    # if a fail then save the error
+    # handle error
     else:
         return {
-            'status': 'Success',
-            'value': res['result']
+            'state': 'Error',
+            'value': data['error']
         }
+
 
 
 ###########################################################################################################################################
