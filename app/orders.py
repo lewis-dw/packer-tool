@@ -41,7 +41,8 @@ Render the page that allows user to type in an order id or scan one in
 """
 @orders.route('/manual_search')
 def manual_search():
-    return render_template('manual_search.html')
+    action = request.args.get('action')
+    return render_template('manual_search.html', action=action)
 
 
 
@@ -55,25 +56,32 @@ def get_order_id():
     # get the order id however it was passed in and handle anything else
     if request.method == 'POST':
         order_id = request.form.get('order_id')
+        action = request.form.get('action')
     elif request.method == 'GET':
         order_id = request.args.get('order_id')
+        action = 'search_order'
     else:
         return redirect('/')
 
 
-    # search for the order id obtained
-    res = get_specific_order(order_id)
+    # if the action is to search for order then try to find an order by that id
+    if action == 'search_order':
+        res = get_specific_order(order_id)
 
-    # on fail we want to display to the user the error of their ways
-    if res['state'] == 'Error':
-        return render_template('no_order_found.html', order_id=order_id)
+        # on fail we want to display to the user the error of their ways
+        if res['state'] == 'Error':
+            return render_template('no_order_found.html', order_id=order_id)
 
-    # if it succeeded then load it into the session
+        # if it succeeded then load it into the session
+        else:
+            session['partial_order_data'] = res['value']
+            session['original_order_data'] = res['value']
+            # Redirect directly to the desired URL
+            return redirect(url_for('orders.load_order'))
+
     else:
-        session['partial_order_data'] = res['value']
-        session['original_order_data'] = res['value']
-        # Redirect directly to the desired URL
-        return redirect(url_for('orders.load_order'))
+        print(action)
+        return redirect('/')
 
 
 

@@ -183,7 +183,7 @@ def download_with_retries(url, delay=0.5, max_retry=10):
         time.sleep(delay)
         res = requests.get(url)
         if res.status_code == 200:
-            return {'state': 'Success', 'value': res}
+            return {'state': 'Success', 'value': res.text}
     return {'state': 'Error', 'value': f'Max retries hit ({max_retry})'}
 
 

@@ -249,12 +249,14 @@ def clean_data(data):
 
 
 
+    """
+    also need to do the bad char replacer here
+    eg U with umlaut goes to U
+    BUT if replacements in 1 line >= 4 then we return that this is invalid
+    """
 
-    # POSTCODE
-    """
-    strip hyphens out
-    - maybe upgrade this to strip any nonalphanumerical and non spaces out? [^a-zA-Z0-9 ]
-    """
+    # strip any nonalphanumerical and non spaces out of the postcode
+    data['shipping_postcode'] = re.sub(r'[^a-zA-Z0-9 ]', '', data['shipping_postcode'])
 
 
 
@@ -283,6 +285,7 @@ def clean_data(data):
 
     # loop over commerical invoice items and clean them up
     commercial_invoice = []
+    lookup_commercial = {}
     for line in data['commercial_invoice_lines']:
         # need to extract the product options from the product description
         line['product_options'] = parse_product_description(line['line_description'])
@@ -300,7 +303,18 @@ def clean_data(data):
         # need to remove the shipping method from the commercial invoice
         if line['product_name'] != data['order_carrier_name']:
             commercial_invoice.append(line)
+
+
+        # also need to update the lookup dict so later code can use it
+        lookup_commercial[str(line['product_id'])] = line['product_sku']
     data['commercial_invoice_lines'] = commercial_invoice
+
+
+
+
+    # loop over pack items and find the parent sku
+    for line in data['order_items']:
+        line['parent_sku'] = lookup_commercial[str(line['sale_product_id'])]
 
     return data
 

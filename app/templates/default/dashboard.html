@@ -18,14 +18,26 @@ Dashboard
     <div role="listbox" class="dashboard-options">
         <div class="dashboard-icon">
             <a href="{{ url_for('orders.all_orders') }}">
-                <img src="static/icons/shipper-icon.png" alt="___">
-                <p>Orders</p>
+                <img src="static/icons/scraper-icon.png" alt="___">
+                <p>List Orders</p>
             </a>
         </div>
         <div class="dashboard-icon">
-            <a href="{{ url_for('orders.manual_search') }}">
-                <img src="static/icons/shipper-icon.png" alt="___">
+            <a href="{{ url_for('orders.manual_search', action='search_order') }}">
+                <img src="static/icons/search-icon.png" alt="___">
                 <p>Search Order</p>
+            </a>
+        </div>
+        <div class="dashboard-icon">
+            <a href="{{ url_for('orders.manual_search', action='reprint_label') }}">
+                <img src="static/icons/search-icon.png" alt="___">
+                <p>Reprint Labels</p>
+            </a>
+        </div>
+        <div class="dashboard-icon">
+            <a href="{{ url_for('orders.manual_search', action='show_invoice') }}">
+                <img src="static/icons/search-icon.png" alt="___">
+                <p>Show invoice</p>
             </a>
         </div>
         <div class="dashboard-icon">

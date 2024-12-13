@@ -453,7 +453,7 @@ def parse_ship_response(res):
     # no errors? lets go parsing!
     else:
         # extract key values
-        main_res = res['output']['transactionShipments']
+        main_res = res['output']['transactionShipments'][0]
         master_id = main_res['masterTrackingNumber']
         commerical_invoice_url = main_res['shipmentDocuments'][0]['url']
         labels = main_res['pieceResponses']
