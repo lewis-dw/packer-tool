@@ -7,6 +7,7 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
 <script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/display_order.js') }}" defer></script>
 {% endblock %}
 
 {% block header %}
@@ -32,117 +33,167 @@
         <form method="POST" action="{{ url_for('orders.save_order') }}">
             <input type="hidden" name="order_id" value="{{ order.order_name }}">
 
-            <!-- customer details -->
-            <div id="customer-details">
-                <!-- Customer name -->
-                <p>
-                    <label for="shipping_name">Customer Name:</label>
-                    <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or '' }}">
-                </p>
+            <!-- We want to split the display order screen up to show lots of info -->
+            <div id="split-screen">
+                <!-- This will display on the left hand side of the display order screen -->
+                <div id="left-screen">
+                    <h2>Order details</h2>
+                    <!-- customer details -->
+                    <div id="customer-details">
+                        <!-- Customer name -->
+                        <p>
+                            <label for="shipping_name">Customer Name:</label>
+                            <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or '' }}">
+                        </p>
 
-                <!-- Customer is a trader or not -->
-                <p>Customer Type: {{ order.customer_pricelist or '' }}</p>
+                        <!-- Customer is a trader or not -->
+                        <p>Customer Type: {{ order.customer_pricelist or '' }}</p>
 
-                <!-- Customer email -->
-                <p>
-                    <label for="customer_email">Customer Email:</label>
-                    <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or '' }}">
-                </p>
+                        <!-- Customer email -->
+                        <p>
+                            <label for="customer_email">Customer Email:</label>
+                            <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or '' }}">
+                        </p>
 
-                <!-- Customer phone number -->
-                <p>
-                    <label for="shipping_telephone">Customer Phone Number:</label>
-                    <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
-                </p>
+                        <!-- Customer phone number -->
+                        <p>
+                            <label for="shipping_telephone">Customer Phone Number:</label>
+                            <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
+                        </p>
 
-                <!-- Customer's company -->
-                <p>
-                    <label for="shipping_company">Company:</label>
-                    <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or '' }}">
-                </p>
+                        <!-- Customer's company -->
+                        <p>
+                            <label for="shipping_company">Company:</label>
+                            <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or '' }}">
+                        </p>
 
-                <!-- Streetline 1 -->
-                <p>
-                    <label for="shipping_street">Streetline 1:</label>
-                    <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
-                    {% if errors.get('shipping_street') %}<span class="missing">Required</span>{% endif %}
-                </p>
+                        <!-- Streetline 1 -->
+                        <p>
+                            <label for="shipping_street">Streetline 1:</label>
+                            <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
+                            {% if errors.get('shipping_street') %}<span class="missing">Required</span>{% endif %}
+                        </p>
 
-                <!-- Streetline 2 -->
-                <p>
-                    <label for="shipping_street2">Streetline 2:</label>
-                    <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
-                </p>
+                        <!-- Streetline 2 -->
+                        <p>
+                            <label for="shipping_street2">Streetline 2:</label>
+                            <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
+                        </p>
 
-                <!-- Locality (Contains city) -->
-                <p>
-                    <label for="shipping_locality">Locality:</label>
-                    <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
-                </p>
+                        <!-- Locality (Contains city) -->
+                        <p>
+                            <label for="shipping_locality">Locality:</label>
+                            <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
+                        </p>
 
-                <!-- Region (Used as streetline 3) -->
-                <p>
-                    <label for="shipping_region">Region:</label>
-                    <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
-                </p>
+                        <!-- Region (Used as streetline 3) -->
+                        <p>
+                            <label for="shipping_region">Region:</label>
+                            <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
+                        </p>
 
-                <!-- Postcode -->
-                <p>
-                    <label for="shipping_postcode">Postcode:</label>
-                    <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
-                    {% if errors.get('shipping_postcode') %}<span class="missing">Required</span>{% endif %}
-                </p>
+                        <!-- Postcode -->
+                        <p>
+                            <label for="shipping_postcode">Postcode:</label>
+                            <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
+                            {% if errors.get('shipping_postcode') %}<span class="missing">Required</span>{% endif %}
+                        </p>
 
-                <!-- Country -->
-                <p>
-                    <label for="shipping_country">Country:</label>
-                    <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
-                </p>
+                        <!-- Country -->
+                        <p>
+                            <label for="shipping_country">Country:</label>
+                            <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
+                        </p>
 
-                <!-- Country ID -->
-                <p>
-                    <label for="shipping_country_id">Country ID:</label>
-                    <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
-                </p>
+                        <!-- Country ID -->
+                        <p>
+                            <label for="shipping_country_id">Country ID:</label>
+                            <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
+                        </p>
 
-                <!-- Checkbox for if the address needs ETD -->
-                <p>
-                    <label for="etd_required">ETD Required:</label>
-                    {% if order.etd_required == 'on' %}
-                        <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
-                    {% else %}
-                        <input type="checkbox" id="etd_required" name="etd_required" value="on">
-                    {% endif %}
-                </p>
-            </div>
-
-
-            <!-- shipping details -->
-            <div id="shipping-details">
-                <p>Carrier: {{ order.order_carrier_name or '' }}</p>
-                <p>Customer Paid Shipping: £{{ order.shipping_cost or '0.0' }}</p>
-
-                <p>
-                    <label for="order_total">Total Cost of Order:</label>
-                    <input type="text" id="order_total" name="order_total" value="{{ order.order_total or '' }}">
-                </p>
-
-                <p>
-                    <label for="order_total_tax">Order Tax:</label>
-                    <input type="text" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or '' }}">
-                </p>
-
-                <p>
-                    <label for="order_total_inc_tax">Total Cost inc Tax:</label>
-                    <input type="text" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '' }}">
-                </p>
-            </div>
+                        <!-- Checkbox for if the address needs ETD -->
+                        <p>
+                            <label for="etd_required">ETD Required:</label>
+                            {% if order.etd_required == 'on' %}
+                                <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
+                            {% else %}
+                                <input type="checkbox" id="etd_required" name="etd_required" value="on">
+                            {% endif %}
+                        </p>
+                    </div>
 
 
-            <!-- additional details -->
-            <div id="shipping-notes">
-                <p>Picking Internal Note: {{ order.picking_internal_note or '' }}</p>
-                <p>Customer Note: {{ order.picking_customer_note or '' }}</p>
+                    <!-- shipping details -->
+                    <div id="shipping-details">
+                        <p>Carrier: {{ order.order_carrier_name or '' }}</p>
+                        <p>Customer Paid Shipping: £{{ order.shipping_cost or '0.0' }}</p>
+
+                        <p>
+                            <label for="order_total">Total Cost of Order: £</label>
+                            <input type="text" id="order_total" name="order_total" value="{{ order.order_total or '0.0' }}">
+                        </p>
+
+                        <p>
+                            <label for="order_total_tax">Order Tax: £</label>
+                            <input type="text" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or '0.0' }}">
+                        </p>
+
+                        <p>
+                            <label for="order_total_inc_tax">Total Cost inc Tax: £</label>
+                            <input type="text" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '0.0' }}">
+                        </p>
+                    </div>
+
+
+                    <!-- shipping notes -->
+                    <div id="shipping-notes">
+                        <p>Picking Internal Note: {{ order.picking_internal_note or '' }}</p>
+                        <p>Customer Note: {{ order.picking_customer_note or '' }}</p>
+                    </div>
+                </div>
+
+
+                <!-- This will display on the right hand side of the display order screen -->
+                <div id="right-screen">
+                    <h2>Invoice Lines</h2>
+                    <!-- invoice info -->
+                    <div id="invoice-info">
+                        {% for line in order.commercial_invoice_lines %}
+                        <div id="order-info-block">
+                            <!-- Product SKU -->
+                            <p>
+                                <label for="line-product_sku_{{ loop.index }}-ignore">Product SKU:</label>
+                                <textarea id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}">{{ line.product_sku or '' }}</textarea>
+                                {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                            </p>
+
+                            <!-- Product name -->
+                            <p>
+                                <label for="line-product_name_{{ loop.index }}-ignore">Product Name:</label>
+                                <textarea id="line-product_name_{{ loop.index }}-ignore" name="line-product_name_{{ loop.index }}-ignore">{{ line.product_name or '' }}</textarea>
+                            </p>
+
+                            <p>Options: {{ line.product_options or '' }}</p>
+
+                            <!-- Unit price -->
+                            <p>
+                                <label for="line-unit_price_{{ loop.index }}-ignore">Unit Price:</label>
+                                <input type="text" id="line-unit_price_{{ loop.index }}-ignore" name="line-unit_price_{{ loop.index }}-ignore" value="{{ line.unit_price or '' }}">
+                                {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                            </p>
+
+                            <!-- Quantity -->
+                            <p>
+                                <label for="line-product_demand_qty_{{ loop.index }}-ignore">Quantity:</label>
+                                <input type="number" id="line-product_demand_qty_{{ loop.index }}-ignore" name="line-product_demand_qty_{{ loop.index }}-ignore" value="{{ line.product_demand_qty or '' }}">
+                                {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                            <p>No items found</p>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
 
 
@@ -150,7 +201,7 @@
             <div>
                 <button type="button" onclick="toggleSection('billing-info')">View Billing Info</button>
                 <button type="button" onclick="toggleSection('items-info')">View Items</button>
-                <button type="button" onclick="toggleSection('invoice-info')">View Invoice Items</button>
+                <button type="button" onclick="toggleSection('invoice-info-edit')">Edit Invoice Lines</button>
             </div>
 
 
@@ -195,23 +246,24 @@
             </div>
 
 
-            <!-- invoice info -->
-            <div id="invoice-info" class="section">
+            <!-- Invoice lines editor -->
+            <div id="invoice-info-edit" class="section">
                 <button type="button" onclick="closeSection()">Close</button>
-                <h2>Invoice Info</h2>
+                <h2>Invoice Lines</h2>
                 {% for line in order.commercial_invoice_lines %}
                 <div id="order-info-block">
                     <!-- Product SKU -->
                     <p>
                         <label for="line-product_sku_{{ loop.index }}">Product SKU:</label>
-                        <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}">
+                        <!-- <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}"> -->
+                        <textarea id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}">{{ line.product_sku or '' }}</textarea>
                         {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Product name -->
                     <p>
                         <label for="line-product_name_{{ loop.index }}">Product Name:</label>
-                        <input type="text" id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}" value="{{ line.product_name or '' }}">
+                        <textarea id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}">{{ line.product_name or '' }}</textarea>
                     </p>
 
                     <p>Options: {{ line.product_options or '' }}</p>
@@ -245,7 +297,7 @@
                     <!-- Unit weight -->
                     <p>
                         <label for="line-unit_weight_{{ loop.index }}">Unit Weight:</label>
-                        <input type="text" id="line-unit_weight_{{ loop.index }}" name="line-unit_weight_{{ loop.index }}" value="{{ line.unit_weight or '' }}">
+                        <input type="number" id="line-unit_weight_{{ loop.index }}" name="line-unit_weight_{{ loop.index }}"value="{{ line.unit_weight or '' }}" id="numberInput" step="any">
                         {% if errors.get('line-unit_weight_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
@@ -280,9 +332,14 @@
                     <p>No items found</p>
                 {% endfor %}
             </div>
+
+
+            <!-- Action buttons -->
             <button type="submit" onclick="showGif()">Quote</button>
             <button type="button" onclick="toggleSection('report-issue')">Report</button>
         </form>
+
+
 
         <!-- Report section -->
         <div id="report-issue" class="section">
@@ -309,77 +366,5 @@
             <p>Processing your request... Please wait.</p>
         </div>
     </div>
-
-
-    <!-- SCRIPTS -->
-    <!-- event listener for when the page is loaded -->
-    <script>
-        // event listener for when the page is loaded
-        window.addEventListener('pageshow', function (event) {
-            // Check if the page is loaded from the cache (persisted state)
-            if (event.persisted) {
-                document.getElementById('loading-gif').style.display = 'none'; // Hide the loading div
-                document.body.style.overflow = ''; // Re-enable scrolling
-            }
-        });
-    </script>
-
-
-    <!-- div visibility -->
-    <script>
-        // Function for toggling the visibility of a div
-        function toggleSection(sectionId) {
-            // Hide all sections
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.style.display = 'none');
-
-            // Show the selected section
-            const section = document.getElementById(sectionId);
-            section.style.display = 'block';
-        }
-
-
-        // Function for closing a section
-        function closeSection() {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.style.display = 'none');
-        }
-    </script>
-
-
-    <!-- loading gif visibility -->
-    <script>
-        // need some separate code for setting the gif to be visible due to display flexbox
-        function showGif() {
-            const section = document.getElementById('loading-gif');
-            section.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-    </script>
-
-
-    <!-- submit clickup report task -->
-    <script>
-        function submitReport() {
-            const report_url = "{{ url_for('orders.report_issue') }}";
-            const sku = document.getElementById('report-product-sku').value;
-            const message = document.getElementById('report-message').value;
-
-            fetch(report_url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    sku: sku,
-                    message: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('response').innerText = `Server response: ${data.response}`;
-            })
-        }
-    </script>
 </body>
 {% endblock %}

@@ -205,6 +205,10 @@ def save_order():
     # if there is not session order data then we want to redirect but if there is we can proceed
     if data:
         for key, value in request.form.items():
+            # if the key is to be ignored then continue to the next one
+            if key.endswith('-ignore'):
+                continue
+
             # format value to correct data type that it should be eg str(1.0) -> int(1)
             value = str(value).strip()
 

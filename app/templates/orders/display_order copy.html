@@ -1,0 +1,385 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{{ order.order_name }}
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
+<script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
+{% endblock %}
+
+{% block header %}
+<a href="/">Back to dashboard</a>
+
+<!-- Display who is currently shipping and allow user to change -->
+<div>
+    <form>
+        <label for="current-shipper">Current shipper:</label>
+        <select id="current-shipper" name="current-shipper">
+            <!-- Options will be dynamically populated here -->
+        </select>
+        <button type="button" onclick="updateShipper()">Change</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block main %}
+<body>
+    <!-- display all order data info div -->
+    <div id="order-details">
+        <h1>Order Details [{{ order.order_name }}]</h1>
+        <form method="POST" action="{{ url_for('orders.save_order') }}">
+            <input type="hidden" name="order_id" value="{{ order.order_name }}">
+
+            <!-- customer details -->
+            <div id="customer-details">
+                <!-- Customer name -->
+                <p>
+                    <label for="shipping_name">Customer Name:</label>
+                    <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or '' }}">
+                </p>
+
+                <!-- Customer is a trader or not -->
+                <p>Customer Type: {{ order.customer_pricelist or '' }}</p>
+
+                <!-- Customer email -->
+                <p>
+                    <label for="customer_email">Customer Email:</label>
+                    <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or '' }}">
+                </p>
+
+                <!-- Customer phone number -->
+                <p>
+                    <label for="shipping_telephone">Customer Phone Number:</label>
+                    <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
+                </p>
+
+                <!-- Customer's company -->
+                <p>
+                    <label for="shipping_company">Company:</label>
+                    <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or '' }}">
+                </p>
+
+                <!-- Streetline 1 -->
+                <p>
+                    <label for="shipping_street">Streetline 1:</label>
+                    <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
+                    {% if errors.get('shipping_street') %}<span class="missing">Required</span>{% endif %}
+                </p>
+
+                <!-- Streetline 2 -->
+                <p>
+                    <label for="shipping_street2">Streetline 2:</label>
+                    <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
+                </p>
+
+                <!-- Locality (Contains city) -->
+                <p>
+                    <label for="shipping_locality">Locality:</label>
+                    <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
+                </p>
+
+                <!-- Region (Used as streetline 3) -->
+                <p>
+                    <label for="shipping_region">Region:</label>
+                    <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
+                </p>
+
+                <!-- Postcode -->
+                <p>
+                    <label for="shipping_postcode">Postcode:</label>
+                    <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
+                    {% if errors.get('shipping_postcode') %}<span class="missing">Required</span>{% endif %}
+                </p>
+
+                <!-- Country -->
+                <p>
+                    <label for="shipping_country">Country:</label>
+                    <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
+                </p>
+
+                <!-- Country ID -->
+                <p>
+                    <label for="shipping_country_id">Country ID:</label>
+                    <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
+                </p>
+
+                <!-- Checkbox for if the address needs ETD -->
+                <p>
+                    <label for="etd_required">ETD Required:</label>
+                    {% if order.etd_required == 'on' %}
+                        <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
+                    {% else %}
+                        <input type="checkbox" id="etd_required" name="etd_required" value="on">
+                    {% endif %}
+                </p>
+            </div>
+
+
+            <!-- shipping details -->
+            <div id="shipping-details">
+                <p>Carrier: {{ order.order_carrier_name or '' }}</p>
+                <p>Customer Paid Shipping: £{{ order.shipping_cost or '0.0' }}</p>
+
+                <p>
+                    <label for="order_total">Total Cost of Order:</label>
+                    <input type="text" id="order_total" name="order_total" value="{{ order.order_total or '' }}">
+                </p>
+
+                <p>
+                    <label for="order_total_tax">Order Tax:</label>
+                    <input type="text" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or '' }}">
+                </p>
+
+                <p>
+                    <label for="order_total_inc_tax">Total Cost inc Tax:</label>
+                    <input type="text" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '' }}">
+                </p>
+            </div>
+
+
+            <!-- additional details -->
+            <div id="shipping-notes">
+                <p>Picking Internal Note: {{ order.picking_internal_note or '' }}</p>
+                <p>Customer Note: {{ order.picking_customer_note or '' }}</p>
+            </div>
+
+
+            <!-- Toggle Buttons -->
+            <div>
+                <button type="button" onclick="toggleSection('billing-info')">View Billing Info</button>
+                <button type="button" onclick="toggleSection('items-info')">View Items</button>
+                <button type="button" onclick="toggleSection('invoice-info')">View Invoice Items</button>
+            </div>
+
+
+            <!-- hidden sections -->
+            <!-- billing info -->
+            <div id="billing-info" class="section">
+                <button type="button" onclick="closeSection()">Close</button>
+                <h2>Billing Info</h2>
+                <div id="order-info-block">
+                    <p>Company: {{ order.billing_company or '' }}</p>
+                    <p>Name: {{ order.billing_name or '' }}</p>
+                    <p>Streetline 1: {{ order.billing_street or '' }}</p>
+                    <p>Streetline 2: {{ order.billing_street2 or '' }}</p>
+                    <p>Locality: {{ order.billing_locality or '' }}</p>
+                    <p>Region: {{ order.billing_region or '' }}</p>
+                    <p>Postcode: {{ order.billing_postcode or '' }}</p>
+                    <p>Country: {{ order.billing_country or '' }}</p>
+                    <p>Country ID: {{ order.billing_country_id or '' }}</p>
+                    <p>Telephone: {{ order.billing_telephone or '' }}</p>
+                    <p>VAT ID: {{ order.billing_vat_id or '' }}</p>
+                </div>
+            </div>
+
+
+            <!-- items info -->
+            <div id="items-info" class="section">
+                <button type="button" onclick="closeSection()">Close</button>
+                <h2>Items Info</h2>
+                {% for item in order.order_items %}
+                <div id="order-info-block">
+                    <p>Product SKU: {{ item.product_sku or '' }}</p>
+                    <p>Product Name: {{ item.product_name or '' }}</p>
+                    <p>Description: {{ item.line_description or '' }}</p>
+                    <p>Quantity: {{ item.product_demand_qty or '' }}</p>
+                    <p>Delivered Quantity: {{ item.product_delivered_qty or '' }}</p>
+                    <p>Reserved Quantity: {{ item.product_reserved_qty or '' }}</p>
+                    <p>Picking State: {{ item.line_picking_state or '' }}</p>
+                </div>
+                {% else %}
+                    <p>No items found</p>
+                {% endfor %}
+            </div>
+
+
+            <!-- invoice info -->
+            <div id="invoice-info" class="section">
+                <button type="button" onclick="closeSection()">Close</button>
+                <h2>Invoice Info</h2>
+                {% for line in order.commercial_invoice_lines %}
+                <div id="order-info-block">
+                    <!-- Product SKU -->
+                    <p>
+                        <label for="line-product_sku_{{ loop.index }}">Product SKU:</label>
+                        <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}">
+                        {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
+
+                    <!-- Product name -->
+                    <p>
+                        <label for="line-product_name_{{ loop.index }}">Product Name:</label>
+                        <input type="text" id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}" value="{{ line.product_name or '' }}">
+                    </p>
+
+                    <p>Options: {{ line.product_options or '' }}</p>
+
+                    <!-- Commodity code -->
+                    <p>
+                        <label for="line-commodity_code_{{ loop.index }}">Commodity Code:</label>
+                        <input type="text" id="line-commodity_code_{{ loop.index }}" name="line-commodity_code_{{ loop.index }}" value="{{ line.commodity_code or '' }}">
+                    </p>
+
+                    <!-- Country of manufacture -->
+                    <p>
+                        <label for="line-country_of_manufacture_{{ loop.index }}">Country of Manufacture:</label>
+                        <input type="text" id="line-country_of_manufacture_{{ loop.index }}" name="line-country_of_manufacture_{{ loop.index }}" value="{{ line.country_of_manufacture or '' }}">
+                    </p>
+
+                    <!-- Quantity -->
+                    <p>
+                        <label for="line-product_demand_qty_{{ loop.index }}">Quantity:</label>
+                        <input type="text" id="line-product_demand_qty_{{ loop.index }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}">
+                        {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
+
+                    <!-- Unit price -->
+                    <p>
+                        <label for="line-unit_price_{{ loop.index }}">Unit Price:</label>
+                        <input type="text" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}">
+                        {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
+
+                    <!-- Unit weight -->
+                    <p>
+                        <label for="line-unit_weight_{{ loop.index }}">Unit Weight:</label>
+                        <input type="text" id="line-unit_weight_{{ loop.index }}" name="line-unit_weight_{{ loop.index }}" value="{{ line.unit_weight or '' }}">
+                        {% if errors.get('line-unit_weight_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
+
+                    <!-- Product height -->
+                    <p>
+                        <label for="line-product_height_{{ loop.index }}">Unit Height:</label>
+                        <input type="text" id="line-product_height_{{ loop.index }}" name="line-product_height_{{ loop.index }}" value="{{ line.product_height or '' }}">
+                        {% if errors.get('line-product_height_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
+
+                    <!-- Unit width -->
+                    <p>
+                        <label for="line-product_width_{{ loop.index }}">Unit Width:</label>
+                        <input type="text" id="line-product_width_{{ loop.index }}" name="line-product_width_{{ loop.index }}" value="{{ line.product_width or '' }}">
+                        {% if errors.get('line-product_width_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
+
+                    <!-- Unit length -->
+                    <p>
+                        <label for="line-product_length_{{ loop.index }}">Unit Length:</label>
+                        <input type="text" id="line-product_length_{{ loop.index }}" name="line-product_length_{{ loop.index }}" value="{{ line.product_length or '' }}">
+                        {% if errors.get('line-product_length_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                    </p>
+
+                    <!-- Parcel insurance -->
+                    <p>
+                        <label for="line-parcel_insurance_{{ loop.index }}">Parcel Insurance:</label>
+                        <input type="text" id="line-parcel_insurance_{{ loop.index }}" name="line-parcel_insurance_{{ loop.index }}" value=0>
+                    </p>
+                </div>
+                {% else %}
+                    <p>No items found</p>
+                {% endfor %}
+            </div>
+            <button type="submit" onclick="showGif()">Quote</button>
+            <button type="button" onclick="toggleSection('report-issue')">Report</button>
+        </form>
+
+        <!-- Report section -->
+        <div id="report-issue" class="section">
+            <button type="button" onclick="closeSection()">Close</button>
+            <p>
+                <label for="report-product-sku">Product SKU:</label>
+                <input type="text" id="report-product-sku" name="report-product-sku">
+            </p>
+            <p>
+                <label for="report-message">Describe the issue:</label>
+                <textarea id="report-message" name="report-message"></textarea>
+            </p>
+            <button type="button" onclick="submitReport()">Submit</button>
+            <p id="response"></p>
+        </div>
+    </div>
+
+
+
+    <!-- loading gif div -->
+    <div id="loading-gif">
+        <div class="loading-content">
+            <img src="{{ url_for('static', filename='images/default_loading.gif') }}" alt="Loading...">
+            <p>Processing your request... Please wait.</p>
+        </div>
+    </div>
+
+
+    <!-- SCRIPTS -->
+    <!-- event listener for when the page is loaded -->
+    <script>
+        // event listener for when the page is loaded
+        window.addEventListener('pageshow', function (event) {
+            // Check if the page is loaded from the cache (persisted state)
+            if (event.persisted) {
+                document.getElementById('loading-gif').style.display = 'none'; // Hide the loading div
+                document.body.style.overflow = ''; // Re-enable scrolling
+            }
+        });
+    </script>
+
+
+    <!-- div visibility -->
+    <script>
+        // Function for toggling the visibility of a div
+        function toggleSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+
+            // Show the selected section
+            const section = document.getElementById(sectionId);
+            section.style.display = 'block';
+        }
+
+
+        // Function for closing a section
+        function closeSection() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+        }
+    </script>
+
+
+    <!-- loading gif visibility -->
+    <script>
+        // need some separate code for setting the gif to be visible due to display flexbox
+        function showGif() {
+            const section = document.getElementById('loading-gif');
+            section.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    </script>
+
+
+    <!-- submit clickup report task -->
+    <script>
+        function submitReport() {
+            const report_url = "{{ url_for('orders.report_issue') }}";
+            const sku = document.getElementById('report-product-sku').value;
+            const message = document.getElementById('report-message').value;
+
+            fetch(report_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sku: sku,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = `Server response: ${data.response}`;
+            })
+        }
+    </script>
+</body>
+{% endblock %}
