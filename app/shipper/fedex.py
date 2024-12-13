@@ -464,9 +464,10 @@ def parse_ship_response(res):
         value = res['value']
         if res['state'] == 'Error':
             update_log.create_log_line('results', f'Commercial invoice download failed: {value}. Available at: {commerical_invoice_url}')
+            pdf_data = None
         else:
             """Send the pdf to database"""
-            print(value)
+            pdf_data = res['value'].content
 
 
         # loop over the labels to extract the zpl data
@@ -481,13 +482,14 @@ def parse_ship_response(res):
             value = res['value']
             if res['state'] == 'Error':
                 update_log.create_log_line('results', f'ZPL file {label_name} download failed: {value}. Available at: {label_data_url}')
+                zpl_data = None
             else:
-                print(value)
+                zpl_data = value
 
             # append raw zpl data to the labels list
             zpls.append({
                 'label_name': label_name,
-                'label_data': 'x'
+                'label_data': zpl_data
             })
 
 
@@ -496,6 +498,7 @@ def parse_ship_response(res):
             'state': 'Success',
             'value': {
                 'master_id': master_id,
-                'labels': zpls
+                'labels': zpls,
+                'commercial_invoice': pdf_data
             }
         }

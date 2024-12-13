@@ -9,7 +9,7 @@ from app.logger import update_log
 
 # database
 from app import db
-from app.models import ShippingCodes
+from app.models import ShippingCodes, Outs
 
 
 # find the data dir
@@ -183,7 +183,7 @@ def download_with_retries(url, delay=0.5, max_retry=10):
         time.sleep(delay)
         res = requests.get(url)
         if res.status_code == 200:
-            return {'state': 'Success', 'value': res.text}
+            return {'state': 'Success', 'value': res}
     return {'state': 'Error', 'value': f'Max retries hit ({max_retry})'}
 
 
@@ -204,3 +204,24 @@ def print_label(label_data, printer_loc, label_size, label_name):
     # then try to print
 
     return {'state': 'Error', 'value': 'Still in development'}
+
+
+
+
+
+def update_database(data, courier, shipping_code, master_id, commercial_invoice):
+    db.session.add(Outs(
+        order_name = data['order_name'],
+        out_id = 'xxx',
+        processed_at = datetime.now(),
+        name = data['shipping_name'],
+        company = data['shipping_company'],
+        shipped_to = data['shipping_country_id'],
+        customer_paid = data['shipping_cost'],
+        dw_paid = 0.0,
+        tracking_number = master_id,
+        courier = courier,
+        method = shipping_code,
+        commercial_invoice = commercial_invoice,
+    ))
+    db.session.commit()

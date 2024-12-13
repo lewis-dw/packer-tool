@@ -141,6 +141,7 @@ def select_method():
     else:
         master_id = res['value']['master_id']
         labels = res['value']['labels']
+        commercial_invoice = res['value'].get('commercial_invoice', None)
         ship_result = f'Successfully shipped with {courier}. Tracking number: {master_id}'
 
     # log the event
@@ -148,8 +149,11 @@ def select_method():
     update_log.create_log_line('results', ship_result)
 
 
-    # if success then we need to also print the labels out
+    # if success then we need need to do other stuff
     if res['state'] == 'Success':
+        # update outs table in database
+        shipping_functions.update_database(data, courier, shipping_code, master_id, commercial_invoice)
+
         # loop over labels
         for label_id, label_dict in enumerate(labels):
             # print the label

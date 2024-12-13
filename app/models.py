@@ -1,5 +1,6 @@
 from app import db
 from sqlalchemy.sql import func
+from sqlalchemy.dialects.mysql import MEDIUMBLOB
 
 
 
@@ -19,49 +20,30 @@ from sqlalchemy.sql import func
 
 
 #     def __repr__(self):
-#         return f'<Order {self.order_id}>'
+#         return f'<Order {self.order_name}>'
 
 
 
-class Picks(db.Model):
-    __tablename__ = 'picks'
-    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
-    order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-    pick_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-    date_shipped = db.Column(db.DateTime(timezone=True), nullable=True, default=func.now()) # DATETIME
-    name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
-    company = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
-    customer_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-    dw_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-    tracking_number = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-    courier = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-    method = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
+# class Picks(db.Model):
+#     __tablename__ = 'picks'
+#     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+#     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+#     pick_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
 
-
-    def __repr__(self):
-        return f'<Order {self.order_id}>'
+#     def __repr__(self):
+#         return f'<Pick ID {self.pick_id}>'
 
 
 
 
-class Packs(db.Model):
-    __tablename__ = 'packs'
-    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
-    order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-    pack_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-    date_shipped = db.Column(db.DateTime(timezone=True), nullable=True, default=func.now()) # DATETIME
-    name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
-    company = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
-    customer_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-    dw_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-    tracking_number = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-    courier = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-    method = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
+# class Packs(db.Model):
+#     __tablename__ = 'packs'
+#     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+#     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+#     pack_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
 
-
-    def __repr__(self):
-        return f'<Order {self.order_id}>'
-
+#     def __repr__(self):
+#         return f'<Pack ID {self.pack_id}>'
 
 
 
@@ -79,29 +61,10 @@ class Outs(db.Model):
     tracking_number = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     courier = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     method = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
-    commercial_invoice = 'IDK'
-
+    commercial_invoice = db.Column(MEDIUMBLOB, nullable=True) # MEDIUMBLOB NULL
 
     def __repr__(self):
-        return f'<Order {self.order_id}>'
-
-
-
-# class Orders(db.Model):
-#     __tablename__ = 'test_orders'
-#     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
-#     order_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-#     date_shipped = db.Column(db.DateTime(timezone=True), nullable=True, default=func.now()) # DATETIME
-#     name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
-#     company = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
-#     customer_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-#     dw_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-#     tracking_number = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-#     courier = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-#     method = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
-
-#     def __repr__(self):
-#         return f'<Order {self.order_id}>'
+        return f'<Out ID {self.out_id}>'
 
 
 
