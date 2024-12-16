@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
 <script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/display_order.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/show_loading_gif.js') }}" defer></script>
 {% endblock %}
 
 {% block header %}
@@ -370,7 +369,7 @@
 
 
             <!-- Action buttons -->
-            <button type="submit" onclick="showGif()">Quote</button>
+            <button type="submit">Quote</button>
             <button type="button" onclick="toggleSection('report-issue')">Report</button>
         </form>
 
@@ -389,16 +388,6 @@
             </p>
             <button type="button" onclick="submitReport()">Submit</button>
             <p id="response"></p>
-        </div>
-    </div>
-
-
-
-    <!-- loading gif div -->
-    <div id="loading-gif">
-        <div class="loading-content">
-            <img src="{{ url_for('static', filename='images/default_loading.gif') }}" alt="Loading...">
-            <p>Processing your request... Please wait.</p>
         </div>
     </div>
 </body>

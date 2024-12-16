@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Parcels
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shipper.css') }}">
+<script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/parcel_add.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/show_loading_gif.js') }}" defer></script>
+{% endblock %}
+
+{% block header %}
+<!-- Navigation buttons -->
+<div id="navbar-buttons">
+    <a href="/">
+        <button type="Button">Back to dashboard</button>
+    </a>
+    <a href="{{ url_for('orders.display_order') }}">
+        <button type="Button">Back</button>
+    </a>
+</div>
+
+<!-- Display who is currently shipping and allow user to change -->
+<div id="current-shipper-container">
+    <form>
+        <label for="current-shipper">Current shipper:</label>
+        <select id="current-shipper" name="current-shipper">
+            <!-- Options will be dynamically populated here -->
+        </select>
+        <button type="button" onclick="updateShipper()">Change</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block main %}
+<body>
+    <!-- form -->
+    <form method="POST" action="{{ url_for('shipping.get_parcels') }}">
+        <!-- need a container here for styling -->
+        <div>
+            <h1>Parcels</h1>
+            <div id="all-parcels">
+                {% for parcel in parcels %}
+                    <div class="parcel" id="parcel_{{ loop.index }}">
+                        <!-- dimensions -->
+                        <p>
+                            <strong><label>Parcel Height:</label></strong>
+                            <input type="text" name="parcel_height_{{ loop.index }}" value="{{ parcel.parcel_height }}">
+                        </p>
+                        <p>
+                            <strong><label>Parcel Width:</label></strong>
+                            <input type="text" name="parcel_width_{{ loop.index }}" value="{{ parcel.parcel_width }}">
+                        </p>
+                        <p>
+                            <strong><label>Parcel Length:</label></strong>
+                            <input type="text" name="parcel_length_{{ loop.index }}" value="{{ parcel.parcel_length }}">
+                        </p>
+
+                        <!-- weight -->
+                        <p>
+                            <strong><label>Parcel Weight:</label></strong>
+                            <input type="text" name="parcel_weight_{{ loop.index }}" value="{{ parcel.parcel_weight }}">
+                        </p>
+
+                        <!-- quantity -->
+                        <p>
+                            <strong><label>Parcel Quantity:</label></strong>
+                            <input type="text" name="parcel_quantity_{{ loop.index }}" value="{{ parcel.parcel_quantity }}">
+                        </p>
+
+                        <!-- insurance -->
+                        <p>
+                            <strong><label>Parcel Insurance:</label></strong>
+                            <input type="text" name="parcel_insurance_{{ loop.index }}" value="{{ parcel.parcel_insurance }}">
+                        </p>
+
+                        <!-- remove parcel button -->
+                        <button type="button" onclick="removeParcel(this)">Remove</button>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- add parcel button -->
+            <button type="button" onclick="addParcel()">Add Parcel</button>
+        </div>
+
+
+        <!-- submit the parcels and quote -->
+        <button type="submit" onclick="showGif()">Quote</button>
+    </form>
+
+
+
+    <!-- loading gif div -->
+    <div id="loading-gif">
+        <div class="loading-content">
+            <img src="{{ url_for('static', filename='images/default_loading.gif') }}" alt="Loading...">
+            <p>Processing your request... Please wait.</p>
+        </div>
+    </div>
+</body>
+{% endblock %}

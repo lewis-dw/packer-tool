@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Quote Order
+Quote Result
 {% endblock %}
 
 {% block head %}
@@ -16,7 +16,7 @@ Quote Order
     <a href="/">
         <button type="Button">Back to dashboard</button>
     </a>
-    <a href="{{ url_for('orders.display_order') }}">
+    <a href="{{ url_for('shipping.create_parcels') }}">
         <button type="Button">Back</button>
     </a>
 </div>

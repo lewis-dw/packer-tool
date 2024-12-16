@@ -259,7 +259,7 @@ def save_order():
 
         # if all required fields were entered then redirect user
         else:
-            return redirect(url_for('shipping.process_data'))
+            return redirect(url_for('shipping.create_parcels'))
     else:
         return redirect('/')
 

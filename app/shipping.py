@@ -1,7 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
-from flask import Blueprint, request, redirect, render_template, session
+from flask import Blueprint, request, redirect, render_template, url_for, session
 from app.shipper import shipping_functions
+from app.parcel_packer import packer
 from app import fedex, ups
 from app.logger import update_log
 
@@ -13,6 +14,47 @@ shipping = Blueprint('shipping', __name__, template_folder='templates/shipping',
 
 # run this to get all the jsons we want
 province_lookup = shipping_functions.get_all_yamls('province_lookup')
+
+
+
+
+
+"""
+Preprocess some parcel values here then display them to user and allow them to edit/add/remove the parcels
+"""
+@shipping.route('/create_parcels')
+def create_parcels():
+    # get the currently loaded data from flask session
+    data = session.get('order_data', {})
+
+    # if there is data then calculate parcels if they dont exist yet, if they do just load them in
+    if data:
+        parcels = data.get('parcels', '')
+        print(parcels)
+        if not parcels:
+            # parcels = packer.calculate_parcels(data['commercial_invoice_lines'])
+            parcels = packer.temp_parcels() # temporary
+
+            # update the order data
+            session['order_data']['parcels'] = parcels
+            session.modified = True
+        return render_template('show_parcels.html', parcels=parcels)
+
+
+    # else just redirect them back to the homepage they shouldnt be here
+    else:
+        return redirect('/')
+
+
+@shipping.route('/get_parcels', methods=['POST'])
+def get_parcels():
+    # parse over the form
+    parcels = packer.parse_form(request.form)
+
+    # assign the parcels back to the order data and redirect
+    session['order_data']['parcels'] = parcels
+    session.modified = True
+    return redirect(url_for('shipping.process_data'))
 
 
 
@@ -84,7 +126,7 @@ def process_data():
             'error_content': error_content
         }
 
-        return render_template('quote_order.html', data=data)
+        return render_template('quote_result.html', data=data)
 
     # else just redirect them back to the homepage they shouldnt be here
     else:
@@ -169,4 +211,4 @@ def select_method():
 
 
     # render the results to the user
-    return render_template('ship_order.html', data=ship_result)
+    return render_template('ship_result.html', data=ship_result)

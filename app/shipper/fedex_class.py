@@ -54,6 +54,11 @@ class FedEx(Courier):
             # costs
             data['commercial_invoice_lines'][c]['unit_price'] = float(invoice_line["unit_price"])
             data['commercial_invoice_lines'][c]['parcel_insurance'] = float(invoice_line['parcel_insurance'])
+
+
+        # # clean parcel data
+        # for c, parcel in enumerate(data['parcels']):
+        #     data['parcels'][c]['parcel_quantity'] = int(parcel['parcel_quantity'])
         return data
 
 
@@ -85,13 +90,13 @@ class FedEx(Courier):
         return all_items
 
 
-    def format_parcels(self, commercial_lines, order_name):
+    def format_parcels(self, parcels, order_name):
         # loop over the invoice lines
         all_parcels = []
-        for invoice_line in commercial_lines:
+        for parcel in parcels:
             # loop over the number of parcels that a required for the invoice line
             parcels_extend = []
-            for _ in range(invoice_line['product_demand_qty']):
+            for _ in range(int(float(parcel['parcel_quantity']))):
                 # generate the parcel
                 parcel_dict = {
                     "customerReferenceType": [
@@ -102,25 +107,25 @@ class FedEx(Courier):
                     ],
                     "groupPackageCount": 1,
                     "weight": {
-                        "value": invoice_line['unit_weight'],
+                        "value": parcel['parcel_weight'],
                         "units": "KG"
                     },
                     "dimensions": {
-                        "length": invoice_line['product_length'],
-                        "width": invoice_line['product_width'],
-                        "height": invoice_line['product_height'],
+                        "length": parcel['parcel_length'],
+                        "width": parcel['parcel_width'],
+                        "height": parcel['parcel_height'],
                         "units": "CM"
                     }
                 }
 
                 # if there is insurance on the parcel add it in
-                if invoice_line['parcel_insurance'] > 0.0:
+                if parcel['parcel_insurance'] > 0.0:
                     parcel_dict["PackageServiceOptions"] = {
                         "DeclaredValue": {
                             "Type": {
                                 "Code": "01"
                             },
-                            "MonetaryValue": invoice_line['parcel_insurance'],
+                            "MonetaryValue": parcel['parcel_insurance'],
                             "CurrencyCode": "GBP"
                         }
                     }
@@ -228,7 +233,7 @@ class FedEx(Courier):
 
         # generate parcels and items before creating payload
         items = self.format_items(c_data['commercial_invoice_lines'])
-        parcels = self.format_parcels(c_data['commercial_invoice_lines'], c_data['order_name'])
+        parcels = self.format_parcels(c_data['parcels'], c_data['order_name'])
         payload = self.create_quote_payload(c_data, items, parcels)
 
         # quote the payload
@@ -422,7 +427,7 @@ class FedEx(Courier):
 
         # generate parcels and items before creating payload
         items = self.format_items(c_data['commercial_invoice_lines'])
-        parcels = self.format_parcels(c_data['commercial_invoice_lines'], c_data['order_name'])
+        parcels = self.format_parcels(c_data['parcels'], c_data['order_name'])
         label_size = size_translate.get(printer_size, 'STOCK_4X6')
         payload = self.create_ship_payload(c_data, shipping_code, label_size, items, parcels)
 

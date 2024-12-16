@@ -83,13 +83,13 @@ class UPS(Courier):
         return all_items
 
 
-    def format_parcels(self, commercial_lines, _extra=''):
+    def format_parcels(self, parcels, _extra=''):
         # loop over the invoice lines
         all_parcels = []
-        for invoice_line in commercial_lines:
+        for parcel in parcels:
             # loop over the number of parcels that a required for the invoice line
             parcels_extend = []
-            for _ in range(int(float(invoice_line['product_demand_qty']))):
+            for _ in range(int(float(parcel['parcel_quantity']))):
                 # generate the parcel
                 parcel_dict = {
                     "Description": "Products from Driftworks",
@@ -102,27 +102,27 @@ class UPS(Courier):
                             "Description": "Centimetres",
                             "Code": "CM"
                         },
-                        "Length": invoice_line['product_length'],
-                        "Width": invoice_line['product_width'],
-                        "Height": invoice_line['product_height']
+                        "Length": str(parcel['parcel_length']),
+                        "Width": str(parcel['parcel_width']),
+                        "Height": str(parcel['parcel_height'])
                     },
                     "PackageWeight": {
                         "UnitOfMeasurement": {
                             "Description": "Kilograms",
                             "Code": "KGS"
                         },
-                        "Weight": invoice_line['unit_weight']
+                        "Weight": str(parcel['parcel_weight'])
                     }
                 }
 
                 # if there is insurance on the parcel add it in
-                if float(invoice_line['parcel_insurance']) > 0.0:
+                if float(parcel['parcel_insurance']) > 0.0:
                     parcel_dict["PackageServiceOptions"] = {
                         "DeclaredValue": {
                             # "Type": {
                             #     "Code": "01"
                             # },
-                            "MonetaryValue": invoice_line['parcel_insurance'],
+                            "MonetaryValue": str(parcel['parcel_insurance']),
                             "CurrencyCode": "GBP"
                         }
                     }
@@ -245,7 +245,7 @@ class UPS(Courier):
         c_data = self.clean_data(data)
 
         # generate parcels and items before creating payload
-        parcels = self.format_parcels(c_data['commercial_invoice_lines'], 'Type')
+        parcels = self.format_parcels(c_data['parcels'], 'Type')
         payload = self.create_quote_payload(c_data, parcels)
 
         # quote the payload
@@ -466,7 +466,7 @@ class UPS(Courier):
 
         # generate parcels and items before creating payload
         items = self.format_items(c_data['commercial_invoice_lines'])
-        parcels = self.format_parcels(c_data['commercial_invoice_lines'])
+        parcels = self.format_parcels(c_data['parcels'])
         payload = self.create_ship_payload(c_data, shipping_code, parcels, items, sat_indicator)
 
         # ship the order
