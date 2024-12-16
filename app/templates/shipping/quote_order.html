@@ -7,6 +7,7 @@ Quote Order
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shipper.css') }}">
 <script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/show_loading_gif.js') }}" defer></script>
 {% endblock %}
 
 {% block header %}
@@ -48,9 +49,21 @@ Quote Order
         <h2>Errors</h2>
         {{ data.error_content|safe }}
     </div>
+
+
+    <!-- loading gif div -->
+    <div id="loading-gif">
+        <div class="loading-content">
+            <img src="{{ url_for('static', filename='images/default_loading.gif') }}" alt="Loading...">
+            <p>Processing your request... Please wait.</p>
+        </div>
+    </div>
 </body>
 <script>
     function rowClicked(courier, shipping_code, sat_indicator) {
+        // needs 
+        showGif()
+
         // Get values
         const baseUrl = "{{ url_for('shipping.select_method')}}";
         const printerLoc = document.getElementById('printer-loc').value;

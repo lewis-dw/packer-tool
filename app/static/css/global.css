@@ -117,3 +117,27 @@ footer {
     align-items: center;
     border: 3px solid red;
 }
+
+
+
+
+
+/* Loading gif stuff */
+#loading-gif {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full width of the viewport */
+    height: 100vh; /* Full height of the viewport */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999; /* ensure it's above everything else */
+    display: none; /* center the content */
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-content {
+    text-align: center;
+    color: rgba(255, 255, 255, 1);
+    font-size: 1.5em;
+}

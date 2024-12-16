@@ -1,8 +1,16 @@
+# metadata variables
+__version__ = '1.10.1'  # semantic versioning: [MAJOR|MINOR|PATCH]
+__author__ = 'Lewis Rumsby'
+__email__ = 'lewis@driftworks.com'
+
+
+# imports
 from flask import Flask, render_template, send_from_directory, g
 from flask_talisman import Talisman
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+
 
 # load environment variables
 load_dotenv()
@@ -10,10 +18,11 @@ load_dotenv()
 # create the database
 db = SQLAlchemy()
 
-# metadata variables
-__version__ = '1.10.0'  # semantic versioning: [MAJOR|MINOR|PATCH]
-__author__ = 'Lewis Rumsby'
-__email__ = 'lewis@driftworks.com'
+
+# create the shipper objects (below load_dotenv)
+from app.shipper import fedex_class, ups_class, royal_mail_class
+fedex = fedex_class.FedEx()
+ups = ups_class.UPS()
 
 
 def create_app():

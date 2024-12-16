@@ -1,7 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from flask import Blueprint, request, redirect, render_template, session
-from app.shipper import fedex, ups, shipping_functions
+from app.shipper import shipping_functions
+from app import fedex, ups
 from app.logger import update_log
 
 """

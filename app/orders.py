@@ -3,6 +3,7 @@ from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.shipper import shipping_functions
 from app.clickup.api import create_task
 from app.logger import update_log
+from app import fedex
 
 """
 These routes are used for when getting orders from odoo
@@ -81,6 +82,7 @@ def get_order_id():
 
     else:
         print(action)
+        fedex.test()
         return redirect('/')
 
 
