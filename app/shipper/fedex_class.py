@@ -20,13 +20,16 @@ prefix = 'TEST_'
 class FedEx(Courier):
     def __init__(self):
         super().__init__(
-            auth_url = os.getenv(f'{prefix}FEDEX_OAUTH_URL'),
+            #credentials
             client_id = os.getenv(f'{prefix}FEDEX_ID'),
             client_secret = os.getenv(f'{prefix}FEDEX_SECRET'),
-            account_id = os.getenv(f'{prefix}FEDEX_ACCOUNT_ID')
+            account_id = os.getenv(f'{prefix}FEDEX_ACCOUNT_ID'),
+
+            # urls
+            auth_url = os.getenv(f'{prefix}FEDEX_OAUTH_URL'),
+            quote_url = os.getenv(f'{prefix}FEDEX_QUOTE_URL'),
+            ship_url = os.getenv(f'{prefix}FEDEX_SHIP_URL')
         )
-        self.quote_url = os.getenv(f'{prefix}FEDEX_QUOTE_URL')
-        self.ship_url = os.getenv(f'{prefix}FEDEX_SHIP_URL')
         self.void_url = os.getenv(f'{prefix}FEDEX_VOID_URL')
 
 

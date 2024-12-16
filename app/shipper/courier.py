@@ -12,11 +12,22 @@ debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 
 
 class Courier(ABC):
-    def __init__(self, auth_url, client_id, client_secret, account_id):
-        self.auth_url = auth_url
+    def __init__(
+            self,
+            auth_url, quote_url, ship_url,
+            client_id, client_secret, account_id
+        ):
+        # credentials
         self.client_id = client_id
         self.client_secret = client_secret
         self.account_id = account_id
+
+        # urls
+        self.auth_url = auth_url
+        self.quote_url = quote_url
+        self.ship_url = ship_url
+
+        # auth token
         self.token = None
         self.token_expires_at = None
 

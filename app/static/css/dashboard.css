@@ -4,10 +4,6 @@ main {
     align-items: center;
 }
 
-body {
-    display: flex;
-}
-
 
 .dashboard-options {
     display: flex;
@@ -19,7 +15,7 @@ body {
     height: 50vh;
     width: 100vh;
 
-    border: 3px solid green;
+    border: 2px solid var(--dw-orange-1);
 }
 
 .dashboard-icon {

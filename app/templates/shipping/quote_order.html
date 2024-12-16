@@ -11,10 +11,18 @@ Quote Order
 {% endblock %}
 
 {% block header %}
-<a href="/">Back to dashboard</a>
+<!-- Navigation buttons -->
+<div id="navbar-buttons">
+    <a href="/">
+        <button type="Button">Back to dashboard</button>
+    </a>
+    <a href="{{ url_for('orders.display_order') }}">
+        <button type="Button">Back</button>
+    </a>
+</div>
 
 <!-- Display who is currently shipping and allow user to change -->
-<div>
+<div id="current-shipper-container">
     <form>
         <label for="current-shipper">Current shipper:</label>
         <select id="current-shipper" name="current-shipper">

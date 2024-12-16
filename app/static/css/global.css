@@ -24,7 +24,31 @@
 
 
 
+/* Navbar */
+#navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: var(--bg-color-2);
+    border-bottom: 2px solid var(--dw-orange-1);
+}
+
+#current-shipper-container {
+    margin-left: auto; /* Push the container to the far right */
+}
+
+#current-shipper {
+    border: 1px solid var(--dw-orange-2);
+}
+
+
+
+
+
+/* main content stuff */
 body {
+    display: flex;
     background-color: var(--bg-color-1);
     color: rgba(255, 255, 255, 1);
     font-family: 'Inter';
@@ -34,8 +58,8 @@ body {
 
 main {
     flex: 1;
-    border: 3px solid red;
     flex-direction: column;
+    padding: 1vw;
 }
 
 
@@ -84,15 +108,6 @@ button:focus {
 
 
 /* Clear session button */
-#current-shipper {
-    border: 1px solid var(--dw-orange-2);
-}
-
-
-
-
-
-/* Clear session button */
 #clear-session {
     all: unset;
     background-color: rgba(60, 60, 60, 1);
@@ -111,11 +126,15 @@ button:focus {
 
 /* Footer */
 footer {
+    /* flex-direction: column; */
+
+    padding: 5px;
     display: flex;
-    flex-direction: column;
-    /* justify-content: center; */
     align-items: center;
-    border: 3px solid red;
+    justify-content: space-between;
+
+    background-color: var(--bg-color-2);
+    border-top: 2px solid var(--dw-orange-1);
 }
 
 

@@ -20,14 +20,18 @@ prefix = 'TEST_'
 class RoyalMail(Courier):
     def __init__(self):
         super().__init__(
-            auth_url = os.getenv(f'{prefix}RM_OAUTH_URL'),
+            # credentials
             client_id = os.getenv(f'{prefix}RM_ID'),
             client_secret = os.getenv(f'{prefix}RM_SECRET'),
-            account_id = os.getenv(f'{prefix}RM_ACCOUNT_ID')
+            account_id = os.getenv(f'{prefix}RM_ACCOUNT_ID'),
+
+            # urls
+            auth_url = os.getenv(f'{prefix}RM_OAUTH_URL'),
+            quote_url = os.getenv(f'{prefix}RM_QUOTE_URL'),
+            ship_url = os.getenv(f'{prefix}RM_SHIP_URL')
         )
-        self.quote_url = os.getenv(f'{prefix}RM_QUOTE_URL')
-        self.ship_url = os.getenv(f'{prefix}RM_SHIP_URL')
         self.void_url = os.getenv(f'{prefix}RM_VOID_URL')
+        self.account_pwd = os.getenv(f'{prefix}RM_PASSWORD')
 
 
 ###########################################################################################################################################
@@ -133,8 +137,10 @@ class RoyalMail(Courier):
 
         # send a request
         headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.token}"
+            'X-IBM-Client-Id': self.client_id,
+            'X-IBM-Client-Secret': self.client_secret,
+            'x-rmg-auth-token': self.token,
+            'accept': 'application/json'
         }
         res = requests.post(url, headers=headers, json=payload)
         return res.json()
@@ -151,18 +157,25 @@ class RoyalMail(Courier):
             return self.token
 
         # get auth token
-        res = requests.post(
+        res = requests.get(
             self.auth_url,
-            headers={'Content-Type': "application/x-www-form-urlencoded"},
-            data=f"grant_type=client_credentials&client_id={self.client_id}&client_secret={self.client_secret}"
+            headers={
+                'X-IBM-Client-Id': self.client_id,
+                'X-IBM-Client-Secret': self.client_secret,
+                'x-rmg-user-name': self.account_id,
+                'x-rmg-password': self.account_pwd,
+                'accept': 'application/json',
+                'content-type': 'application/json'
+            }
         )
 
         # on a fail just raise exception for now
         if res.status_code != 200:
             raise Exception(f"Auth failed: {res.text}")
 
+        print(res.json())
         # on success save the new auth token
-        self.token_expires_at = time.time() + int(res.json()["expires_in"])
+        # self.token_expires_at = time.time() + int(res.json()["expires_in"])
         return res.json()["access_token"]
 
 

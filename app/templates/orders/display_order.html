@@ -12,10 +12,15 @@
 {% endblock %}
 
 {% block header %}
-<a href="/">Back to dashboard</a>
+<!-- Navigation buttons -->
+<div id="navbar-buttons">
+    <a href="/">
+        <button type="Button">Back to dashboard</button>
+    </a>
+</div>
 
 <!-- Display who is currently shipping and allow user to change -->
-<div>
+<div id="current-shipper-container">
     <form>
         <label for="current-shipper">Current shipper:</label>
         <select id="current-shipper" name="current-shipper">
@@ -30,7 +35,7 @@
 <body>
     <!-- display all order data info div -->
     <div id="order-details">
-        <h1>Order Details [{{ order.order_name }}]</h1>
+        <h1>Order Number: {{ order.order_name }}</h1>
         <form method="POST" action="{{ url_for('orders.save_order') }}">
             <input type="hidden" name="order_id" value="{{ order.order_name }}">
 
@@ -228,8 +233,8 @@
                         <h2>Items Info</h2>
                         {% for item in order.order_items %}
                         <div id="order-info-block">
-                            <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
                             <p><strong>Product SKU:</strong> {{ item.product_sku or '' }}</p>
+                            <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
                             <p><strong>Product Name:</strong> {{ item.product_name or '' }}</p>
                             <p><strong>Description:</strong> {{ item.line_description or '' }}</p>
                             <p><strong>Quantity:</strong> {{ item.product_demand_qty or '' }}</p>

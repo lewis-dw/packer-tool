@@ -22,13 +22,16 @@ prefix = 'TEST_'
 class UPS(Courier):
     def __init__(self):
         super().__init__(
-            auth_url = os.getenv(f'{prefix}UPS_OAUTH_URL'),
+            # credentials
             client_id = os.getenv(f'{prefix}UPS_ID'),
             client_secret = os.getenv(f'{prefix}UPS_SECRET'),
-            account_id = os.getenv(f'{prefix}UPS_ACCOUNT_ID')
+            account_id = os.getenv(f'{prefix}UPS_ACCOUNT_ID'),
+
+            # urls
+            auth_url = os.getenv(f'{prefix}UPS_OAUTH_URL'),
+            quote_url = os.getenv(f'{prefix}UPS_QUOTE_URL'),
+            ship_url = os.getenv(f'{prefix}UPS_SHIP_URL')
         )
-        self.quote_url = os.getenv(f'{prefix}UPS_QUOTE_URL')
-        self.ship_url = os.getenv(f'{prefix}UPS_SHIP_URL')
         self.void_url = os.getenv(f'{prefix}UPS_VOID_URL')
 
 
