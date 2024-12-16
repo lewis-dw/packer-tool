@@ -28,7 +28,7 @@ class UPS(Courier):
             account_id = os.getenv(f'{prefix}UPS_ACCOUNT_ID')
         )
         self.quote_url = os.getenv(f'{prefix}UPS_QUOTE_URL')
-        self.ship_url = os.getenv(f'{prefix}UPS_QUOTE_URL')
+        self.ship_url = os.getenv(f'{prefix}UPS_SHIP_URL')
         self.void_url = os.getenv(f'{prefix}UPS_VOID_URL')
 
 
@@ -300,7 +300,6 @@ class UPS(Courier):
                         "Name": "Driftworks",
                         "AttentionName": "Logistics",
                         "CompanyDisplayableName": "DW",
-                        "TaxIdentificationNumber": "GB862889662",
                         "Phone": {
                             "Number": "441217922000"
                         },
@@ -344,6 +343,15 @@ class UPS(Courier):
                         "EMailAddress": "logistics@driftworks.com",
                         "Phone": {
                             "Number": "441217922000"
+                        }
+                    },
+                    "GlobalTaxInformation": {
+                        "AgentTaxIdentificationNumber": {
+                            "AgentRole": {
+                                "IdentificationNumber": "GB862889662",
+                                "IDNumberEncryptionIndicator": "0",
+                                "IDNumberPurposeCode": "01"
+                            }
                         }
                     },
                     "PaymentInformation": {

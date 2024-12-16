@@ -26,7 +26,7 @@ class FedEx(Courier):
             account_id = os.getenv(f'{prefix}FEDEX_ACCOUNT_ID')
         )
         self.quote_url = os.getenv(f'{prefix}FEDEX_QUOTE_URL')
-        self.ship_url = os.getenv(f'{prefix}FEDEX_QUOTE_URL')
+        self.ship_url = os.getenv(f'{prefix}FEDEX_SHIP_URL')
         self.void_url = os.getenv(f'{prefix}FEDEX_VOID_URL')
 
 

@@ -47,10 +47,8 @@ mongo_db = PyMongo(app)
 ```
 For more information on how to use read the full PyMongo documentation or ask ChatGPT for a run down.
 
-
-
-
 ### File struture
+
 ```plaintext
 ├── app
 │   ├── shipping
