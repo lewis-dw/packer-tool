@@ -278,7 +278,7 @@ class FedEx(Courier):
 # Shipping
 
 
-    def create_ship_payload(self, data, shipping_code, label_size, items, parcels):
+    def create_ship_payload(self, data, shipping_code, label_size, ship_at, items, parcels):
         payload = {
             "labelResponseOptions": "URL_ONLY",
             "requestedShipment": {
@@ -318,7 +318,7 @@ class FedEx(Courier):
                         }
                     }
                 ],
-                "shipDatestamp": get_shipping_date('12:00', 1, r'%Y-%m-%d'),
+                "shipDatestamp": ship_at,
                 "serviceType": shipping_code,
                 "packagingType": "YOUR_PACKAGING",
                 "pickupType": "USE_SCHEDULED_PICKUP",
@@ -429,7 +429,8 @@ class FedEx(Courier):
         items = self.format_items(c_data['commercial_invoice_lines'])
         parcels = self.format_parcels(c_data['parcels'], c_data['order_name'])
         label_size = size_translate.get(printer_size, 'STOCK_4X6')
-        payload = self.create_ship_payload(c_data, shipping_code, label_size, items, parcels)
+        f_ship_date, ship_date = get_shipping_date('12:00', 1, r'%Y-%m-%d')
+        payload = self.create_ship_payload(c_data, shipping_code, label_size, f_ship_date, items, parcels)
 
         # ship the order
         res = self.send_payload(self.ship_url, payload)
@@ -439,8 +440,8 @@ class FedEx(Courier):
         self.dump_json('ship', 'fedex', 'response.json', res)
 
         # parse the result and return
-        res = self.parse_ship_response(res, label_size)
-        return res
+        result = self.parse_ship_response(res, label_size)
+        return result, ship_date
 
 
 

@@ -105,6 +105,7 @@ def quote_result():
             for future in as_completed(future_to_service):
                 service_name = future_to_service[future] # pull this in case i want to debug which has completed
                 # print(f'Completed: {service_name}')
+                update_log.create_log_line('results', f'{service_name} has completed.')
                 quote = future.result()
                 if quote['state'] == 'Success':
                     all_quotes.extend(quote['value'])
@@ -147,6 +148,7 @@ def select_method():
     courier = request.args.get('courier').upper()
     shipping_code = request.args.get('shipping_code')
     sat_indicator = request.args.get('sat_indicator')
+    dw_paid = request.args.get('cost')
     printer_loc = request.args.get('printer_loc')
     shipper = request.cookies.get('current_shipper')
 
@@ -177,11 +179,11 @@ def select_method():
             """Ship the order based on who was selected"""
             # ups
             if courier == 'UPS':
-                res = ups.ship_order(data, shipping_code, sat_indicator)
+                result, ship_at = ups.ship_order(data, shipping_code, sat_indicator)
 
             # fedex
             elif courier == 'FEDEX':
-                res = fedex.ship_order(data, shipping_code, label_size)
+                result, ship_at = fedex.ship_order(data, shipping_code, label_size)
 
 
         # if they access with no shipper selected then redirect to a page telling them this
@@ -195,32 +197,36 @@ def select_method():
 
 
     # deal with result of a successful ship and log a message respective of what happened
-    if res['state'] == 'Error':
-        errors = res['value']
+    if result['state'] == 'Error':
+        errors = result['value']
         ship_result = f'Failed with {courier}. Error/s: {errors}'
     else:
-        master_id = res['value']['master_id']
-        labels = res['value']['labels']
-        commercial_invoice = res['value'].get('commercial_invoice', None)
+        master_id = result['value']['master_id']
+        labels = result['value']['labels']
+        commercial_invoice = result['value'].get('commercial_invoice', None)
         ship_result = f'Successfully shipped with {courier}. Tracking number: {master_id}'
 
     # log all that has happened
-    update_log.create_log_line('actions', res['state'])
+    update_log.create_log_line('actions', result['state'])
     update_log.create_log_line('results', ship_result)
     update_log.create_log_line('results', changed_printer)
 
 
     # if success then we need need to do other stuff
-    if res['state'] == 'Success':
-        # update outs table in database
-        shipping_functions.update_database(data, courier, shipping_code, master_id, commercial_invoice)
+    if result['state'] == 'Success':
+        # update the outs table in database
+        print(dw_paid)
+        shipping_functions.update_outs_database(data, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice)
 
         # loop over labels
         label_results = []
         for label_id, label_dict in enumerate(labels):
             # send the zpl data to the print server
             # server_name and printer_name were found earlier
-            print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data'])
+            # print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data'])
+            print_res = {
+                'state': 'Success'
+            }
 
             # deal with result of printing the label
             initial_message = f'Label {label_id+1}/{len(labels)} for {master_id}'

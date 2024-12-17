@@ -65,7 +65,7 @@ Quote Result
     </div>
 </body>
 <script>
-    function rowClicked(courier, shipping_code, sat_indicator) {
+    function rowClicked(courier, shipping_code, sat_indicator, cost) {
         // needs 
         showGif()
 
@@ -78,6 +78,7 @@ Quote Result
             courier: courier,
             shipping_code: shipping_code,
             sat_indicator: sat_indicator,
+            cost: cost,
             printer_loc: printerLoc
         }).toString();
 

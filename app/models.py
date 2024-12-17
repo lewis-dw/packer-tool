@@ -56,6 +56,7 @@ class Outs(db.Model):
     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     out_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     processed_at = db.Column(db.DateTime(timezone=True), nullable=True, default=func.now()) # DATETIME
+    shipped_at = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
     company = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
     shipped_to = db.Column(db.String(128), nullable=False) # VARCHAR(81280) NOT NULL

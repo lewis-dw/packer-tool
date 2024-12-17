@@ -50,6 +50,7 @@ def get_shipping_date(end_time, days_penalty, date_format):
 
     Returns:
         str: The shipping date in the correct format and with the day penalty.
+        str: The shipping date in a normal format and with the day penalty.
     """
     # format the input end time
     end_time = datetime.strptime(end_time, "%H:%M").time()
@@ -60,7 +61,7 @@ def get_shipping_date(end_time, days_penalty, date_format):
         new_date = now + timedelta(days=days_penalty)
     else:
         new_date = now
-    return new_date.strftime(date_format) # return the date in the requested format
+    return new_date.strftime(date_format), new_date.strftime(r'%Y-%m-%d')
 
 
 
@@ -125,7 +126,7 @@ def parse_quotes(data):
 
             # construct table line and log to success
             html_row = ''.join([
-                f'<tr onclick="rowClicked(\'{courier}\', \'{shipping_code}\', \'{sat_indicator}\')">',
+                f'<tr onclick="rowClicked(\'{courier}\', \'{shipping_code}\', \'{sat_indicator}\', \'{cost}\')">',
                 f'<td>{courier}</td><td>{friendly_code}</td><td>{cost}</td>',
                 '</tr>'
             ])
@@ -190,16 +191,17 @@ def download_with_retries(url, delay=0.5, max_retry=10):
 
 
 
-def update_database(data, courier, shipping_code, master_id, commercial_invoice):
+def update_outs_database(data, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice):
     db.session.add(Outs(
         order_name = data['order_name'],
         out_id = 'xxx',
         processed_at = datetime.now(),
+        shipped_at = ship_at,
         name = data['shipping_name'],
         company = data['shipping_company'],
         shipped_to = data['shipping_country_id'],
         customer_paid = data['shipping_cost'],
-        dw_paid = 0.0,
+        dw_paid = float(dw_paid),
         tracking_number = master_id,
         courier = courier,
         method = shipping_code,

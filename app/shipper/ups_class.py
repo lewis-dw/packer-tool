@@ -6,8 +6,7 @@ from requests.auth import HTTPBasicAuth
 import time
 import base64
 from dotenv import load_dotenv
-from app.shipper.shipping_functions import get_shipping_date, download_with_retries, get_country_code
-from app.logger import update_log
+from app.shipper.shipping_functions import get_shipping_date, get_country_code
 
 # generate root_dir for outputting debug files
 cur_dir = pathlib.Path(__file__).parent
@@ -290,7 +289,7 @@ class UPS(Courier):
 # Shipping
 
 
-    def create_ship_payload(self, data, shipping_code, parcels, items, sat_indicator):
+    def create_ship_payload(self, data, shipping_code, parcels, items, ship_at, sat_indicator):
         payload = {
             "ShipmentRequest": {
                 "Shipment": {
@@ -425,7 +424,7 @@ class UPS(Courier):
                 },
                 "FormType": "01",
                 "InvoiceNumber": data['order_name'],
-                "InvoiceDate": get_shipping_date('16:00', 1, r'%Y%m%d'),
+                "InvoiceDate": ship_at,
                 "TermsOfShipment": "DAP",
                 "ReasonForExport": "Sale",
                 "Comments": "Commercial invoice for items dispatched from Driftworks Ltd",
@@ -465,9 +464,10 @@ class UPS(Courier):
         c_data = self.clean_data(data)
 
         # generate parcels and items before creating payload
-        items = self.format_items(c_data['commercial_invoice_lines'])
         parcels = self.format_parcels(c_data['parcels'])
-        payload = self.create_ship_payload(c_data, shipping_code, parcels, items, sat_indicator)
+        items = self.format_items(c_data['commercial_invoice_lines'])
+        f_ship_date, ship_date = get_shipping_date('16:00', 1, r'%Y%m%d')
+        payload = self.create_ship_payload(c_data, shipping_code, parcels, items, f_ship_date, sat_indicator)
 
         # ship the order
         res = self.send_payload(self.ship_url, payload)
@@ -477,8 +477,8 @@ class UPS(Courier):
         self.dump_json('ship', 'ups', 'response.json', res)
 
         # parse the result and return
-        labels = self.parse_ship_response(res)
-        return labels
+        result = self.parse_ship_response(res)
+        return result, ship_date
 
 
 
