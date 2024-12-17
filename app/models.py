@@ -46,6 +46,9 @@ from sqlalchemy.dialects.mysql import MEDIUMBLOB
 #         return f'<Pack ID {self.pack_id}>'
 
 
+#################################################################################################################################################
+# Shipping Results
+
 
 class Outs(db.Model):
     __tablename__ = 'outs'
@@ -67,6 +70,9 @@ class Outs(db.Model):
         return f'<Out ID {self.out_id}>'
 
 
+#################################################################################################################################################
+# General Data
+
 
 class Countries(db.Model):
     __tablename__ = 'countries'
@@ -81,6 +87,17 @@ class Countries(db.Model):
         return f'<Country {self.country_name}>'
 
 
+class ShippingFlags(db.Model):
+    __tablename__ = 'shipping_flags'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    country_code = db.Column(db.String(4), nullable=False) # VARCHAR(4) NOT NULL
+    flag_svg = db.Column(db.Text, nullable=False)  # TEXT NOT NULL
+
+    def __repr__(self):
+        return f'<Country ID {self.country_code}>'
+
+
+
 
 class ShippingCodes(db.Model):
     __tablename__ = 'shipping_codes'
@@ -90,3 +107,17 @@ class ShippingCodes(db.Model):
 
     def __repr__(self):
         return f'<Shipping Code {self.friendly_code}>'
+
+
+
+
+class Printers(db.Model):
+    __tablename__ = 'printer_info'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    server_name = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
+    printer_name = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
+    can_print_4x6 = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
+    can_print_4x675 = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
+
+    def __repr__(self):
+        return f'<Printer UNC \\{self.server_name}\{self.printer_name}>'
