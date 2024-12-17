@@ -9,7 +9,7 @@ import os
 import pathlib
 
 # table to create
-from app.models import Printers, Outs
+from app.models import Labels, Outs
 
 
 cur_dir = pathlib.Path(__file__).parent

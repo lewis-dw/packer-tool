@@ -9,7 +9,7 @@ from app.logger import update_log
 
 # database
 from app import db
-from app.models import ShippingCodes, Outs
+from app.models import ShippingCodes, Outs, Labels
 
 
 # find the data dir
@@ -188,15 +188,17 @@ def download_with_retries(url, delay=0.5, max_retry=10):
     return {'state': 'Error', 'value': f'Max retries hit ({max_retry})'}
 
 
+########################################################################################################################################################################
+# Database updates
 
 
-
-def update_outs_database(data, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice):
+def update_outs_table(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice):
     db.session.add(Outs(
         order_name = data['order_name'],
         out_id = 'xxx',
         processed_at = datetime.now(),
         shipped_at = ship_at,
+        shipper = shipper,
         name = data['shipping_name'],
         company = data['shipping_company'],
         shipped_to = data['shipping_country_id'],
@@ -208,3 +210,34 @@ def update_outs_database(data, courier, shipping_code, master_id, ship_at, dw_pa
         commercial_invoice = commercial_invoice,
     ))
     db.session.commit()
+
+
+
+def update_labels_table(data, master_id, label_id, zpl_data, courier, shipping_code):
+    db.session.add(Labels(
+        order_name = data['order_name'],
+        out_id = 'xxx',
+        tracking_number = master_id,
+        label_id = label_id,
+        zpl_data = zpl_data,
+        courier = courier,
+        method = shipping_code
+    ))
+    db.session.commit()
+
+
+########################################################################################################################################################################
+# Database queries
+
+
+def get_labels_for_order(order_id):
+    # get all labels related to the order_id passed
+    results = Labels.query.filter(
+        Labels.order_name == order_id
+    ).all()
+
+    # parse the results
+    if results:
+        return {'state': 'Success', 'value': results}
+    else:
+        return {'state': 'Error', 'value': f'No labels found for order name: {order_id}'}

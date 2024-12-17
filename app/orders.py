@@ -71,7 +71,7 @@ def get_order_id():
 
         # on fail we want to display to the user the error of their ways
         if res['state'] == 'Error':
-            return render_template('no_order_found.html', order_id=order_id)
+            return render_template('bad_search.html', message=f'I couldn\'t find an order with the ID: {order_id}')
 
         # if it succeeded then load it into the session
         else:
@@ -79,10 +79,13 @@ def get_order_id():
             session['original_order_data'] = res['value']
             # Redirect directly to the desired URL
             return redirect(url_for('orders.load_order'))
+        
+
+    elif action == 'reprint_label':
+        return redirect(url_for('shipping.reprint_label', order_id=order_id))
 
     else:
         print(action)
-        fedex.test()
         return redirect('/')
 
 

@@ -55,6 +55,7 @@ class Outs(db.Model):
     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     out_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+    shipper = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     processed_at = db.Column(db.DateTime(timezone=True), nullable=True, default=func.now()) # DATETIME
     shipped_at = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
@@ -69,6 +70,23 @@ class Outs(db.Model):
 
     def __repr__(self):
         return f'<Out ID {self.out_id}>'
+
+
+
+
+class Labels(db.Model):
+    __tablename__ = 'labels'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+    out_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+    tracking_number = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
+    label_id = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
+    zpl_data = db.Column(db.Text, nullable=False) # TEXT NOT NULL
+    courier = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
+    method = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
+
+    def __repr__(self):
+        return f'<Order Name {self.order_name}>'
 
 
 #################################################################################################################################################

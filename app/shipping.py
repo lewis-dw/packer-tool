@@ -215,8 +215,7 @@ def select_method():
     # if success then we need need to do other stuff
     if result['state'] == 'Success':
         # update the outs table in database
-        print(dw_paid)
-        shipping_functions.update_outs_database(data, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice)
+        shipping_functions.update_outs_table(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice)
 
         # loop over labels
         label_results = []
@@ -243,6 +242,28 @@ def select_method():
                 'print_result': print_result
             })
 
+            # update the labels table
+            shipping_functions.update_labels_table(data, master_id, label_dict['label_name'], label_dict['label_data'], courier, shipping_code)
+
 
     # render the results to the user
     return render_template('ship_result.html', ship_result=ship_result, label_results=label_results)
+
+
+
+
+
+"""
+This page handles the user selecting a shipping method from the quote page
+"""
+@shipping.route('/reprint_label')
+def reprint_label():
+    # search for labels relating to the order id passed in
+    order_id = request.args.get('order_id', '')
+    result = shipping_functions.get_labels_for_order(order_id)
+
+    # parse the result
+    if result['state'] == 'Success':
+        return render_template('reprint_label.html', order_id=order_id, labels=result['value'])
+    else:
+        return render_template('bad_search.html', message=result['value'])
