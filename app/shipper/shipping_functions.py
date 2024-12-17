@@ -190,25 +190,6 @@ def download_with_retries(url, delay=0.5, max_retry=10):
 
 
 
-def print_label(label_data, printer_loc, label_size, label_name):
-    """
-    Prints a label to a specified printer
-    """
-    # save the zpl as a file in a current day dir
-
-    # check if printer loc and size are valid
-    #   - this is fine if it isnt as it can be retried on the next page after redirect
-
-    # then try to connect
-
-    # then try to print
-
-    return {'state': 'Error', 'value': 'Still in development'}
-
-
-
-
-
 def update_database(data, courier, shipping_code, master_id, commercial_invoice):
     db.session.add(Outs(
         order_name = data['order_name'],

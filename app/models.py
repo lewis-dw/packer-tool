@@ -116,6 +116,7 @@ class Printers(db.Model):
     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
     server_name = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     printer_name = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
+    printer_loc = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     can_print_4x6 = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
     can_print_4x675 = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
 

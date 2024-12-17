@@ -5,12 +5,11 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 from sqlalchemy.schema import CreateTable
 from app import create_app, db
-from app.shipper.shipping_functions import get_all_yamls
 import os
 import pathlib
 
-
-from app.models import Outs
+# table to create
+from app.models import Printers
 
 
 cur_dir = pathlib.Path(__file__).parent
@@ -29,7 +28,7 @@ def create_table(table_name):
 def save_table(table_name):
     orders_table = db.metadata.tables[table_name]
     create_statement = str(CreateTable(orders_table).compile(db.engine))
-    rows = db.session.query(Outs).all() # THIS NEEDS TO BE CHANGED TO THE IMPORTED TABLE
+    rows = db.session.query(Printers).all() # THIS NEEDS TO BE CHANGED TO THE IMPORTED TABLE
 
     # Prepare INSERT statements for each row
     insert_statements = []
@@ -43,11 +42,36 @@ def save_table(table_name):
         f.write("\n".join(insert_statements))
 
 
+"""
+Add to db
+server_name     printer_name    can_print_4x6   can_print_4x675
+LOGISTICS       UPS             True            False
+LOGISTICS       Fedex           True            True
+LOGISTICS       wifizebra       True            False
+LOGISTICS       Royal Mail      True            False
+"""
+
+
+
+def add_row():
+    new_printer = Printers(
+        server_name='LOGISTICS',
+        printer_name='Royal Mail',
+        printer_loc='loc-1',
+        can_print_4x6=True,
+        can_print_4x675=False
+    )
+
+    # Add the new record to the session and commit it
+    db.session.add(new_printer)
+    db.session.commit()
+
 
 app = create_app()
-table_name = 'outs'
+table_name = Printers.__tablename__
 
 with app.app_context():
     """Perform a function"""
     # drop_table(table_name)
-    create_table(table_name)
+    # create_table(table_name)
+    add_row()

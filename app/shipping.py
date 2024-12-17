@@ -2,9 +2,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from flask import Blueprint, request, redirect, render_template, url_for, session
 from app.shipper import shipping_functions
+from app.zpl_printer import printer
 from app.parcel_packer import packer
-from app import fedex, ups
 from app.logger import update_log
+from app import fedex, ups
+
 
 """
 These routes are used for quoting and shipping an order
@@ -160,6 +162,7 @@ def select_method():
 
             # ups
             if courier == 'UPS':
+                # label_size = '4x6'
                 res = ups.ship_order(data, shipping_code, sat_indicator)
 
             # fedex
@@ -199,8 +202,19 @@ def select_method():
 
         # loop over labels
         for label_id, label_dict in enumerate(labels):
-            # print the label
-            print_res = shipping_functions.print_label(label_dict['label_data'], printer_loc, label_size, label_dict['label_name'])
+            # first try find a printer that can print what the user selected
+            res = printer.find_printer(printer_loc, label_size)
+            update_log.create_log_line('results', res['value'])
+
+            # parse result
+            if res['state'] == 'Success':
+                server_name, printer_name = res['value']
+                print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data'])
+            else:
+                # default to the fedex printer in main room as it can print anything
+                print_res = printer.send_zpl_to_server('LOGISTICS', 'Fedex', label_dict['label_data'])
+
+
 
             # deal with result of printing the label
             initial_message = f'Label {label_id+1}/{len(labels)} for {master_id}'
