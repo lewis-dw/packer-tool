@@ -32,9 +32,15 @@ Shipping Result
 {% block main %}
 <body>
     <h1>Shipping result</h1>
-    <p>{{ data }}</p>
-    <!-- list all the labels -->
-    <!-- next to each label give the user the location and size dropdowns and a button to reprint -->
-    <!-- this will activate a python function to access the zpl file name in the correct dir and re run the print script -->
+    <p>{{ ship_result }}</p>
+
+    <!-- list all the label results -->
+    {% for label_result in label_results %}
+        <div id="label-result">
+            <p>Individual label number: {{ label_result.label_id }}</p>
+            <p>{{ label_result.changed_printer }}</p>
+            <p>{{ label_result.print_result }}</p>
+        </div>
+    {% endfor %}
 </body>
 {% endblock %}

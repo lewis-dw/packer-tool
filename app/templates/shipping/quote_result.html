@@ -48,10 +48,6 @@ Quote Result
             <option value="loc-1">Main Room</option>
             <option value="loc-2">Josh Area</option>
         </select>
-        <select id="label-size" name="label-size">
-            <option value="4x6">4x6</option>
-            <option value="4x675">4x6.75</option>
-        </select>
     </div>
 
     <div>
@@ -76,15 +72,13 @@ Quote Result
         // Get values
         const baseUrl = "{{ url_for('shipping.select_method')}}";
         const printerLoc = document.getElementById('printer-loc').value;
-        const labelSize = document.getElementById('label-size').value;
 
         // Build the query params with encoding
         const queryParams = new URLSearchParams({
             courier: courier,
             shipping_code: shipping_code,
             sat_indicator: sat_indicator,
-            printer_loc: printerLoc,
-            label_size: labelSize
+            printer_loc: printerLoc
         }).toString();
 
         // Redirect with the query params

@@ -53,13 +53,16 @@ LOGISTICS       Royal Mail      True            False
 
 
 
+
 def add_row():
     new_printer = Printers(
         server_name='LOGISTICS',
         printer_name='Royal Mail',
         printer_loc='loc-1',
+        label_size='4x6',
         can_print_4x6=True,
-        can_print_4x675=False
+        can_print_4x675=False,
+        can_print=['royal_mail']
     )
 
     # Add the new record to the session and commit it

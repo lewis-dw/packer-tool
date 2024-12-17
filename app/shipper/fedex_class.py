@@ -439,13 +439,13 @@ class FedEx(Courier):
         self.dump_json('ship', 'fedex', 'response.json', res)
 
         # parse the result and return
-        res = self.parse_ship_response(res)
+        res = self.parse_ship_response(res, label_size)
         return res
 
 
 
 
-    def parse_ship_response(self, res):
+    def parse_ship_response(self, res, label_size):
         # check if we have errors
         if res.get('errors', '') != '':
             errors = []
@@ -490,7 +490,8 @@ class FedEx(Courier):
                     update_log.create_log_line('results', f'ZPL file {label_name} download failed: {value}. Available at: {label_data_url}')
                     zpl_data = None
                 else:
-                    zpl_data = value
+                    zpl_data = value.text
+                    zpl_data = self.edit_zpl(zpl_data, label_size)
 
                 # append raw zpl data to the labels list
                 zpls.append({
@@ -508,6 +509,18 @@ class FedEx(Courier):
                     'commercial_invoice': pdf_data
                 }
             }
+
+
+
+
+    def edit_zpl(self, zpl_data, label_size):
+        """This adds in additional zpl commands to further customize the zpl label"""
+
+        """Add in the dpd weight indicator if need be"""
+
+        if label_size == '4x675':
+            """Edit the doc tab"""
+        return zpl_data
 
 
 ###########################################################################################################################################

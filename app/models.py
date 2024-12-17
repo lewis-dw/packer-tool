@@ -1,6 +1,6 @@
 from app import db
 from sqlalchemy.sql import func
-from sqlalchemy.dialects.mysql import MEDIUMBLOB
+from sqlalchemy.dialects.mysql import MEDIUMBLOB, JSON
 
 
 
@@ -117,8 +117,10 @@ class Printers(db.Model):
     server_name = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     printer_name = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     printer_loc = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
+    label_size = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     can_print_4x6 = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
     can_print_4x675 = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
+    can_print = db.Column(JSON, nullable=False) # JSON NOT NULL
 
     def __repr__(self):
         return f'<Printer UNC \\{self.server_name}\{self.printer_name}>'

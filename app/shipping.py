@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from flask import Blueprint, request, redirect, render_template, url_for, session
 from app.shipper import shipping_functions
-from app.zpl_printer import printer
+from app.print_zpl import printer
 from app.parcel_packer import packer
 from app.logger import update_log
 from app import fedex, ups
@@ -32,7 +32,6 @@ def create_parcels():
     # if there is data then calculate parcels if they dont exist yet, if they do just load them in
     if data:
         parcels = data.get('parcels', '')
-        print(parcels)
         if not parcels:
             # parcels = packer.calculate_parcels(data['commercial_invoice_lines'])
             parcels = packer.temp_parcels() # temporary
@@ -56,17 +55,17 @@ def get_parcels():
     # assign the parcels back to the order data and redirect
     session['order_data']['parcels'] = parcels
     session.modified = True
-    return redirect(url_for('shipping.process_data'))
+    return redirect(url_for('shipping.quote_result'))
 
 
 
 
 
 """
-Process the data before quoting the data with every courier
+Quote the data with every courier
 """
-@shipping.route('/process_data')
-def process_data():
+@shipping.route('/quote_result')
+def quote_result():
     # get the currently loaded data from flask session
     data = session.get('order_data', {})
     shipper = request.cookies.get('current_shipper')
@@ -149,7 +148,6 @@ def select_method():
     shipping_code = request.args.get('shipping_code')
     sat_indicator = request.args.get('sat_indicator')
     printer_loc = request.args.get('printer_loc')
-    label_size = request.args.get('label_size')
     shipper = request.cookies.get('current_shipper')
 
 
@@ -160,9 +158,25 @@ def select_method():
             sat_msg = 'Yes' if sat_indicator else 'No'
             update_log.create_log_line('actions', f'`{shipper}` attempting to ship with {courier} using {shipping_code}, SAT: {sat_msg}.')
 
+
+            # try find a printer that can print what the user selected
+            res = printer.find_printer(printer_loc, courier)
+
+            # parse results
+            if res['state'] == 'Success':
+                server_name, printer_name, label_size = res['value']
+                changed_printer = ''
+            else:
+                server_name = 'LOGISTICS'
+                printer_name = 'wifizebra'
+                label_size = '4x6'
+                changed_printer = f"{res['value']}, switched to `wifizebra` in Josh Area."
+
+
+
+            """Ship the order based on who was selected"""
             # ups
             if courier == 'UPS':
-                # label_size = '4x6'
                 res = ups.ship_order(data, shipping_code, sat_indicator)
 
             # fedex
@@ -190,9 +204,10 @@ def select_method():
         commercial_invoice = res['value'].get('commercial_invoice', None)
         ship_result = f'Successfully shipped with {courier}. Tracking number: {master_id}'
 
-    # log the event
+    # log all that has happened
     update_log.create_log_line('actions', res['state'])
     update_log.create_log_line('results', ship_result)
+    update_log.create_log_line('results', changed_printer)
 
 
     # if success then we need need to do other stuff
@@ -201,28 +216,27 @@ def select_method():
         shipping_functions.update_database(data, courier, shipping_code, master_id, commercial_invoice)
 
         # loop over labels
+        label_results = []
         for label_id, label_dict in enumerate(labels):
-            # first try find a printer that can print what the user selected
-            res = printer.find_printer(printer_loc, label_size)
-            update_log.create_log_line('results', res['value'])
-
-            # parse result
-            if res['state'] == 'Success':
-                server_name, printer_name = res['value']
-                print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data'])
-            else:
-                # default to the fedex printer in main room as it can print anything
-                print_res = printer.send_zpl_to_server('LOGISTICS', 'Fedex', label_dict['label_data'])
-
-
+            # send the zpl data to the print server
+            # server_name and printer_name were found earlier
+            print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data'])
 
             # deal with result of printing the label
             initial_message = f'Label {label_id+1}/{len(labels)} for {master_id}'
             if print_res['state'] == 'Error':
-                update_log.create_log_line('results', f"{initial_message} failed to print. Reason: {print_res['value']}")
+                print_result = f"{initial_message} failed to print. Reason: {print_res['value']}"
             else:
-                update_log.create_log_line('results', f'{initial_message} succeeded in printing.')
+                print_result = f'{initial_message} succeeded printing to {printer_name} in {printer.friendly_translate(printer_loc)}'
+            update_log.create_log_line('results', print_result)
+
+            # create result info dict for the row
+            label_results.append({
+                'label_id': label_dict['label_name'],
+                'changed_printer': changed_printer,
+                'print_result': print_result
+            })
 
 
     # render the results to the user
-    return render_template('ship_result.html', data=ship_result)
+    return render_template('ship_result.html', ship_result=ship_result, label_results=label_results)

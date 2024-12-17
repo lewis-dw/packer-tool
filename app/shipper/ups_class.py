@@ -512,6 +512,7 @@ class UPS(Courier):
                 graphic_image = label["ShippingLabel"]["GraphicImage"]
                 label_data = base64.b64decode(graphic_image)
                 zpl_data = label_data.decode('latin-1').replace('\n', '')
+                zpl_data = self.edit_zpl(zpl_data)
 
                 # append raw zpl data to the labels list
                 zpls.append({
@@ -528,6 +529,16 @@ class UPS(Courier):
                     'labels': zpls
                 }
             }
+
+
+
+
+    def edit_zpl(self, zpl_data):
+        """This adds in additional zpl commands to further customize the zpl label"""
+
+        """Add in the dpd weight indicator if need be"""
+
+        return zpl_data
 
 
 ###########################################################################################################################################
