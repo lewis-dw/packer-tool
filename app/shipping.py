@@ -211,7 +211,7 @@ def select_method():
     # if success then we need need to do other stuff
     if result['state'] == 'Success':
         # update the outs table in database
-        shipping_functions.update_outs_table(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice)
+        shipping_functions.update_shipping_history(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice)
 
         # loop over labels
         label_results = []

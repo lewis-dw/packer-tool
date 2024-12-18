@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import os
 import pathlib
-import yaml
 import html
 import requests
 import time
@@ -17,7 +16,8 @@ cur_dir = pathlib.Path(__file__).parent
 data_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'data'))
 
 
-
+########################################################################################################################################################################
+# URL queries
 
 
 def join_url(*url_parts):
@@ -31,6 +31,24 @@ def join_url(*url_parts):
 
 
 
+
+
+def download_with_retries(url, delay=0.5, max_retry=10):
+    """
+    Download the content from a url and keep retrying until successful up to a limit.
+    Returns the raw content from the url.
+    """
+
+    for attempt in range(max_retry):
+        time.sleep(delay)
+        res = requests.get(url)
+        if res.status_code == 200:
+            return {'state': 'Success', 'value': res}
+    return {'state': 'Error', 'value': f'Max retries hit ({max_retry})'}
+
+
+########################################################################################################################################################################
+# Shipping API functions
 
 
 def get_shipping_date(end_time, days_penalty, date_format):
@@ -142,31 +160,16 @@ def parse_quotes(data):
     return quote_content, error_content
 
 
-
-
-
-def download_with_retries(url, delay=0.5, max_retry=10):
-    """
-    Download the content from a url and keep retrying until successful up to a limit.
-    Returns the raw content from the url.
-    """
-
-    for attempt in range(max_retry):
-        time.sleep(delay)
-        res = requests.get(url)
-        if res.status_code == 200:
-            return {'state': 'Success', 'value': res}
-    return {'state': 'Error', 'value': f'Max retries hit ({max_retry})'}
-
-
 ########################################################################################################################################################################
 # Database updates
 
 
-def update_outs_table(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice):
+def update_shipping_history(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice):
+    """
+    Add a new row to the shipping history table
+    """
     db.session.add(ShippingHistory(
         order_name = data['order_name'],
-        out_id = 'xxx',
         processed_at = datetime.now(),
         shipped_at = ship_at,
         shipper = shipper,
@@ -185,6 +188,9 @@ def update_outs_table(data, shipper, courier, shipping_code, master_id, ship_at,
 
 
 def update_labels_table(data, master_id, label_id, zpl_data, courier, shipping_code):
+    """
+    Add a new row to the labels table
+    """
     db.session.add(Labels(
         order_name = data['order_name'],
         tracking_number = master_id,
@@ -225,6 +231,10 @@ def get_country_code(country):
 
 
 def get_all_country_codes():
+    """
+    Returns all country names to shipping country code as a dictionary
+    """
+
     # query the table
     results =  Countries.query.with_entities(Countries.country_name, Countries.shipping_country_code).all()
     country_dict = {country_id: country_name for country_name, country_id in results}
