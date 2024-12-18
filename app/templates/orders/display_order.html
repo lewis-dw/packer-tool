@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
 <script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/display_order.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/map_view.js') }}" defer></script>
 {% endblock %}
 
 {% block header %}
@@ -85,16 +86,16 @@
                             <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
                         </p>
 
-                        <!-- Locality (Contains city) -->
-                        <p>
-                            <strong><label for="shipping_locality">Locality:</label></strong>
-                            <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
-                        </p>
-
                         <!-- Region (Used as streetline 3) -->
                         <p>
                             <strong><label for="shipping_region">Region:</label></strong>
                             <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
+                        </p>
+
+                        <!-- Locality (Contains city) -->
+                        <p>
+                            <strong><label for="shipping_locality">Locality:</label></strong>
+                            <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
                         </p>
 
                         <!-- Postcode -->
@@ -125,6 +126,8 @@
                             <input type="checkbox" id="etd_required" name="etd_required" value="on">
                             {% endif %}
                         </p>
+
+                        <button type="button" onclick="showAddress('{{ order.shipping_postcode | escape }}')">View on Google Maps</button>
                     </div>
 
                     <!-- shipping details -->
@@ -179,7 +182,7 @@
                             </p>
 
                             {% for option in line.product_options %}
-                            <p>{{ option|safe }}</p>
+                            <p>{{ option | safe }}</p>
                             {% else %}
                             {% endfor %}
 
@@ -241,7 +244,7 @@
                             <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
                             <p><strong>Product Name:</strong> {{ item.product_name or '' }}</p>
                             {% for option in item.product_options %}
-                            <p>{{ option|safe }}</p>
+                            <p>{{ option | safe }}</p>
                             {% else %}
                             {% endfor %}
                             <p><strong>Quantity:</strong> {{ item.product_demand_qty or '' }}</p>
@@ -307,7 +310,7 @@
                     </p>
 
                     {% for option in line.product_options %}
-                    <p>{{ option|safe }}</p>
+                    <p>{{ option | safe }}</p>
                     {% else %}
                     {% endfor %}
 

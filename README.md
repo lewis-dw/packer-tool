@@ -42,3 +42,8 @@ Combined functionality of the scraper tool and the shipper tool.
 ### 17-12-2024 - v1.12
 
 - Missed a few version updates but have an almost fully functional shipper system now with label printing etc
+
+### 18-12-2024 - v1.13
+
+- User can now search for an order name and reprint labels based on that
+- User can also search for an order name and view/download commercial invoice based on that
