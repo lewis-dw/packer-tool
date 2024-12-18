@@ -48,7 +48,7 @@ All Orders
 
         <!-- For each order display the content in each row -->
         <tbody>
-            {% for order in orders %}
+        {% for order in orders %}
             <tr onclick="rowClicked('{{ order.order_name }}')">
                 <td>{{ order.order_name }}</td>
                 <td>{{ order.picking_names }}</td>
@@ -59,7 +59,7 @@ All Orders
                 <td>{{ order.picking_internal_note }}</td>
                 <td>{{ order.picking_customer_note }}</td>
             </tr>
-            {% endfor %}
+        {% endfor %}
         </tbody>
     </table>
 </body>

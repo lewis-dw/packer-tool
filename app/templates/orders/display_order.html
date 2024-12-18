@@ -120,9 +120,9 @@
                         <p>
                             <strong><label for="etd_required">ETD Required:</label></strong>
                             {% if order.etd_required == 'on' %}
-                                <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
+                            <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
                             {% else %}
-                                <input type="checkbox" id="etd_required" name="etd_required" value="on">
+                            <input type="checkbox" id="etd_required" name="etd_required" value="on">
                             {% endif %}
                         </p>
                     </div>
@@ -159,9 +159,10 @@
 
                 <!-- List the invoice line data -->
                 <div id="split-2">
-                    <h2>Invoice Lines</h2>
                     <!-- invoice info -->
                     <div id="invoice-info">
+                        <h2>Invoice Lines</h2>
+
                         {% for line in order.commercial_invoice_lines %}
                         <div id="order-info-block">
                             <!-- Product SKU -->
@@ -178,7 +179,7 @@
                             </p>
 
                             {% for option in line.product_options %}
-                                <p>{{ option|safe }}</p>
+                            <p>{{ option|safe }}</p>
                             {% else %}
                             {% endfor %}
 
@@ -221,7 +222,7 @@
                             </p>
                         </div>
                         {% else %}
-                            <p>No items found</p>
+                        <p>No items found</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -233,19 +234,20 @@
                     <!-- Items info -->
                     <div id="items-info">
                         <h2>Items Info</h2>
+
                         {% for item in order.order_items %}
                         <div id="order-info-block">
                             <p><strong>Product SKU:</strong> {{ item.product_sku or '' }}</p>
                             <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
                             <p><strong>Product Name:</strong> {{ item.product_name or '' }}</p>
                             {% for option in item.product_options %}
-                                <p>{{ option|safe }}</p>
+                            <p>{{ option|safe }}</p>
                             {% else %}
                             {% endfor %}
                             <p><strong>Quantity:</strong> {{ item.product_demand_qty or '' }}</p>
                         </div>
                         {% else %}
-                            <p>No items found</p>
+                        <p>No items found</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -287,6 +289,7 @@
             <div id="invoice-info-edit" class="section">
                 <button type="button" onclick="closeSection()">Close</button>
                 <h2>Invoice Lines</h2>
+
                 {% for line in order.commercial_invoice_lines %}
                 <div id="order-info-block">
                     <!-- Product SKU -->
@@ -304,7 +307,7 @@
                     </p>
 
                     {% for option in line.product_options %}
-                        <p>{{ option|safe }}</p>
+                    <p>{{ option|safe }}</p>
                     {% else %}
                     {% endfor %}
 

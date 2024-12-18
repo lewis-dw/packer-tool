@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Reprint Labels
+Get Invoices
 {% endblock %}
 
 {% block head %}
@@ -15,7 +15,7 @@ Reprint Labels
     <a href="/">
         <button type="Button">Back to dashboard</button>
     </a>
-    <a href="{{ url_for('orders.manual_search', action=_from) }}">
+    <a href="{{ url_for('orders.manual_search', action='get_invoice') }}">
         <button type="Button">Back</button>
     </a>
 </div>
@@ -34,18 +34,25 @@ Reprint Labels
 
 {% block main %}
 <body>
-    <h1>Labels for order name: {{ order_id }}</h1>
+    <h1>Invoices for order name: {{ order_id }}</h1>
 
-    <form method="POST" action="{{ url_for('shipping.reprint_label') }}">
-    {% for label in labels %}
+    <form method="POST" action="{{ url_for('shipping.get_invoice') }}">
+        {% for result in results %}
         <div>
-            <p>{{ label.tracking_number }}</p>
-            <p>{{ label.label_id }}</p>
-            <input type="checkbox" name="{{ label.label_id }}" value="on">
+            <p>{{ result.processed_at }}</p>
+            <p>{{ result.tracking_number }}</p>
+            <input type="hidden" name="row_id" value="{{ result.id }}">
+            <button type="submit" name="action" value="view" formtarget="_blank">View</button>
+            <button type="submit" name="action" value="download">Download</button>
         </div>
-    {% endfor %}
-
-    <button type="submit">Reprint</button>
+        {% else %}
+        <p>No invoices have been stored for the order.</p>
+        <p>Possible reasons:</p>
+        <ul>
+            <li>UPS do not provide commercial invoices</li>
+            <li>This is a really old order and we don't have data from this long ago</li>
+        </ul>
+        {% endfor %}
     </form>
 </body>
 {% endblock %}

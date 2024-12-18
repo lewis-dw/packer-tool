@@ -36,24 +36,26 @@ def send_zpl_to_server(server_name, printer_name, zpl_data):
 
     # connect to the server
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        # send the zpl payload
-        port=9100 # this will always be this
-        s.connect((server_name, port))
-        s.send(payload)
+        try:
+            # send the zpl payload
+            port=9100 # this will always be the port of the print server
+            s.connect((server_name, port))
+            s.send(payload)
 
-        # receive the response from the print server
-        res = s.recv(4096).decode()
+            # receive the response from the print server
+            res = json.loads(
+                s.recv(4096).decode()
+            )
 
+        # catch failed connection error
+        except socket.gaierror as e:
+            res = e
 
-    # print(res)
+        # finally close the socket regardless of what occurred
+        finally:
+            s.close()
 
-
-
-
-    return {'state':'Success', 'value':'This value is unused'}
-
-    # except Exception as e:
-    #     return {'state':'Error', 'value':e}
+    return res
 
 
 

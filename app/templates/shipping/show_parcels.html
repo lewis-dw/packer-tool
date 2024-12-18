@@ -40,45 +40,46 @@ Parcels
     <form method="POST" action="{{ url_for('shipping.get_parcels') }}">
         <!-- need a container here for styling -->
         <div>
-            <h1>Parcels</h1>
             <div id="all-parcels">
+                <h1>Parcels</h1>
+
                 {% for parcel in parcels %}
-                    <div class="parcel" id="parcel_{{ loop.index }}">
-                        <!-- dimensions -->
-                        <p>
-                            <strong><label>Parcel Height:</label></strong>
-                            <input type="text" name="parcel_height_{{ loop.index }}" value="{{ parcel.parcel_height }}">
-                        </p>
-                        <p>
-                            <strong><label>Parcel Width:</label></strong>
-                            <input type="text" name="parcel_width_{{ loop.index }}" value="{{ parcel.parcel_width }}">
-                        </p>
-                        <p>
-                            <strong><label>Parcel Length:</label></strong>
-                            <input type="text" name="parcel_length_{{ loop.index }}" value="{{ parcel.parcel_length }}">
-                        </p>
+                <div class="parcel" id="parcel_{{ loop.index }}">
+                    <!-- dimensions -->
+                    <p>
+                        <strong><label>Parcel Height:</label></strong>
+                        <input type="text" name="parcel_height_{{ loop.index }}" value="{{ parcel.parcel_height }}">
+                    </p>
+                    <p>
+                        <strong><label>Parcel Width:</label></strong>
+                        <input type="text" name="parcel_width_{{ loop.index }}" value="{{ parcel.parcel_width }}">
+                    </p>
+                    <p>
+                        <strong><label>Parcel Length:</label></strong>
+                        <input type="text" name="parcel_length_{{ loop.index }}" value="{{ parcel.parcel_length }}">
+                    </p>
 
-                        <!-- weight -->
-                        <p>
-                            <strong><label>Parcel Weight:</label></strong>
-                            <input type="text" name="parcel_weight_{{ loop.index }}" value="{{ parcel.parcel_weight }}">
-                        </p>
+                    <!-- weight -->
+                    <p>
+                        <strong><label>Parcel Weight:</label></strong>
+                        <input type="text" name="parcel_weight_{{ loop.index }}" value="{{ parcel.parcel_weight }}">
+                    </p>
 
-                        <!-- quantity -->
-                        <p>
-                            <strong><label>Parcel Quantity:</label></strong>
-                            <input type="text" name="parcel_quantity_{{ loop.index }}" value="{{ parcel.parcel_quantity }}">
-                        </p>
+                    <!-- quantity -->
+                    <p>
+                        <strong><label>Parcel Quantity:</label></strong>
+                        <input type="text" name="parcel_quantity_{{ loop.index }}" value="{{ parcel.parcel_quantity }}">
+                    </p>
 
-                        <!-- insurance -->
-                        <p>
-                            <strong><label>Parcel Insurance:</label></strong>
-                            <input type="text" name="parcel_insurance_{{ loop.index }}" value="{{ parcel.parcel_insurance }}">
-                        </p>
+                    <!-- insurance -->
+                    <p>
+                        <strong><label>Parcel Insurance:</label></strong>
+                        <input type="text" name="parcel_insurance_{{ loop.index }}" value="{{ parcel.parcel_insurance }}">
+                    </p>
 
-                        <!-- remove parcel button -->
-                        <button type="button" onclick="removeParcel(this)">Remove</button>
-                    </div>
+                    <!-- remove parcel button -->
+                    <button type="button" onclick="removeParcel(this)">Remove</button>
+                </div>
                 {% endfor %}
             </div>
 

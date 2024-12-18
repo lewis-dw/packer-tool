@@ -216,7 +216,7 @@ def get_state_code(region_name):
     # query the table
     state_code = db.session.query(StateCodes.state_code).filter(
         StateCodes.region_name == str(region_name).upper()
-    ).first()
+    ).scalar() # returns first item of the result - in this case the state_code
     return state_code
 
 
@@ -228,10 +228,10 @@ def get_country_code(country):
     # query the table
     country_code = db.session.query(Countries.shipping_country_code).filter(
         Countries.country_name == country
-    ).first()
+    ).scalar() # returns first item of the result - in this case the shipping_country_code
 
     if country_code:
-        return country_code[0]
+        return country_code
     else:
         return 'Can\'t find country code'
 
@@ -264,3 +264,40 @@ def get_labels_for_order(order_id):
         return {'state': 'Success', 'value': results}
     else:
         return {'state': 'Error', 'value': f'No labels found for order name: {order_id}'}
+
+
+def search_label_id(label_id):
+    zpl_data = db.session.query(Labels.zpl_data).filter(
+        Labels.label_id == label_id
+    ).scalar() # returns first item of the result - in this case the zpl_data
+
+    # we dont need to validate that there is data there because this label id is from a prior query so it should exist
+    return zpl_data
+
+
+
+
+def search_for_commercial_invoice(order_id):
+    """
+    get all available commercial invoices for the order_id passed
+    """
+
+    # query the table
+    results = db.session.query(ShippingHistory).filter(
+        ShippingHistory.order_name == order_id,
+        ShippingHistory.commercial_invoice != None
+    ).all()
+
+    if results:
+        return {'state': 'Success', 'value': results}
+    else:
+        return {'state': 'Error', 'value': f'No commercial invoices found for order name: {order_id}'}
+
+
+def get_commercial_invoice(row_id):
+    order_name, commercial_invoice = db.session.query(ShippingHistory.order_name, ShippingHistory.commercial_invoice).filter(
+        ShippingHistory.id == row_id
+    ).first()
+
+    # we dont need to validate that there is data there because this is a direct row get from a prior query so it should be there
+    return order_name, commercial_invoice

@@ -1,11 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
-from flask import Blueprint, request, redirect, render_template, url_for, session, current_app
+from flask import Blueprint, request, redirect, render_template, url_for, session, current_app, send_file
 from app.shipper import shipping_functions
 from app.print_zpl import printer
 from app.parcel_packer import packer
 from app.logger import update_log
 from app import fedex, ups
+from io import BytesIO
 
 
 """
@@ -260,16 +261,91 @@ def select_method():
 
 
 """
-This page handles the user selecting a shipping method from the quote page
+This page handles the user searching for an order number and selecting which labels from that order to print
 """
-@shipping.route('/reprint_label')
+@shipping.route('/reprint_label', methods=['GET', 'POST'])
 def reprint_label():
-    # search for labels relating to the order id passed in
-    order_id = request.args.get('order_id', '')
-    result = shipping_functions.get_labels_for_order(order_id)
+    # handle the user searching for order_id
+    if request.method == 'GET':
+        # search for labels relating to the order id passed in
+        order_id = request.args.get('order_id', '')
+        result = shipping_functions.get_labels_for_order(order_id)
 
-    # parse the result
-    if result['state'] == 'Success':
-        return render_template('reprint_label.html', order_id=order_id, labels=result['value'])
+        # parse the result
+        if result['state'] == 'Success':
+            return render_template('reprint_label.html', order_id=order_id, labels=result['value'])
+        else:
+            return render_template('bad_search.html', message=result['value'], _from='reprint_label')
+
+
+    # handle the user's selections to reprint
+    elif request.method == 'POST':
+        for key, _ in request.form.items():
+            # get the zpl data from the label id and send a print request to the print server
+            zpl_data = shipping_functions.search_label_id(key)
+            res = printer.send_zpl_to_server('LOGISTICS', 'UPS', zpl_data)
+            if res['state'] == 'Error':
+                update_log.create_log_line('results', res['value'])
+        return redirect('/')
+
+
+    # not sure how the user would trigger this but we need to catch it before we continue
     else:
-        return render_template('bad_search.html', message=result['value'], _from='reprint_label')
+        return redirect('/')
+
+
+
+
+
+"""
+This page handles the user searching for an order number and selecting which labels from that order to print
+"""
+@shipping.route('/get_invoice', methods=['GET', 'POST'])
+def get_invoice():
+    # handle the user searching for order_id
+    if request.method == 'GET':
+        # get the order id from the query and search for it
+        order_id = request.args.get('order_id', '')
+        result = shipping_functions.search_for_commercial_invoice(order_id)
+
+        # parse the result
+        if result['state'] == 'Success':
+            return render_template('get_invoice.html', order_id=order_id, results=result['value'])
+        else:
+            return render_template('bad_search.html', message=result['value'], _from='get_invoice')
+
+
+    # handle the user's selection to download
+    elif request.method == 'POST':
+        # get the commercial invoice by row id
+        row_id = request.form.get('row_id')
+        action = request.form.get('action')
+        order_name, commercial_invoice = shipping_functions.get_commercial_invoice(row_id)
+
+        # wrap the pdf data in a BytesIO object
+        pdf_data = BytesIO(commercial_invoice)
+
+
+        # serve the file based on the action
+        if action == 'view':
+            # use inline content-disposition to open in a browser tab
+            response = send_file(
+                pdf_data,
+                mimetype='application/pdf'
+            )
+            response.headers['Content-Disposition'] = f'inline; filename="commercial_invoice_{order_name}.pdf"'
+            return response
+
+        elif action == 'download':
+            # use attachment content-disposition to trigger a direct download
+            return send_file(
+                pdf_data,
+                download_name=f'commercial_invoice_{order_name}.pdf', # give the file a name
+                mimetype='application/pdf',
+                as_attachment=True
+            )
+
+
+    # not sure how the user would trigger this but we need to catch it before we continue
+    else:
+        return redirect('/')

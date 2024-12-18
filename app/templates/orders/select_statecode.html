@@ -25,7 +25,7 @@ Quote Order
             <select id="statecode_options" name="state_code">
                 <!-- dynamically generate the dropdown for all the statecodes -->
                 {% for code, name in codes.items() %}
-                    <option value="{{ code }}">{{ name }}</option>
+                <option value="{{ code }}">{{ name }}</option>
                 {% endfor %}
             </select>
             <button type="submit">Submit</button>
