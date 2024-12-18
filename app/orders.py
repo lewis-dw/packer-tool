@@ -11,10 +11,6 @@ These routes are used for when getting orders from odoo
 orders = Blueprint('orders', __name__, template_folder='templates/orders', static_folder='static')
 
 
-# we want to load our yamls into json format
-state_codes = shipping_functions.get_all_yamls('state_codes')
-
-
 
 
 
@@ -98,9 +94,11 @@ Allow user to select the correct statecode for country code
 @orders.route('/select_statecode')
 def select_statecode():
     data = session.get('partial_order_data', {})
+    data = 'a'
 
     # if data exists then load the page and pass in all the statecodes to choose from
     if data:
+        state_codes = shipping_functions.get_all_country_codes()
         return render_template('select_statecode.html', codes=state_codes)
     else:
         return redirect('/')

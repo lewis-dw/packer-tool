@@ -4,57 +4,31 @@ from sqlalchemy.dialects.mysql import MEDIUMBLOB, JSON
 
 
 
-# class ShippingHistory(db.Model):
-#     __tablename__ = 'shipping_history'
-#     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
-#     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
 
-#     date_shipped = db.Column(db.DateTime(timezone=True), nullable=True, default=func.now()) # DATETIME
-#     name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
-#     company = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
-#     customer_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-#     dw_paid = db.Column(db.Numeric(10, 2), nullable=False) # NUMERIC(10, 2) NOT NULL
-#     tracking_number = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-#     courier = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
-#     method = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
+#################################################################################################################################################
+# Order Relationships
 
 
-#     def __repr__(self):
-#         return f'<Order {self.order_name}>'
+class OrderRelations(db.Model):
+    __tablename__ = 'order_relations'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+    pick_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+    pack_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+    out_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
 
-
-
-# class Picks(db.Model):
-#     __tablename__ = 'picks'
-#     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
-#     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-#     pick_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-
-#     def __repr__(self):
-#         return f'<Pick ID {self.pick_id}>'
-
-
-
-
-# class Packs(db.Model):
-#     __tablename__ = 'packs'
-#     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
-#     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-#     pack_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-
-#     def __repr__(self):
-#         return f'<Pack ID {self.pack_id}>'
+    def __repr__(self):
+        return f'<Out ID {self.out_id}>'
 
 
 #################################################################################################################################################
 # Shipping Results
 
 
-class Outs(db.Model):
-    __tablename__ = 'outs'
+class ShippingHistory(db.Model):
+    __tablename__ = 'shipping_history'
     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-    out_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     shipper = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     processed_at = db.Column(db.DateTime(timezone=True), nullable=True, default=func.now()) # DATETIME
     shipped_at = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
@@ -69,7 +43,7 @@ class Outs(db.Model):
     commercial_invoice = db.Column(MEDIUMBLOB, nullable=True) # MEDIUMBLOB NULL
 
     def __repr__(self):
-        return f'<Out ID {self.out_id}>'
+        return f'<Order Name {self.order_name}, Tracking Number {self.tracking_number}>'
 
 
 
@@ -91,6 +65,16 @@ class Labels(db.Model):
 
 #################################################################################################################################################
 # General Data
+
+
+class StateCodes(db.Model):
+    __tablename__ = 'state_codes'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    region_name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
+    state_code = db.Column(db.String(4), nullable=False) # VARCHAR(4) NOT NULL
+
+    def __repr__(self):
+        return f'<Region {self.region_name}>'
 
 
 class Countries(db.Model):

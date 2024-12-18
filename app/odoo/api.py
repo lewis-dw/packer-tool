@@ -27,10 +27,6 @@ cur_dir = pathlib.Path(__file__).parent
 debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 
 
-# load yamls
-province_lookup = shipping_functions.get_all_yamls('province_lookup')
-
-
 ###########################################################################################################################################
 
 ###########################################################################################################################################
@@ -249,6 +245,7 @@ def clean_data(data):
 
 
 
+
     """
     also need to do the bad char replacer here
     eg U with umlaut goes to U
@@ -264,12 +261,17 @@ def clean_data(data):
     # if the data is missing it's statecode then try to find it automatically based on the country
     # else just give it a random value because if it isnt explicitly being told to get a value then it isnt required
     if not data.get('shipping_statecode', ''):
-        if data['shipping_country_id'] in ['IE']: # ireland
+        # ireland
+        if data['shipping_country_id'] in ['IE']:
             result = get_eircode(data['shipping_postcode'])
-            state_code = province_lookup[result['value']]
-        elif data['shipping_country_id'] in ['US', 'CA']: # usa/canada
+            state_code = shipping_functions.get_state_code([result['value']])
+
+        # usa/canada
+        elif data['shipping_country_id'] in ['US', 'CA']:
             result = get_statecode(data['shipping_country_id'], data['shipping_postcode'])
             state_code = result['value']
+
+        # all others
         else:
             result = {'state':'Success'}
             state_code = 'This will never see the light of day'

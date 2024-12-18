@@ -14,10 +14,6 @@ These routes are used for quoting and shipping an order
 shipping = Blueprint('shipping', __name__, template_folder='templates/shipping', static_folder='static')
 
 
-# run this to get all the jsons we want
-province_lookup = shipping_functions.get_all_yamls('province_lookup')
-
-
 
 
 

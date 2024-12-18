@@ -9,7 +9,7 @@ from app.logger import update_log
 
 # database
 from app import db
-from app.models import ShippingCodes, Outs, Labels
+from app.models import ShippingCodes, ShippingHistory, Labels, Countries, StateCodes
 
 
 # find the data dir
@@ -62,35 +62,6 @@ def get_shipping_date(end_time, days_penalty, date_format):
     else:
         new_date = now
     return new_date.strftime(date_format), new_date.strftime(r'%Y-%m-%d')
-
-
-
-
-
-def get_country_code(country):
-    """
-    Returns the country code for a given country for the invoice items
-    """
-    # maybe inefficient but load the country_codes from yaml and search for the given country in there
-    country_codes = get_all_yamls('country_codes')
-    country_code = country_codes.get(country, country) # if it doesnt exist then just return the country
-    return country_code
-
-
-
-
-
-def get_all_yamls(*yamls):
-    """
-    For each file_name passed in, open the yaml file and return to user
-    """
-    results = []
-    for file_name in yamls:
-        with open(os.path.join(data_dir, f'{file_name}.yaml'), 'r') as file:
-            results.append(yaml.safe_load(file))
-    if len(results) == 1:
-        results = results[0]
-    return results
 
 
 
@@ -193,7 +164,7 @@ def download_with_retries(url, delay=0.5, max_retry=10):
 
 
 def update_outs_table(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice):
-    db.session.add(Outs(
+    db.session.add(ShippingHistory(
         order_name = data['order_name'],
         out_id = 'xxx',
         processed_at = datetime.now(),
@@ -230,8 +201,45 @@ def update_labels_table(data, master_id, label_id, zpl_data, courier, shipping_c
 # Database queries
 
 
+def get_state_code(region_name):
+    """
+    Returns the statecode for a given region
+    """
+
+    # query the table
+    state_code = StateCodes.query.filter(
+        StateCodes.region_name == str(region_name).upper()
+    ).with_entities(StateCodes.state_code).first()
+    return state_code
+
+
+def get_country_code(country):
+    """
+    Returns the country code for a given country for the invoice items
+    """
+
+    # query the table
+    country_code = Countries.query.filter(
+        Countries.country_name == country
+    ).with_entities(Countries.shipping_country_code).first()
+    return country_code
+
+
+def get_all_country_codes():
+    # query the table
+    results =  Countries.query.with_entities(Countries.country_name, Countries.shipping_country_code).all()
+    country_dict = {country_id: country_name for country_name, country_id in results}
+    return country_dict
+
+
+
+
 def get_labels_for_order(order_id):
-    # get all labels related to the order_id passed
+    """
+    get all labels related to the order_id passed
+    """
+
+    # query the table
     results = Labels.query.filter(
         Labels.order_name == order_id
     ).all()
