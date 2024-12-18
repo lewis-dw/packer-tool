@@ -239,7 +239,7 @@
                             <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
                             <p><strong>Product Name:</strong> {{ item.product_name or '' }}</p>
                             {% for option in item.product_options %}
-                                <p>{{ option }}</p>
+                                <p>{{ option|safe }}</p>
                             {% else %}
                             {% endfor %}
                             <p><strong>Quantity:</strong> {{ item.product_demand_qty or '' }}</p>

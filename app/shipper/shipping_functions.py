@@ -107,7 +107,9 @@ def parse_quotes(data):
             sat_indicator = html.escape(str(quote['sat_indicator']))
 
             # need to translate the shipping code
-            code_query = ShippingCodes.query.filter(ShippingCodes.shipping_code == f'{shipping_code}{sat_indicator}').first()
+            code_query = db.session.query(ShippingCodes).filter(
+                ShippingCodes.shipping_code == f'{shipping_code}{sat_indicator}'
+            ).first()
             if code_query is not None: # match
                 friendly_code = code_query.friendly_code
             else: # no match
@@ -212,9 +214,9 @@ def get_state_code(region_name):
     """
 
     # query the table
-    state_code = StateCodes.query.filter(
+    state_code = db.session.query(StateCodes.state_code).filter(
         StateCodes.region_name == str(region_name).upper()
-    ).with_entities(StateCodes.state_code).first()
+    ).first()
     return state_code
 
 
@@ -224,10 +226,14 @@ def get_country_code(country):
     """
 
     # query the table
-    country_code = Countries.query.filter(
+    country_code = db.session.query(Countries.shipping_country_code).filter(
         Countries.country_name == country
-    ).with_entities(Countries.shipping_country_code).first()
-    return country_code
+    ).first()
+
+    if country_code:
+        return country_code[0]
+    else:
+        return 'Can\'t find country code'
 
 
 def get_all_country_codes():
@@ -236,7 +242,7 @@ def get_all_country_codes():
     """
 
     # query the table
-    results =  Countries.query.with_entities(Countries.country_name, Countries.shipping_country_code).all()
+    results = db.session.query(Countries.country_name, Countries.shipping_country_code).all()
     country_dict = {country_id: country_name for country_name, country_id in results}
     return country_dict
 
@@ -249,7 +255,7 @@ def get_labels_for_order(order_id):
     """
 
     # query the table
-    results = Labels.query.filter(
+    results = db.session.query(Labels).filter(
         Labels.order_name == order_id
     ).all()
 

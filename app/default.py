@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, request
+from flask import Blueprint, render_template, session, redirect, request, make_response
 from app.logger import update_log
 
 """
@@ -24,8 +24,14 @@ For testing purposes this clears all session data
 """
 @default.route('/clear_session', methods=['POST'])
 def clear_session():
+    # clear session data
     session.clear()
-    return redirect('/')
+
+    # clear cookies
+    response = make_response(redirect("/"))
+    for cookie in request.cookies:
+        response.set_cookie(cookie, '', max_age=0)
+    return response
 
 
 

@@ -1,6 +1,8 @@
 import socket
 import json
-from app.logger import update_log
+
+# database
+from app import db
 from app.models import Printers
 from sqlalchemy import and_
 
@@ -59,7 +61,7 @@ def send_zpl_to_server(server_name, printer_name, zpl_data):
 
 def find_printer(printer_loc, courier):
     # query the table for results and grab the first row that satisfies these conditions
-    result = Printers.query.filter(
+    result = db.session.query(Printers).filter(
         and_(
             Printers.printer_loc == printer_loc,
             Printers.can_print.contains(courier.lower())

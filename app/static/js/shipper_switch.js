@@ -1,5 +1,6 @@
 // List of shippers
 const shippers = [
+    { value: "", text: "Select a shipper" },
     { value: "josh", text: "Josh" },
     { value: "webby", text: "Webby" },
     { value: "hayden", text: "Hayden" },

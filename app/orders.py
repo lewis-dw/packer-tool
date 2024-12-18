@@ -3,7 +3,6 @@ from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.shipper import shipping_functions
 from app.clickup.api import create_task
 from app.logger import update_log
-from app import fedex
 
 """
 These routes are used for when getting orders from odoo
@@ -67,7 +66,7 @@ def get_order_id():
 
         # on fail we want to display to the user the error of their ways
         if res['state'] == 'Error':
-            return render_template('bad_search.html', message=f'I couldn\'t find an order with the ID: {order_id}')
+            return render_template('bad_search.html', message=f'I couldn\'t find an order with the ID: {order_id}', _from='search_order')
 
         # if it succeeded then load it into the session
         else:

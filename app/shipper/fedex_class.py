@@ -197,7 +197,7 @@ class FedEx(Courier):
                         "residential": True
                     }
                 },
-                "shipDateStamp": get_shipping_date('12:00', 1, r'%Y-%m-%d'),
+                "shipDateStamp": get_shipping_date('12:00', 1, r'%Y-%m-%d')[0],
                 "pickupType": "USE_SCHEDULED_PICKUP",
                 "rateRequestType": [
                     "ACCOUNT"

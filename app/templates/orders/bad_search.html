@@ -13,6 +13,9 @@ No order found
     <a href="/">
         <button type="Button">Back to dashboard</button>
     </a>
+    <a href="{{ url_for('orders.manual_search', action=_from) }}">
+        <button type="Button">Back</button>
+    </a>
 </div>
 {% endblock %}
 

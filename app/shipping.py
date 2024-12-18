@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
-from flask import Blueprint, request, redirect, render_template, url_for, session
+from flask import Blueprint, request, redirect, render_template, url_for, session, current_app
 from app.shipper import shipping_functions
 from app.print_zpl import printer
 from app.parcel_packer import packer
@@ -60,6 +60,13 @@ def get_parcels():
 """
 Quote the data with every courier
 """
+def run_with_app_context(app, func, *args, **kwargs):
+    """
+    Helper to execute a threaded function with the Flask app context.
+    """
+    with app.app_context():
+        return func(*args, **kwargs)
+
 @shipping.route('/quote_result')
 def quote_result():
     # get the currently loaded data from flask session
@@ -84,23 +91,26 @@ def quote_result():
         update_log.create_log_line('actions', f"`{shipper}` attempting to quote {data['order_name']} to {data['shipping_country']} ({data['shipping_country_id']}).")
         all_quotes = []
         all_errors = []
+
+        cur_app = current_app._get_current_object()
         with ThreadPoolExecutor() as executor:
             # create the futures to commit map
-            future_to_service = {
-                executor.submit(fedex.quote_order, deepcopy(data)): 'FedEx',
-                executor.submit(ups.quote_order, deepcopy(data)): 'UPS',
-            }
+            services = [
+                (fedex.quote_order, deepcopy(data), 'FedEx'),
+                (ups.quote_order, deepcopy(data), 'UPS'),
+                (ups.quote_order, deepcopy(no_sat_data), 'UPS - No SAT') if do_no_sat else None
+            ]
+            services = list(filter(None, services))
 
-            # if sat indicator exists then also submit the no sat data as well
-            if do_no_sat:
-                future_to_service[
-                    executor.submit(ups.quote_order, deepcopy(no_sat_data))
-                ] = 'UPS - No SAT'
+            # submit the futures
+            future_to_service = {}
+            for service, data_copy, service_name in services:
+                future_to_service[executor.submit(run_with_app_context, cur_app, service, data_copy)] = service_name
+
 
             # process results as they complete
             for future in as_completed(future_to_service):
-                service_name = future_to_service[future] # pull this in case i want to debug which has completed
-                # print(f'Completed: {service_name}')
+                service_name = future_to_service[future]
                 update_log.create_log_line('results', f'{service_name} has completed.')
                 quote = future.result()
                 if quote['state'] == 'Success':
@@ -262,4 +272,4 @@ def reprint_label():
     if result['state'] == 'Success':
         return render_template('reprint_label.html', order_id=order_id, labels=result['value'])
     else:
-        return render_template('bad_search.html', message=result['value'])
+        return render_template('bad_search.html', message=result['value'], _from='reprint_label')
