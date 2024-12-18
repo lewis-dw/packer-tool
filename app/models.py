@@ -126,3 +126,15 @@ class Printers(db.Model):
 
     def __repr__(self):
         return f'<Printer UNC \\{self.server_name}\{self.printer_name}>'
+
+
+
+
+class ProductOptions(db.Model):
+    __tablename__ = 'product_options'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    find_this = db.Column(db.Text, nullable=False) # TEXT NOT NULL
+    replace_with = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
+
+    def __repr__(self):
+        return f'<Replace {self.find_this} -> {self.replace_with}>'

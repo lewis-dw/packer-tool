@@ -9,8 +9,7 @@ from app.shipper import shipping_functions
 from app.logger import update_log
 
 # database
-from app import db
-from app.models import Countries
+from app.models import Countries, ProductOptions
 
 
 prefix='TEST_'
@@ -132,21 +131,6 @@ def get_specific_order(order_id):
 # Helper functions for cleaning order data
 
 
-description_translate = {
-    '"Please Enter Your Car Make/Model/Year so we can provide the correct Spigot Rings (if needed). We won\'t check wheel fitment - so if you\'re unsure on sizes just get in touch!":':'Provided Car:',
-    'Step 1 - Start by choosing your PCD:':'PCD:',
-    'Step 2 - Choose your Wheel Diameter:':'Wheel Diameter:',
-    'Step 3 - Choose your Wheel Width:':'Wheel Width:',
-    'Step 4 - What offset do you want?:':'Offset:',
-    'Step 5 - What disk type do you want?:':'Disk Type:',
-    'Step 5a - What brake setup are you running?:':'Brake Setup:',
-    'Step 6 - Choose your Centre Colour:':'Centre Colour:',
-    'Step 7 - choose your Lip Colour:':'Lip Colour:',
-    'Step 8 - Choose Your Assembly Bolt Colour:':'Assembly Bolt Colour:',
-    'WORK WHEEL SHIPPING METHOD:':'Work Wheel Shipping Method:'
-}
-
-
 def parse_product_description(description):
     product_options = []
     if description:
@@ -159,7 +143,8 @@ def parse_product_description(description):
             if 'Option Price' in piece: # should always be present
                 # extract the data we want and clean it up before adding to the product options
                 piece = piece.split('Option Price')[0].strip(' -')
-                for find, repl in description_translate.items():
+                description_translate = ProductOptions.query.with_entities(ProductOptions.find_this, ProductOptions.replace_with).all()
+                for find, repl in description_translate:
                     piece = piece.replace(find, repl)
                 product_options.append(piece)
     return product_options
@@ -317,6 +302,7 @@ def clean_data(data):
     # loop over pack items and find the parent sku
     for line in data['order_items']:
         line['parent_sku'] = lookup_commercial[str(line['sale_product_id'])]
+        line['product_options'] = parse_product_description(line['line_description'])
 
     return data
 

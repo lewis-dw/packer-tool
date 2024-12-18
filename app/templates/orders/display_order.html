@@ -177,7 +177,10 @@
                                 <textarea id="line-product_name_{{ loop.index }}-ignore" name="line-product_name_{{ loop.index }}-ignore">{{ line.product_name or '' }}</textarea>
                             </p>
 
-                            <p><strong>Options:</strong> {{ line.product_options or '' }}</p>
+                            {% for option in line.product_options %}
+                                <p>{{ option|safe }}</p>
+                            {% else %}
+                            {% endfor %}
 
                             <!-- Unit price -->
                             <p>
@@ -235,7 +238,10 @@
                             <p><strong>Product SKU:</strong> {{ item.product_sku or '' }}</p>
                             <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
                             <p><strong>Product Name:</strong> {{ item.product_name or '' }}</p>
-                            <p><strong>Description:</strong> {{ item.line_description or '' }}</p>
+                            {% for option in item.product_options %}
+                                <p>{{ option }}</p>
+                            {% else %}
+                            {% endfor %}
                             <p><strong>Quantity:</strong> {{ item.product_demand_qty or '' }}</p>
                         </div>
                         {% else %}
@@ -297,7 +303,10 @@
                         <textarea id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}">{{ line.product_name or '' }}</textarea>
                     </p>
 
-                    <p>Options: {{ line.product_options or '' }}</p>
+                    {% for option in line.product_options %}
+                        <p>{{ option|safe }}</p>
+                    {% else %}
+                    {% endfor %}
 
                     <!-- Commodity code -->
                     <p>
