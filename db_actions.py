@@ -9,7 +9,7 @@ import os
 import pathlib
 
 # table to create
-from app.models import ShippingHistory
+from app.models import ShippingHistory, Labels
 
 
 cur_dir = pathlib.Path(__file__).parent
@@ -53,13 +53,13 @@ def add_row():
 
 
 app = create_app()
-table_name = ShippingHistory.__tablename__
+table_name = Labels.__tablename__
 
 
 
 with app.app_context():
     """Perform a function"""
-    # drop_table(table_name)
+    drop_table(table_name)
     create_table(table_name)
 
     # add_row()

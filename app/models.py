@@ -52,7 +52,6 @@ class Labels(db.Model):
     __tablename__ = 'labels'
     id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
     order_name = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
-    out_id = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
     tracking_number = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     label_id = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     zpl_data = db.Column(db.Text, nullable=False) # TEXT NOT NULL

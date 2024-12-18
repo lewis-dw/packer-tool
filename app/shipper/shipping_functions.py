@@ -187,7 +187,6 @@ def update_outs_table(data, shipper, courier, shipping_code, master_id, ship_at,
 def update_labels_table(data, master_id, label_id, zpl_data, courier, shipping_code):
     db.session.add(Labels(
         order_name = data['order_name'],
-        out_id = 'xxx',
         tracking_number = master_id,
         label_id = label_id,
         zpl_data = zpl_data,
