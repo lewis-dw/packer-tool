@@ -1,7 +1,7 @@
 from app import db
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.mysql import MEDIUMBLOB, MEDIUMTEXT, JSON
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
 
 # this is for an error message return for printers
 from app.print_zpl import printer
@@ -110,6 +110,21 @@ class ShippingHistory(db.Model):
 
         # we dont need to validate that there is data there because this is a direct row get from a prior query so it should be there
         return order_name, commercial_invoice
+
+    @staticmethod
+    def get_shipping_history(max_rows=60):
+        """
+        Return most recently processed shipping history rows up to a limit of `max_rows`
+        """
+
+        # order the shipping_history table and then grab only the first `max_rows` rows
+        recent_shipments = (
+            db.session.query(ShippingHistory)
+            .order_by(ShippingHistory.processed_at.desc())
+            .limit(max_rows)
+            .all()
+        )
+        return recent_shipments
 
 
 

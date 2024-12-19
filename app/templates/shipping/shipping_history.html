@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Quote Result
+Shipping History
 {% endblock %}
 
 {% block head %}
@@ -31,6 +31,47 @@ Quote Result
 
 {% block main %}
 <body>
-    <h1>HELLO</h1>
+    <div>
+        {% if history %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Order Name</th>
+                    <th>Shipper</th>
+                    <th>Processed At</th>
+                    <th>Shipped At</th>
+                    <th>Customer</th>
+                    <th>Company</th>
+                    <th>Shipped To</th>
+                    <th>Customer Paid</th>
+                    <th>DW Paid</th>
+                    <th>Tracking ID</th>
+                    <th>Courier</th>
+                    <th>Method</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history %}
+                <tr>
+                    <td>{{ row.order_name }}</td>
+                    <td>{{ row.shipper }}</td>
+                    <td>{{ row.processed_at }}</td>
+                    <td>{{ row.shipped_at }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.company }}</td>
+                    <td>{{ row.shipped_to }}</td>
+                    <td>{{ row.customer_paid }}</td>
+                    <td>{{ row.dw_paid }}</td>
+                    <td>{{ row.tracking_number }}</td>
+                    <td>{{ row.courier }}</td>
+                    <td>{{ row.method }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No shipping history</p>
+        {% endif %}
+    </div>
 </body>
 {% endblock %}

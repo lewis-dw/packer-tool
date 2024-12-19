@@ -361,4 +361,5 @@ This page displays all the shipping history
 """
 @shipping.route('/shipping_history')
 def shipping_history():
-    return render_template('shipping_history.html')
+    history_result = ShippingHistory.get_shipping_history()
+    return render_template('shipping_history.html', history=history_result)
