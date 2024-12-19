@@ -5,12 +5,10 @@ import pathlib
 from dotenv import load_dotenv
 import re
 from pgeocode import Nominatim
-from app.models import StateCodes
 from app.logger import update_log
 
 # database
-from app import db
-from app.models import Countries, ProductOptions
+from app.models import Countries, StateCodes, ProductOptions
 
 
 prefix='TEST_'
@@ -144,7 +142,7 @@ def parse_product_description(description):
             if 'Option Price' in piece: # should always be present
                 # extract the data we want and clean it up before adding to the product options
                 piece = piece.split('Option Price')[0].strip(' -')
-                description_translate = db.session.query(ProductOptions.find_this, ProductOptions.replace_with).all()
+                description_translate = ProductOptions.get_replacers()
                 for find, repl in description_translate:
                     piece = piece.replace(find, repl)
                 product_options.append(piece)
@@ -208,9 +206,7 @@ def get_statecode(country, post_code):
 
 def clean_data(data):
     # query db with country code, if not in then log this and let user know
-    country_data = db.session.query(Countries).filter(
-        Countries.country_name == data['shipping_country']
-    ).first()
+    country_data = Countries.get_country_data(data['shipping_country'])
     if country_data is not None: # match
         data['shipping_country_id'] = country_data.country_code # update shipping country code
         data['etd_required'] = 'on' if country_data.etd_required else 'off' # set on/off based on bool value of etd_required

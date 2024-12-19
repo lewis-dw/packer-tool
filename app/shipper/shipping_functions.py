@@ -8,7 +8,7 @@ from app.logger import update_log
 
 # database
 from app import db
-from app.models import ShippingCodes, ShippingHistory, Labels, Countries, StateCodes
+from app.models import ShippingCodes
 
 
 # find the data dir
@@ -107,13 +107,7 @@ def parse_quotes(data):
             sat_indicator = html.escape(str(quote['sat_indicator']))
 
             # need to translate the shipping code
-            code_query = db.session.query(ShippingCodes).filter(
-                ShippingCodes.shipping_code == f'{shipping_code}{sat_indicator}'
-            ).first()
-            if code_query is not None: # match
-                friendly_code = code_query.friendly_code
-            else: # no match
-                friendly_code = shipping_code
+            friendly_code = ShippingCodes.get_friendly_code(shipping_code, sat_indicator)
 
             # construct table line and log to success
             html_row = ''.join([

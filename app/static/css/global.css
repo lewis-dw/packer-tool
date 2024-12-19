@@ -107,8 +107,8 @@ button:focus {
 
 
 
-/* Clear session button */
-#clear-session {
+/* Subtle submit button */
+#subtle-submit {
     all: unset;
     background-color: rgba(60, 60, 60, 1);
     border-radius: 4px;
@@ -116,7 +116,7 @@ button:focus {
     cursor: pointer;
 }
 
-#clear-session:active {
+#subtle-submit:active {
     background-color: rgba(40, 40, 40, 1);
 }
 

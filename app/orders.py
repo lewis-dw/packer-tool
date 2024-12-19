@@ -1,6 +1,5 @@
 from flask import Blueprint, request, redirect, render_template, session, url_for, jsonify
 from app.odoo.api import get_orders, get_specific_order, clean_data
-from app.shipper import shipping_functions
 from app.clickup.api import create_task
 from app.logger import update_log
 from app.models import Countries, CountryFlags

@@ -20,7 +20,7 @@ def index():
 
 
 """
-For testing purposes this clears all session data
+This clears all session data and cookies
 """
 @default.route('/clear_session', methods=['POST'])
 def clear_session():
@@ -34,6 +34,15 @@ def clear_session():
     return response
 
 
+
+
+"""
+Allows user to switch user roles
+"""
+@default.route('/switch_role', methods=['POST'])
+def switch_role():
+    request.form.get('user-role')
+    return redirect('/')
 
 
 

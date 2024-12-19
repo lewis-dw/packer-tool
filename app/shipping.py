@@ -7,6 +7,7 @@ from app.parcel_packer import packer
 from app.logger import update_log
 from app import fedex, ups
 from io import BytesIO
+from datetime import datetime
 from app.models import ShippingHistory, Labels
 
 
@@ -223,7 +224,7 @@ def select_method():
     # if success then we need need to do other stuff
     if result['state'] == 'Success':
         # update the outs table in database
-        ShippingHistory.add_row(data, shipper, courier, shipping_code, master_id, ship_at, dw_paid, commercial_invoice)
+        ShippingHistory.add_row(data['order_name'], shipper, datetime.now(), ship_at, data['shipping_name'], data['shipping_company'], data['shipping_country_id'], data['shipping_cost'], float(dw_paid), master_id, courier, shipping_code, commercial_invoice)
 
         # loop over labels
         label_results = []
@@ -251,7 +252,7 @@ def select_method():
             })
 
             # update the labels table
-            Labels.add_row(data, master_id, label_dict['label_name'], label_dict['label_data'], courier, shipping_code)
+            Labels.add_row(data['order_name'], master_id, label_dict['label_name'], label_dict['label_data'], courier, shipping_code)
 
 
     # render the results to the user

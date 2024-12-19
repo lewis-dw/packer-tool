@@ -26,12 +26,30 @@
         {% block main %}{% endblock %}
     </main>
     <footer>
+        <!-- version -->
         <div>
             <p>v{{ g.version }}</p>
         </div>
-        <form action="/clear_session" method="post">
-            <button id="clear-session" type="submit">Clear Session</button>
-        </form>
+
+        <div>
+            <!-- change user mode -->
+            <div>
+                <form action="/switch_role" method="post">
+                    <label for="user-role">Current role:</label>
+                    <select id="user-role" name="user-role">
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button id="subtle-submit" type="submit">Change</button>
+                </form>
+            </div>
+
+            <!-- clear all session data and cookies -->
+            <div>
+                <form action="/clear_session" method="post">
+                    <button id="subtle-submit" type="submit">Clear Session</button>
+                </form>
+            </div>
+        </div>
     </footer>
 </body>
 

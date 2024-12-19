@@ -1,6 +1,10 @@
 from app import db
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.mysql import MEDIUMBLOB, MEDIUMTEXT, JSON
+from sqlalchemy import and_
+
+# this is for an error message return for printers
+from app.print_zpl import printer
 
 
 
@@ -127,7 +131,7 @@ class Labels(db.Model):
 
     @staticmethod
     def add_row(order_name, tracking_number, label_id, zpl_data, courier, method):
-        db.session.add(Countries(
+        db.session.add(Labels(
             order_name=order_name,
             tracking_number=tracking_number,
             label_id=label_id,
@@ -229,6 +233,13 @@ class Countries(db.Model):
         db.session.commit()
 
     @staticmethod
+    def get_country_data(country_name):
+        country_data = db.session.query(Countries).filter(
+            Countries.country_name == country_name
+        ).first()
+        return country_data
+
+    @staticmethod
     def get_all_country_codes():
         """
         Returns all country names to shipping country code as a dictionary
@@ -318,6 +329,17 @@ class ShippingCodes(db.Model):
         ))
         db.session.commit()
 
+    @staticmethod
+    def get_friendly_code(shipping_code, sat_indicator):
+        friendly_code = db.session.query(ShippingCodes.friendly_code).filter(
+            ShippingCodes.shipping_code == f'{shipping_code}{sat_indicator}'
+        ).scalar() # returns first item of the result - in this case the friendly_code
+
+        if friendly_code is not None: # match
+            return friendly_code
+        else: # no match
+            return shipping_code
+
 
 
 """
@@ -350,6 +372,22 @@ class Printers(db.Model):
         ))
         db.session.commit()
 
+    @staticmethod
+    def find_printer(printer_loc, courier):
+        # query the table for results and grab the first row that satisfies these conditions
+        result = db.session.query(Printers).filter(
+            and_(
+                Printers.printer_loc == printer_loc,
+                Printers.can_print.contains(courier.lower())
+            )
+        ).order_by(Printers.can_print_4x675.desc()).first() # order by if it can print 4x6.75 or not and grab first
+
+        # parse the result
+        if result:
+            return {'state': 'Success', 'value': (result.server_name, result.printer_name, result.label_size)}
+        else:
+            return {'state': 'Error', 'value': f'No printer could be found that can print {courier} in {printer.friendly_translate(printer_loc)}'}
+
 
 
 """
@@ -371,3 +409,8 @@ class ProductOptions(db.Model):
             replace_with=replace_with
         ))
         db.session.commit()
+    
+    @staticmethod
+    def get_replacers():
+        description_translate = db.session.query(ProductOptions.find_this, ProductOptions.replace_with).all()
+        return description_translate
