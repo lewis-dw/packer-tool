@@ -7,6 +7,7 @@ from app.parcel_packer import packer
 from app.logger import update_log
 from app import fedex, ups
 from io import BytesIO
+from app.models import ShippingHistory, Labels
 
 
 """
@@ -269,7 +270,7 @@ def reprint_label():
     if request.method == 'GET':
         # search for labels relating to the order id passed in
         order_id = request.args.get('order_id', '')
-        result = shipping_functions.get_labels_for_order(order_id)
+        result = Labels.get_labels_for_order(order_id)
 
         # parse the result
         if result['state'] == 'Success':
@@ -282,7 +283,7 @@ def reprint_label():
     elif request.method == 'POST':
         for key, _ in request.form.items():
             # get the zpl data from the label id and send a print request to the print server
-            zpl_data = shipping_functions.search_label_id(key)
+            zpl_data = Labels.get_zpl_data(key)
             res = printer.send_zpl_to_server('LOGISTICS', 'UPS', zpl_data)
             if res['state'] == 'Error':
                 update_log.create_log_line('results', res['value'])
@@ -306,7 +307,7 @@ def get_invoice():
     if request.method == 'GET':
         # get the order id from the query and search for it
         order_id = request.args.get('order_id', '')
-        result = shipping_functions.search_for_commercial_invoice(order_id)
+        result = ShippingHistory.search_for_invoice(order_id)
 
         # parse the result
         if result['state'] == 'Success':
@@ -320,7 +321,7 @@ def get_invoice():
         # get the commercial invoice by row id
         row_id = request.form.get('row_id')
         action = request.form.get('action')
-        order_name, commercial_invoice = shipping_functions.get_commercial_invoice(row_id)
+        order_name, commercial_invoice = ShippingHistory.search_row_id(row_id)
 
         # wrap the pdf data in a BytesIO object
         pdf_data = BytesIO(commercial_invoice)

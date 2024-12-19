@@ -5,7 +5,7 @@ import pathlib
 from dotenv import load_dotenv
 import re
 from pgeocode import Nominatim
-from app.shipper import shipping_functions
+from app.models import StateCodes
 from app.logger import update_log
 
 # database
@@ -252,7 +252,7 @@ def clean_data(data):
         # ireland
         if data['shipping_country_id'] in ['IE']:
             result = get_eircode(data['shipping_postcode'])
-            state_code = shipping_functions.get_state_code([result['value']])
+            state_code = StateCodes.get_state_code([result['value']])
 
         # usa/canada
         elif data['shipping_country_id'] in ['US', 'CA']:

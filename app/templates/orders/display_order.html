@@ -43,7 +43,7 @@
             <div id="split-screen">
                 <!-- Display the order details like customer details and shipping address -->
                 <div id="split-1">
-                    <h2>Order details</h2>
+                    <h2>Shipping details</h2>
                     <!-- customer details -->
                     <div id="customer-details">
                         <!-- Customer name -->
@@ -115,6 +115,12 @@
                         <p>
                             <strong><label for="shipping_country_id">Country ID:</label></strong>
                             <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
+                        </p>
+
+                        <!-- Small SVG icon of the Country ID flag -->
+                        <p>
+                            <strong><label for="svg-container">Flag:</label></strong>
+                            <div id="svg-container">{{ svg_data | safe }}</div>
                         </p>
 
                         <!-- Checkbox for if the address needs ETD -->

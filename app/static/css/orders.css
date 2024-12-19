@@ -66,3 +66,8 @@ tr:hover {
 .small-input {
     width: 50px;
 }
+
+#svg-container {
+    width: 30px;
+    height: 30px;
+}

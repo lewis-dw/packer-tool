@@ -6,7 +6,8 @@ from requests.auth import HTTPBasicAuth
 import time
 import base64
 from dotenv import load_dotenv
-from app.shipper.shipping_functions import get_shipping_date, get_country_code
+from app.shipper.shipping_functions import get_shipping_date
+from app.models import Countries
 
 # generate root_dir for outputting debug files
 cur_dir = pathlib.Path(__file__).parent
@@ -72,7 +73,7 @@ class UPS(Courier):
                     }
                 },
                 "CommodityCode": invoice_line["commodity_code"],
-                "OriginCountryCode": get_country_code(invoice_line["country_of_manufacture"]),
+                "OriginCountryCode": Countries.get_country_code(invoice_line["country_of_manufacture"]),
                 "PackageWeight": {
                     "UnitOfMeasurement": "KGS",
                     "Weight": invoice_line["unit_weight"]

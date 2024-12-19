@@ -4,8 +4,9 @@ import pathlib
 import requests
 import time
 from dotenv import load_dotenv
-from app.shipper.shipping_functions import get_shipping_date, download_with_retries, get_country_code
+from app.shipper.shipping_functions import get_shipping_date, download_with_retries
 from app.logger import update_log
+from app.models import Countries
 
 # generate root_dir for outputting debug files
 cur_dir = pathlib.Path(__file__).parent
@@ -69,7 +70,7 @@ class FedEx(Courier):
             item_dict = {
                 "name": invoice_line["product_sku"][:35],
                 "description": invoice_line["product_name"][:35],
-                "countryOfManufacture": get_country_code(invoice_line["country_of_manufacture"]),
+                "countryOfManufacture": Countries.get_country_code(invoice_line["country_of_manufacture"]),
                 "quantity": invoice_line['product_demand_qty'],
                 "quantityUnits": "PCS",
                 "unitPrice": {

@@ -3,6 +3,7 @@ from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.shipper import shipping_functions
 from app.clickup.api import create_task
 from app.logger import update_log
+from app.models import Countries, CountryFlags
 
 """
 These routes are used for when getting orders from odoo
@@ -38,7 +39,10 @@ Render the page that allows user to type in an order id or scan one in
 @orders.route('/manual_search')
 def manual_search():
     action = request.args.get('action')
-    return render_template('manual_search.html', action=action)
+    if action:
+        return render_template('manual_search.html', action=action)
+    else:
+        return redirect('/')
 
 
 
@@ -60,35 +64,41 @@ def get_order_id():
         return redirect('/')
 
 
-    # if the action is to search for order then try to find an order by that id
-    if action == 'search_order':
-        res = get_specific_order(order_id)
+    # first verify they actually searched for something
+    if order_id:
+        # if the action is to search for order then try to find an order by that id
+        if action == 'search_order':
+            res = get_specific_order(order_id)
 
-        # on fail we want to display to the user the error of their ways
-        if res['state'] == 'Error':
-            return render_template('bad_search.html', message=f'I couldn\'t find an order with the ID: {order_id}', _from='search_order')
+            # on fail we want to display to the user the error of their ways
+            if res['state'] == 'Error':
+                return render_template('bad_search.html', message=f'I couldn\'t find an order with the ID: {order_id}', _from='search_order')
 
-        # if it succeeded then load it into the session
+            # if it succeeded then load it into the session
+            else:
+                session['partial_order_data'] = res['value']
+                session['original_order_data'] = res['value']
+                # Redirect directly to the desired URL
+                return redirect(url_for('orders.load_order'))
+
+
+        # redirect to the reprint label page to handle this request
+        elif action == 'reprint_label':
+            return redirect(url_for('shipping.reprint_label', order_id=order_id))
+
+
+        # redirect to the commercial invoice page to handle this request
+        elif action == 'get_invoice':
+            return redirect(url_for('shipping.get_invoice', order_id=order_id))
+
+
+        # not sure how the user would trigger this but we need to catch it before we continue
         else:
-            session['partial_order_data'] = res['value']
-            session['original_order_data'] = res['value']
-            # Redirect directly to the desired URL
-            return redirect(url_for('orders.load_order'))
+            return redirect('/')
 
-
-    # redirect to the reprint label page to handle this request
-    elif action == 'reprint_label':
-        return redirect(url_for('shipping.reprint_label', order_id=order_id))
-
-
-    # redirect to the commercial invoice page to handle this request
-    elif action == 'get_invoice':
-        return redirect(url_for('shipping.get_invoice', order_id=order_id))
-
-
-    # not sure how the user would trigger this but we need to catch it before we continue
+    # if they didnt search for anything redirect back to manual search
     else:
-        return redirect('/')
+        return redirect(url_for('orders.manual_search', action=action))
 
 
 
@@ -104,7 +114,7 @@ def select_statecode():
 
     # if data exists then load the page and pass in all the statecodes to choose from
     if data:
-        state_codes = shipping_functions.get_all_country_codes()
+        state_codes = Countries.get_all_country_codes()
         return render_template('select_statecode.html', codes=state_codes)
     else:
         return redirect('/')
@@ -182,7 +192,9 @@ def display_order():
 
     # if there is data then display it to user
     if data:
-        return render_template('display_order.html', order=data, errors=errors)
+        # find the svg data for the country id then render the page
+        svg_data = CountryFlags.get_flag_svg(data['shipping_country_id'])
+        return render_template('display_order.html', order=data, svg_data=svg_data, errors=errors)
 
     # if user tried to load the page with no data in the session then they need to be redirected back to the dashboard
     else:
