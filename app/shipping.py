@@ -351,3 +351,14 @@ def get_invoice():
     # not sure how the user would trigger this but we need to catch it before we continue
     else:
         return redirect('/')
+
+
+
+
+
+"""
+This page displays all the shipping history
+"""
+@shipping.route('/shipping_history')
+def shipping_history():
+    return render_template('shipping_history.html')
