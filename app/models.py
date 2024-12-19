@@ -245,7 +245,7 @@ class Countries(db.Model):
         Returns all country names to shipping country code as a dictionary
         """
 
-        # query the table
+        # query the table then turn it into a dict for lookups
         results = db.session.query(Countries.country_name, Countries.shipping_country_code).all()
         country_dict = {country_id: country_name for country_name, country_id in results}
         return country_dict
@@ -409,8 +409,38 @@ class ProductOptions(db.Model):
             replace_with=replace_with
         ))
         db.session.commit()
-    
+
     @staticmethod
     def get_replacers():
         description_translate = db.session.query(ProductOptions.find_this, ProductOptions.replace_with).all()
         return description_translate
+
+
+
+"""
+Replacement table for bad characters in foreign names
+"""
+class ForeignCharacters(db.Model):
+    __tablename__ = 'foreign_characters'
+    __table_args__ = {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_unicode_ci'}
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    bad_char = db.Column(db.String(8), nullable=False) # VARCHAR(8) NOT NULL
+    equivalent = db.Column(db.String(8), nullable=False) # VARCHAR(8) NOT NULL
+
+    def __repr__(self):
+        return f'<Replace {self.bad_char} -> {self.equivalent}>'
+
+    @staticmethod
+    def add_row(bad_char, equivalent):
+        db.session.add(ForeignCharacters(
+            bad_char=bad_char,
+            equivalent=equivalent
+        ))
+        db.session.commit()
+
+    @staticmethod
+    def get_replacers():
+        # query the table then turn it into a dict for lookups
+        results = db.session.query(ForeignCharacters.bad_char, ForeignCharacters.equivalent).all()
+        foreign_translate = {bad_char: equivalent for bad_char, equivalent in results}
+        return foreign_translate

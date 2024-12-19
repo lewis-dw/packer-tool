@@ -8,10 +8,11 @@ from pgeocode import Nominatim
 from app.logger import update_log
 
 # database
-from app.models import Countries, StateCodes, ProductOptions
+from app.models import Countries, StateCodes, ForeignCharacters, ProductOptions
 
 
 prefix='TEST_'
+prefix=''
 
 
 # load .env variables
@@ -200,11 +201,60 @@ def get_statecode(country, post_code):
         return {'state':'Error', 'value':'pgeocode failed'}
 
 
+
+
+def clean_string(s, foreign_translate):
+    # init vars
+    valid_chars = ''.join([
+        '0123456789',
+        'abcdefghijklmnopqrstuvwxyz',
+        '/,.+- <>()'
+    ])
+    replacement_counter = 0
+    rebuild_string = ''
+    bad_chars = ''
+
+    # loop over the value and if a bad character is found then try to translate it
+    for char in s:
+        # if the char is not a valid one then increment the counter
+        if str(char).lower() not in valid_chars:
+            replacement_counter+=1
+            bad_chars+=char
+
+        # see if we have a translation for it
+        char = foreign_translate.get(char, char)
+
+        # rebuild the string piece by piece
+        rebuild_string+=char
+
+    # return the cleaned string and the number of replacements made
+    return rebuild_string, replacement_counter, bad_chars
+
+
 ###########################################################################################################################################
 # Function for cleaning order data
 
 
 def clean_data(data):
+    """ Clean every item """
+    foreign_translate = ForeignCharacters.get_replacers()
+    for key, value in data.items():
+        # if the value is a string then proceed to clean it
+        if isinstance(value, str):
+            # clean the string
+            data[key], r_count, bad_chars = clean_string(value, foreign_translate)
+
+            # if the number of replacements was 4 or more then abort!
+            if r_count >= 4:
+                return {'state': 'Error', 'value': f'Too many bad characters in `{key}`:{bad_chars}'}
+
+        # else if the value is a list then we still want to check it but it requires an extra step
+        elif isinstance(value, list):
+            """Clean"""
+
+
+
+    """ Country Shipping Details """
     # query db with country code, if not in then log this and let user know
     country_data = Countries.get_country_data(data['shipping_country'])
     if country_data is not None: # match
@@ -218,30 +268,26 @@ def clean_data(data):
 
 
 
+    """ General Shipping Details """
+    # translate customer type to friendly version
+    customer_translate = {
+        'Public Pricelist': 'General Customer',
+        'Trade1': 'Trader'
+    }
+    data['customer_pricelist'] = customer_translate.get(data['customer_pricelist'], data['customer_pricelist'])
 
-    # TRADER
-    """
-    If trader:
-        do stuff
-    Else:
-        do other stuff
-    """
-
-
-
-
-    """
-    also need to do the bad char replacer here
-    eg U with umlaut goes to U
-    BUT if replacements in 1 line >= 4 then we return that this is invalid
-    """
+    # make shipping company empty string if these conditions are met
+    bad_vals = ['n/a', 'no', 'none', 'false']
+    if data['shipping_name'] == data['shipping_company'] or str(data['shipping_company']).strip().lower() in bad_vals:
+        data['shipping_company'] = ''
 
     # strip any nonalphanumerical and non spaces out of the postcode
-    data['shipping_postcode'] = re.sub(r'[^a-zA-Z0-9 ]', '', data['shipping_postcode'])
+    if data['shipping_postcode']:
+        data['shipping_postcode'] = re.sub(r'[^a-zA-Z0-9 ]', '', data['shipping_postcode'])
 
 
 
-
+    """ Shipping Statecode """
     # if the data is missing it's statecode then try to find it automatically based on the country
     # else just give it a random value because if it isnt explicitly being told to get a value then it isnt required
     if not data.get('shipping_statecode', ''):
@@ -268,20 +314,11 @@ def clean_data(data):
 
 
 
-
+    """ Commercial Invoice """
     # loop over commerical invoice items and clean them up
     commercial_invoice = []
     lookup_commercial = {}
     for line in data['commercial_invoice_lines']:
-        # need to extract the product options from the product description
-        line['product_options'] = parse_product_description(line['line_description'])
-
-
-        # set parcel insurance if it doesnt exist
-        if line.get('parcel_insurance', '') == '':
-            line['parcel_insurance'] = 0
-
-
         """
         This code here needs to be updated when we change the format we get our odoo orders back as, this should be used as a backup for compatibility with old orders.
         They will likely be fine though as the shipping items we want to set as 'False shippable' will also update for them too
@@ -289,6 +326,26 @@ def clean_data(data):
         # need to remove the shipping method from the commercial invoice
         if line['product_name'] != data['order_carrier_name']:
             commercial_invoice.append(line)
+        else:
+            continue
+
+
+        # need to extract the product options from the product description
+        line['product_options'] = parse_product_description(line['line_description'])
+
+
+        # if we are shipping to the USA and the product has a certain commodity code then we need to add a legal string to each commercial invoice item
+        commodity_code_ranges = [(73000000, 74000000), (84000000, 85000000), (87000000, 88000000), (90000000, 91000000)]
+        if data['shipping_country_id'] == 'US':
+            for start, end in commodity_code_ranges:
+                if start < int(line['commodity_code']) < end:
+                    line['product_name'] = f"{line['product_name']} (For Motorsport Use Only!)"
+                    break
+
+
+        # set parcel insurance if it doesnt exist
+        if line.get('parcel_insurance', '') == '':
+            line['parcel_insurance'] = 0
 
 
         # also need to update the lookup dict so later code can use it
@@ -297,13 +354,15 @@ def clean_data(data):
 
 
 
-
+    """ Order Items """
     # loop over pack items and find the parent sku
     for line in data['order_items']:
         line['parent_sku'] = lookup_commercial[str(line['sale_product_id'])]
         line['product_options'] = parse_product_description(line['line_description'])
 
-    return data
+
+    # return a successful clean
+    return {'state': 'Success', 'value': data}
 
 
 ###########################################################################################################################################

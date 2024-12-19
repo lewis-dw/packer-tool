@@ -9,7 +9,7 @@ import os
 import pathlib
 
 # table to create
-from app.models import ProductOptions, CountryFlags
+from app.models import ProductOptions
 
 
 cur_dir = pathlib.Path(__file__).parent
@@ -45,21 +45,18 @@ def save_table(table_name):
 
 
 def add_row():
-    flags_dir = os.path.join(data_dir, 'flags', '4x3')
-    for flag in os.listdir(flags_dir):
-        flag_name, ext = os.path.splitext(flag)
-        if len(flag_name) <= 2:
-            with open(os.path.join(flags_dir, flag), 'r', encoding="utf-8") as f:
-                CountryFlags.add_row(flag_name, f.read())
+    ProductOptions.add_row(
+        'Step 6 - Choose decal colour:',
+        '<strong>Decal Colour: </strong>'
+    )
 
 app = create_app()
-table_name = CountryFlags.__tablename__
-
+table_name = ProductOptions.__tablename__
 
 
 with app.app_context():
     """Perform a function"""
     # drop_table(table_name)
-    create_table(table_name)
+    # create_table(table_name)
 
-    # add_row()
+    add_row()

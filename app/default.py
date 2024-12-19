@@ -41,7 +41,8 @@ Allows user to switch user roles
 """
 @default.route('/switch_role', methods=['POST'])
 def switch_role():
-    request.form.get('user-role')
+    new_role = request.form.get('user-role')
+    print(new_role)
     return redirect('/')
 
 

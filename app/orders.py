@@ -141,14 +141,20 @@ def load_order():
             # rename the items key as it causes issues
             data['order_items'] = data.pop('items')
 
-            # clean the data up
-            data = clean_data(data)
+            # clean the data up and deal with the result
+            result = clean_data(data)
 
-            # if the statecode retrieval failed then the user needs to do it manually
-            if data['shipping_statecode'] == 'manual':
-                session['partial_order_data'] = data
-                return redirect(url_for('orders.select_statecode'))
+            if result['state'] == 'Success':
+                data = result['value']
 
+                # if the statecode retrieval failed then the user needs to do it manually
+                if data['shipping_statecode'] == 'manual':
+                    session['partial_order_data'] = data
+                    return redirect(url_for('orders.select_statecode'))
+
+            else:
+                print(result['value'])
+                return redirect('/')
 
     # alternatively if the method to access this page was via a post request,
     # then it means they are already after the initial clean but the statecode retrieval failed

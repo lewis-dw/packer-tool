@@ -8,7 +8,7 @@ from app.logger import update_log
 from app import fedex, ups
 from io import BytesIO
 from datetime import datetime
-from app.models import ShippingHistory, Labels
+from app.models import ShippingHistory, Labels, Printers
 
 
 """
@@ -171,7 +171,7 @@ def select_method():
 
 
             # try find a printer that can print what the user selected
-            res = printer.find_printer(printer_loc, courier)
+            res = Printers.find_printer(printer_loc, courier)
 
             # parse results
             if res['state'] == 'Success':

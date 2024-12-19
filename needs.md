@@ -4,7 +4,7 @@
 
 ### Commercial invoice lines
 
-- Need a `shippable` var where shipping methods like No Rush, UPS, Admin Shipping are False, whereas actual items are True.
+- Need a `shippable` var where shipping methods (like No Rush, UPS, Admin Shipping, Discounts, etc.) are False, whereas actual items are True.
 - Reidual amount on order
 - Need the pick, pack, and out id returned
 
