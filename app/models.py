@@ -459,3 +459,32 @@ class ForeignCharacters(db.Model):
         results = db.session.query(ForeignCharacters.bad_char, ForeignCharacters.equivalent).all()
         foreign_translate = {bad_char: equivalent for bad_char, equivalent in results}
         return foreign_translate
+
+
+
+"""
+List of commodity codes for user to select from
+"""
+class CommodityCodes(db.Model):
+    __tablename__ = 'commodity_codes'
+    id = db.Column(db.Integer, primary_key=True) # INTEGER NOT NULL AUTO_INCREMENT
+    code = db.Column(db.String(16), nullable=False) # VARCHAR(16) NOT NULL
+    friendly_name = db.Column(db.String(64), nullable=False) # VARCHAR(64) NOT NULL
+
+    def __repr__(self):
+        return f'<Commodity code {self.friendly_name}>'
+
+    @staticmethod
+    def add_row(code, friendly_name):
+        db.session.add(CommodityCodes(
+            code=code,
+            friendly_name=friendly_name
+        ))
+        db.session.commit()
+
+    @staticmethod
+    def get_all_codes():
+        # query the table then turn it into a dict for lookups
+        commodity_codes = db.session.query(CommodityCodes.code, CommodityCodes.friendly_name).all()
+        commodity_codes = {code: name for code, name in commodity_codes}
+        return commodity_codes

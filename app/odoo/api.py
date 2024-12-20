@@ -12,7 +12,7 @@ from app.models import Countries, StateCodes, ForeignCharacters, ProductOptions
 
 
 prefix='TEST_'
-prefix=''
+# prefix=''
 
 
 # load .env variables
@@ -37,7 +37,8 @@ def join_url(*url_parts):
     Simple function to join all parts of the passed in url pieces and return
     This is because os.path.join doesnt work for URLs and i didnt want to muck about with other libraries when this is just as easy
     """
-    url_parts = map(str, url_parts)
+    url_parts = map(lambda p: str(p).strip('/'), url_parts)
+    url_parts = filter(None, url_parts)
     full_url = '/'.join(url_parts).replace(' ', '%20')
     return full_url
 
@@ -203,6 +204,16 @@ def get_statecode(country, post_code):
 
 
 
+def us_commodity_code_check(code, name):
+    commodity_code_ranges = [(73000000, 74000000), (84000000, 85000000), (87000000, 88000000), (90000000, 91000000)]
+    for start, end in commodity_code_ranges:
+        if start < int(code) < end:
+            name = f"{name} (For Motorsport Use Only!)"
+            break
+    return name
+
+
+
 def clean_string(s, foreign_translate):
     # init vars
     valid_chars = ''.join([
@@ -236,6 +247,9 @@ def clean_string(s, foreign_translate):
 
 
 def clean_data(data):
+    # this var tracks if there is a need for user to manually select something
+    user_intervention = False
+
     """ Clean every item """
     foreign_translate = ForeignCharacters.get_replacers()
     for key, value in data.items():
@@ -250,7 +264,7 @@ def clean_data(data):
 
         # else if the value is a list then we still want to check it but it requires an extra step
         elif isinstance(value, list):
-            """Clean"""
+            """Lewis"""
 
 
 
@@ -310,6 +324,7 @@ def clean_data(data):
         if result['state'] == 'Success':
             data['shipping_statecode'] = state_code
         elif result['state'] == 'Error':
+            user_intervention = True
             data['shipping_statecode'] = 'manual'
 
 
@@ -317,6 +332,7 @@ def clean_data(data):
     """ Commercial Invoice """
     # loop over commerical invoice items and clean them up
     commercial_invoice = []
+    needs_a_hand = []
     lookup_commercial = {}
     for line in data['commercial_invoice_lines']:
         """
@@ -334,13 +350,18 @@ def clean_data(data):
         line['product_options'] = parse_product_description(line['line_description'])
 
 
-        # if we are shipping to the USA and the product has a certain commodity code then we need to add a legal string to each commercial invoice item
-        commodity_code_ranges = [(73000000, 74000000), (84000000, 85000000), (87000000, 88000000), (90000000, 91000000)]
-        if data['shipping_country_id'] == 'US':
-            for start, end in commodity_code_ranges:
-                if start < int(line['commodity_code']) < end:
-                    line['product_name'] = f"{line['product_name']} (For Motorsport Use Only!)"
-                    break
+        # check if commodity code exists
+        if line.get('commodity_code', ''):
+            # if we are shipping to the USA and the product has a certain commodity code then we need to add a legal string to each commercial invoice item
+            if data['shipping_country_id'] == 'US':
+                line['product_name'] = us_commodity_code_check(line['commodity_code'], line['product_name'])
+        else:
+            user_intervention = True
+            line['commodity_code'] = ''
+            needs_a_hand.append({
+                'product_name': line['product_name'],
+                'product_sku': line['product_sku']
+            })
 
 
         # set parcel insurance if it doesnt exist
@@ -351,6 +372,7 @@ def clean_data(data):
         # also need to update the lookup dict so later code can use it
         lookup_commercial[str(line['product_id'])] = line['product_sku']
     data['commercial_invoice_lines'] = commercial_invoice
+    data['needs_a_hand'] = needs_a_hand
 
 
 
@@ -362,7 +384,7 @@ def clean_data(data):
 
 
     # return a successful clean
-    return {'state': 'Success', 'value': data}
+    return {'state': 'Success', 'value': [data, user_intervention]}
 
 
 ###########################################################################################################################################
@@ -371,51 +393,49 @@ def clean_data(data):
 # Functions for sending response back to odoo
 
 
-def send_ship_message(order_key, courier, tracking_no):
+def send_ship_message(order_name, courier, tracking_no):
     # generate url
-    url = join_url(api_base_url, 'dwapi', 'v1', 'orders', order_key, 'ship')
+    url = join_url(api_base_url, 'dwapi', 'v1', 'orders', order_name, 'ship')
 
     # generate payload
     payload = {
-        'tracking_ref': f'{courier}:{tracking_no}',
-        'comment': 'test'
+        'tracking_ref': f'{courier}: {tracking_no}',
+        'comment': 'test',
+        'complete': True
     }
 
     # get res and parse
-    res = requests.post(url, headers=main_headers, json=payload).json()
-    if res.get('error', '') != '':
-        print(res)
+    res = requests.post(url, headers=main_headers, json=payload)
+    print(res)
+    print(res.json())
+    # if res.get('error', '') != '':
+    #     print(res)
+    # else:
+    #     print(res)
+
+
+
+
+def send_pack_message(order_name, shipper, items):
+    # generate url
+    url = join_url(api_base_url, 'dwapi', 'v1', 'order', order_name, 'pack')
+
+    # extract values
+    pack_id = items['pack_id']
+    done_items = items['done_items_message']
+    order_items = items['order_items']
+
+    # generate payload
+    if len(order_items) == 0:
+        payload = {
+            'comment': f'IBAM2001: {shipper} has packed none of the {pack_id}',
+            'complete': False
+        }
     else:
-        print(res)
-
-
-
-# def send_pack_message(order_key, items):
-#     # generate url
-#     url = join_url(api_base_url, 'dwapi', 'v1', 'orders', order_key, 'pack')
-
-#     # generate payload
-#     picking_id = items.get("picking_id")
-#     if len(items) <= 1:
-#         body_data = {
-#             "comment": f"IBAM2001 says:I (%whospacking%) have packed the following: {picking_id}",
-#             "complete": True
-#         }
-#     else:
-#         body_data = {
-#             "comment": f"IBAM2001 says:I (%whospacking%) have packed the following: {picking_id}",
-#             "complete": False,
-#             "items": [
-#                 {
-#                     "product_id": key,
-#                     "qty_shipped": value
-#                 }
-#                 for key, value in items.items() if key != "picking_id"
-#             ]
-#         }
-#     print(body_data)
-#     response = requests.post(url, headers=main_headers, json=body_data)
-#     if response.status_code == 200:
-#         return f"DONE: {response.json()}"
-#     else:
-#         return f"ERROR: {response}"
+        payload = {
+            'comment': f'IBAM2001: {shipper} has packed {len(order_items)} of {pack_id}\rItems: {done_items}',
+            'complete': False,
+            'items': order_items
+        }
+    response = requests.post(url, headers=main_headers, json=payload)
+    print(response.text)

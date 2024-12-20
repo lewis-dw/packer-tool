@@ -36,7 +36,7 @@ Shipping Result
 
     <!-- list all the label results -->
     {% for label_result in label_results %}
-    <div id="label-result">
+    <div id="default-segment">
         <p>Individual label number: {{ label_result.label_id }}</p>
         <p>{{ label_result.changed_printer }}</p>
         <p>{{ label_result.print_result }}</p>

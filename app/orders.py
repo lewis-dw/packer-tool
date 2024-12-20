@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, render_template, session, url_fo
 from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.clickup.api import create_task
 from app.logger import update_log
-from app.models import Countries, CountryFlags
+from app.models import Countries, CountryFlags, CommodityCodes
 
 """
 These routes are used for when getting orders from odoo
@@ -104,17 +104,17 @@ def get_order_id():
 
 
 """
-Allow user to select the correct statecode for country code
+We need the user to do some manual selections
 """
-@orders.route('/select_statecode')
-def select_statecode():
+@orders.route('/user_intervention')
+def user_intervention():
     data = session.get('partial_order_data', {})
-    data = 'a'
 
-    # if data exists then load the page and pass in all the statecodes to choose from
+    # if data exists then load the page and pass in all information it could require
     if data:
         state_codes = Countries.get_all_country_codes()
-        return render_template('select_statecode.html', codes=state_codes)
+        commodity_codes = CommodityCodes.get_all_codes()
+        return render_template('user_intervention.html', data=data, codes=state_codes, commodity_codes=commodity_codes)
     else:
         return redirect('/')
 
@@ -145,12 +145,12 @@ def load_order():
             result = clean_data(data)
 
             if result['state'] == 'Success':
-                data = result['value']
+                data, user_intervention = result['value']
 
-                # if the statecode retrieval failed then the user needs to do it manually
-                if data['shipping_statecode'] == 'manual':
+                # if there is a need for user intervention then display the page for it and handle the specifics there
+                if user_intervention:
                     session['partial_order_data'] = data
-                    return redirect(url_for('orders.select_statecode'))
+                    return redirect(url_for('orders.user_intervention'))
 
             else:
                 print(result['value'])

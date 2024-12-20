@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block title %}
+User Intervention
+{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='js/map_view.js') }}" defer></script>
+{% endblock %}
+
+{% block header %}
+<!-- Navigation buttons -->
+<div id="navbar-buttons">
+    <a href="/">
+        <button type="Button">Back to dashboard</button>
+    </a>
+</div>
+{% endblock %}
+
+{% block main %}
+
+<body>
+    <div>
+        <form method="POST" action="{{ url_for('orders.load_order') }}">
+            <!-- if user needs to manually select the statecode then display this -->
+            {% if data.shipping_statecode == 'manual' %}
+            <h2>Missing Statecode</h2>
+            <div id="default-segment">
+                <strong><label for="state_code">Select correct statecode:</label></strong>
+                <select id="state_code_options" name="state_code">
+                    <!-- dynamically generate the dropdown for all the statecodes -->
+                    {% for code, name in codes.items() %}
+                    <option value="{{ code }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" onclick="showAddress('{{ data.shipping_postcode | escape }}')">View on Google Maps</button>
+            </div>
+            {% endif %}
+
+
+
+            <!-- if user needs to manually select a correct commodity code for a sku that has it missing then do it here -->
+            {% if data.needs_a_hand %}
+            <h2>Missing Commodity Codes</h2>
+            {% for invoice_line in data.needs_a_hand %}
+            <div id="default-segment">
+                <p><strong>Product Name: </strong>{{ invoice_line.product_name }}</p>
+                <p><strong>Product SKU: </strong>{{ invoice_line.product_sku }}</p>
+                <strong><label for="commodity_code">Select correct commodity codes:</label></strong>
+
+                <select id="commodity_code_options" name="commodity_code">
+                <!-- dynamically generate the dropdown for all the statecodes -->
+                {% for code, name in commodity_codes.items() %}
+                    <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            {% endfor %}
+            {% endif %}
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+{% endblock %}

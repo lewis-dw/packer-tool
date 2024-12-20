@@ -76,6 +76,19 @@ h1 {
 
 
 
+/* default segment */
+#default-segment {
+    background-color: var(--bg-color-2);
+    border: 2px solid var(--dw-orange-1);
+    border-radius: 10px;
+    margin: 10px;
+    padding: 5px 10px;
+}
+
+
+
+
+
 /* Button default */
 button {
     background-color: var(--dw-orange-1);

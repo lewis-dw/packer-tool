@@ -45,7 +45,7 @@
                 <div id="split-1">
                     <h2>Shipping details</h2>
                     <!-- customer details -->
-                    <div id="customer-details">
+                    <div id="default-segment">
                         <!-- Customer name -->
                         <p>
                             <strong><label for="shipping_name">Customer Name:</label></strong>
@@ -137,7 +137,7 @@
                     </div>
 
                     <!-- shipping details -->
-                    <div id="shipping-details">
+                    <div id="default-segment">
                         <p><strong>Carrier:</strong> {{ order.order_carrier_name or '' }}</p>
                         <p><strong>Customer Paid Shipping:</strong> £{{ order.shipping_cost or '0.0' }}</p>
 
@@ -158,7 +158,7 @@
                     </div>
 
                     <!-- shipping notes -->
-                    <div id="shipping-notes">
+                    <div id="default-segment">
                         <p><strong>Picking Internal Note:</strong> {{ order.picking_internal_note or '' }}</p>
                         <p><strong>Customer Note:</strong> {{ order.picking_customer_note or '' }}</p>
                     </div>
@@ -173,7 +173,7 @@
                         <h2>Invoice Lines</h2>
 
                         {% for line in order.commercial_invoice_lines %}
-                        <div id="order-info-block">
+                        <div id="default-segment">
                             <!-- Product SKU -->
                             <p>
                                 <strong><label for="line-product_sku_{{ loop.index }}-ignore">Product SKU:</label></strong>
@@ -245,7 +245,7 @@
                         <h2>Items Info</h2>
 
                         {% for item in order.order_items %}
-                        <div id="order-info-block">
+                        <div id="default-segment">
                             <p><strong>Product SKU:</strong> {{ item.product_sku or '' }}</p>
                             <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
                             <p><strong>Product Name:</strong> {{ item.product_name or '' }}</p>
@@ -277,7 +277,7 @@
             <div id="billing-info" class="section">
                 <button type="button" onclick="closeSection()">Close</button>
                 <h2>Billing Info</h2>
-                <div id="order-info-block">
+                <div id="default-segment">
                     <p><strong>Company: </strong>{{ order.billing_company or '' }}</p>
                     <p><strong>Name: </strong>{{ order.billing_name or '' }}</p>
                     <p><strong>Streetline 1: </strong>{{ order.billing_street or '' }}</p>
@@ -300,7 +300,7 @@
                 <h2>Invoice Lines</h2>
 
                 {% for line in order.commercial_invoice_lines %}
-                <div id="order-info-block">
+                <div id="default-segment">
                     <!-- Product SKU -->
                     <p>
                         <strong><label for="line-product_sku_{{ loop.index }}">Product SKU:</label></strong>
