@@ -48,7 +48,7 @@ User Intervention
                 <p><strong>Product SKU: </strong>{{ invoice_line.product_sku }}</p>
                 <strong><label for="commodity_code">Select correct commodity codes:</label></strong>
 
-                <select id="commodity_code_options" name="commodity_code">
+                <select id="commodity_code_options" name="commodity_code|{{ invoice_line.product_sku }}">
                 <!-- dynamically generate the dropdown for all the statecodes -->
                 {% for code, name in commodity_codes.items() %}
                     <option value="{{ code }}">{{ name }}</option>

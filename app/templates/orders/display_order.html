@@ -133,7 +133,7 @@
                             {% endif %}
                         </p>
 
-                        <button type="button" onclick="showAddress('{{ order.shipping_postcode | escape }}')">View on Google Maps</button>
+                        <button type="button" id="subtle-submit" onclick="showAddress('{{ order.shipping_postcode | escape }}')">View on Google Maps</button>
                     </div>
 
                     <!-- shipping details -->

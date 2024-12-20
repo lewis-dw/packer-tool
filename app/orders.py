@@ -169,7 +169,20 @@ def load_order():
 
         # if there was data then save the selected statecode and continue
         else:
-            data['shipping_statecode'] = request.form.get('state_code')
+            # loop over the form data and if the value is one that will update the order_data then proceed to do that
+            for k, value in request.form.items():
+                if '|' in k:
+                    # extract the key and key and the sku to update
+                    key, sku = k.split('|')
+
+                    # loop over the items to update the values
+                    for line in data['commercial_invoice_lines']:
+                        if line['product_sku'] == sku:
+                            line[key] = value
+
+            # update state code if it exists
+            if request.form.get('state_code'):
+                data['shipping_statecode'] = request.form.get('state_code')
 
 
     # not sure how the user would trigger this but we need to catch it before we continue

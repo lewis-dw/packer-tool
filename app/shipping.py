@@ -254,6 +254,12 @@ def select_method():
             # update the labels table
             Labels.add_row(data['order_name'], master_id, label_dict['label_name'], label_dict['label_data'], courier, shipping_code)
 
+        # send a pack response to odoo telling it that we have completed some/all of the pack
+        """ """
+
+        # clear session data
+        session.clear()
+
 
     # render the results to the user
     return render_template('ship_result.html', ship_result=ship_result, label_results=label_results)
