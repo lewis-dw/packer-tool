@@ -3,6 +3,7 @@ from copy import deepcopy
 from flask import Blueprint, request, redirect, render_template, url_for, session, current_app, send_file
 from app.shipper import shipping_functions
 from app.print_zpl import printer
+from app.odoo.api import send_pack_message
 from app.parcel_packer import packer
 from app.logger import update_log
 from app import fedex, ups
@@ -255,10 +256,10 @@ def select_method():
             Labels.add_row(data['order_name'], master_id, label_dict['label_name'], label_dict['label_data'], courier, shipping_code)
 
         # send a pack response to odoo telling it that we have completed some/all of the pack
-        """ """
+        send_pack_message(shipper, data, master_id)
 
         # clear session data
-        session.clear()
+        # session.clear()
 
 
     # render the results to the user

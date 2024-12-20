@@ -370,7 +370,10 @@ def clean_data(data):
 
 
         # also need to update the lookup dict so later code can use it
-        lookup_commercial[str(line['product_id'])] = line['product_sku']
+        lookup_commercial[str(line['product_id'])] = {
+            'sku': line['product_sku'],
+            'demand_qty': line['product_demand_qty']
+        }
     data['commercial_invoice_lines'] = commercial_invoice
     data['needs_a_hand'] = needs_a_hand
 
@@ -379,8 +382,10 @@ def clean_data(data):
     """ Order Items """
     # loop over pack items and find the parent sku
     for line in data['order_items']:
-        line['parent_sku'] = lookup_commercial[str(line['sale_product_id'])]
+        parent_product = lookup_commercial[str(line['sale_product_id'])]
+        line['parent_sku'] = parent_product['sku']
         line['product_options'] = parse_product_description(line['line_description'])
+        line['per_one_parent'] = line['product_demand_qty'] / parent_product['demand_qty']
 
 
     # return a successful clean
@@ -390,7 +395,68 @@ def clean_data(data):
 ###########################################################################################################################################
 
 ###########################################################################################################################################
-# Functions for sending response back to odoo
+# Function for returning pack response back to Odoo
+
+
+def create_message(invoice_lines):
+    """Helper function to construct a message for what items are packed"""
+    done_items = []
+    for line_dict in invoice_lines:
+        qty = int(float(line_dict['product_demand_qty']))
+        if qty > 0:
+            done_items.append(f"{line_dict['product_sku']} (x{qty})")
+    return ' | '.join(done_items)
+
+
+def count_items_done(invoice_lines):
+    """Helper function to count up all items done and return"""
+    count = 0
+    for line_dict in invoice_lines:
+        count += float(line_dict['product_demand_qty'])
+    return int(count)
+
+
+def parse_items(items):
+    """Helper function to get only the values we want for items"""
+    new_items = []
+    for item_dict in items:
+        qty = int(float(item_dict['product_demand_qty']))
+        if qty > 0:
+            new_items.append({
+                "product_id": item_dict['product_id'],
+                "qty_done": int(float(item_dict['product_demand_qty']))
+            })
+    return new_items
+
+
+def send_pack_message(shipper, data, tracking_number):
+    # generate url
+    url = join_url(api_base_url, 'dwapi', 'v1', 'order', data['order_name'], 'pack')
+
+    # extract values
+    pack_id = data['picking_names']
+    done_items = create_message(data['commercial_invoice_lines'])
+    n_kits_done = count_items_done(data['commercial_invoice_lines'])
+    order_items = parse_items(data['order_items'])
+
+    # generate payload
+    if n_kits_done == 0:
+        payload = {
+            'comment': f'IBAM2001: {shipper} has packed none of the {pack_id}',
+            'complete': False
+        }
+    else:
+        payload = {
+            'comment': f'IBAM2001: {shipper} has packed {n_kits_done} of {pack_id}<br>Items: {done_items}<br>Tracking Number: {tracking_number}',
+            'complete': False,
+            'items': order_items
+        }
+
+    print(payload)
+    response = requests.post(url, headers=main_headers, json=payload)
+    print(response.text)
+
+
 
 
 def send_ship_message(order_name, courier, tracking_no):
@@ -412,30 +478,3 @@ def send_ship_message(order_name, courier, tracking_no):
     #     print(res)
     # else:
     #     print(res)
-
-
-
-
-def send_pack_message(order_name, shipper, items):
-    # generate url
-    url = join_url(api_base_url, 'dwapi', 'v1', 'order', order_name, 'pack')
-
-    # extract values
-    pack_id = items['pack_id']
-    done_items = items['done_items_message']
-    order_items = items['order_items']
-
-    # generate payload
-    if len(order_items) == 0:
-        payload = {
-            'comment': f'IBAM2001: {shipper} has packed none of the {pack_id}',
-            'complete': False
-        }
-    else:
-        payload = {
-            'comment': f'IBAM2001: {shipper} has packed {len(order_items)} of {pack_id}\rItems: {done_items}',
-            'complete': False,
-            'items': order_items
-        }
-    response = requests.post(url, headers=main_headers, json=payload)
-    print(response.text)

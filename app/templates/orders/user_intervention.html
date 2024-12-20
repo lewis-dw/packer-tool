@@ -25,7 +25,7 @@ User Intervention
             <!-- if user needs to manually select the statecode then display this -->
             {% if data.shipping_statecode == 'manual' %}
             <h2>Missing Statecode</h2>
-            <div id="default-segment">
+            <div class="default-segment">
                 <strong><label for="state_code">Select correct statecode:</label></strong>
                 <select id="state_code_options" name="state_code">
                     <!-- dynamically generate the dropdown for all the statecodes -->
@@ -43,7 +43,7 @@ User Intervention
             {% if data.needs_a_hand %}
             <h2>Missing Commodity Codes</h2>
             {% for invoice_line in data.needs_a_hand %}
-            <div id="default-segment">
+            <div class="default-segment">
                 <p><strong>Product Name: </strong>{{ invoice_line.product_name }}</p>
                 <p><strong>Product SKU: </strong>{{ invoice_line.product_sku }}</p>
                 <strong><label for="commodity_code">Select correct commodity codes:</label></strong>

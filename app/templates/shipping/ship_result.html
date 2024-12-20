@@ -24,7 +24,7 @@ Shipping Result
         <select id="current-shipper" name="current-shipper">
             <!-- Options will be dynamically populated here -->
         </select>
-        <button id="subtle-submit" type="button" onclick="updateShipper()">Change</button>
+        <button class="subtle-submit" type="button" onclick="updateShipper()">Change</button>
     </form>
 </div>
 {% endblock %}
@@ -36,7 +36,7 @@ Shipping Result
 
     <!-- list all the label results -->
     {% for label_result in label_results %}
-    <div id="default-segment">
+    <div class="default-segment">
         <p>Individual label number: {{ label_result.label_id }}</p>
         <p>{{ label_result.changed_printer }}</p>
         <p>{{ label_result.print_result }}</p>

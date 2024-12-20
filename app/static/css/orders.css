@@ -62,3 +62,19 @@ tr:hover {
     width: 30px;
     height: 30px;
 }
+
+
+/* an input that i want to treat as a non interactable value display */
+input.no-input {
+    border: none;
+    background: transparent;
+    font-size: inherit; /* Match font size with <p> */
+    font-family: inherit; /* Match font family with <p> */
+    color: inherit; /* Match text color with <p> */
+    outline: none; /* Remove focus outline */
+    padding: 0; /* Remove padding for a seamless look */
+    margin: 0; /* Ensure alignment with <p> */
+    text-align: inherit; /* Match text alignment */
+    width: auto; /* Adjust width dynamically to fit content */
+    pointer-events: none; /* Disable user interaction if desired */
+}

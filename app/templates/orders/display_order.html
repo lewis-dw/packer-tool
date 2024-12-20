@@ -7,8 +7,9 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
 <script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/display_order.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/map_view.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/display_order/display_order.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/display_order/update_quantity.js') }}" defer></script>
 {% endblock %}
 
 {% block header %}
@@ -26,7 +27,7 @@
         <select id="current-shipper" name="current-shipper">
             <!-- Options will be dynamically populated here -->
         </select>
-        <button id="subtle-submit" type="button" onclick="updateShipper()">Change</button>
+        <button class="subtle-submit" type="button" onclick="updateShipper()">Change</button>
     </form>
 </div>
 {% endblock %}
@@ -45,11 +46,11 @@
                 <div id="split-1">
                     <h2>Shipping details</h2>
                     <!-- customer details -->
-                    <div id="default-segment">
+                    <div class="default-segment">
                         <!-- Customer name -->
                         <p>
                             <strong><label for="shipping_name">Customer Name:</label></strong>
-                            <input type="text" id="shipping_name" name="shipping_name" value="{{ order.shipping_name or '' }}">
+                            <input type="text" name="shipping_name" value="{{ order.shipping_name or '' }}">
                         </p>
 
                         <!-- Customer is a trader or not -->
@@ -58,63 +59,63 @@
                         <!-- Customer email -->
                         <p>
                             <strong><label for="customer_email">Customer Email:</label></strong>
-                            <input type="text" id="customer_email" name="customer_email" value="{{ order.customer_email or '' }}">
+                            <input type="text" name="customer_email" value="{{ order.customer_email or '' }}">
                         </p>
 
                         <!-- Customer phone number -->
                         <p>
                             <strong><label for="shipping_telephone">Customer Phone Number:</label></strong>
-                            <input type="text" id="shipping_telephone" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
+                            <input type="text" name="shipping_telephone" value="{{ order.shipping_telephone or '' }}">
                         </p>
 
                         <!-- Customer's company -->
                         <p>
                             <strong><label for="shipping_company">Company:</label></strong>
-                            <input type="text" id="shipping_company" name="shipping_company" value="{{ order.shipping_company or '' }}">
+                            <input type="text" name="shipping_company" value="{{ order.shipping_company or '' }}">
                         </p>
 
                         <!-- Streetline 1 -->
                         <p>
                             <strong><label for="shipping_street">Streetline 1:</label></strong>
-                            <input type="text" id="shipping_street" name="shipping_street" value="{{ order.shipping_street or '' }}">
+                            <input type="text" name="shipping_street" value="{{ order.shipping_street or '' }}">
                             {% if errors.get('shipping_street') %}<span class="missing">Required</span>{% endif %}
                         </p>
 
                         <!-- Streetline 2 -->
                         <p>
                             <strong><label for="shipping_street2">Streetline 2:</label></strong>
-                            <input type="text" id="shipping_street2" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
+                            <input type="text" name="shipping_street2" value="{{ order.shipping_street2 or '' }}">
                         </p>
 
                         <!-- Region (Used as streetline 3) -->
                         <p>
                             <strong><label for="shipping_region">Region:</label></strong>
-                            <input type="text" id="shipping_region" name="shipping_region" value="{{ order.shipping_region or '' }}">
+                            <input type="text" name="shipping_region" value="{{ order.shipping_region or '' }}">
                         </p>
 
                         <!-- Locality (Contains city) -->
                         <p>
                             <strong><label for="shipping_locality">Locality:</label></strong>
-                            <input type="text" id="shipping_locality" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
+                            <input type="text" name="shipping_locality" value="{{ order.shipping_locality or '' }}">
                         </p>
 
                         <!-- Postcode -->
                         <p>
                             <strong><label for="shipping_postcode">Postcode:</label></strong>
-                            <input type="text" id="shipping_postcode" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
+                            <input type="text" name="shipping_postcode" value="{{ order.shipping_postcode or '' }}">
                             {% if errors.get('shipping_postcode') %}<span class="missing">Required</span>{% endif %}
                         </p>
 
                         <!-- Country -->
                         <p>
                             <strong><label for="shipping_country">Country:</label></strong>
-                            <input type="text" id="shipping_country" name="shipping_country" value="{{ order.shipping_country or '' }}">
+                            <input type="text" name="shipping_country" value="{{ order.shipping_country or '' }}">
                         </p>
 
                         <!-- Country ID -->
                         <p>
                             <strong><label for="shipping_country_id">Country ID:</label></strong>
-                            <input type="text" id="shipping_country_id" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
+                            <input type="text" name="shipping_country_id" value="{{ order.shipping_country_id or '' }}">
                         </p>
 
                         <!-- Small SVG icon of the Country ID flag -->
@@ -127,38 +128,38 @@
                         <p>
                             <strong><label for="etd_required">ETD Required:</label></strong>
                             {% if order.etd_required == 'on' %}
-                            <input type="checkbox" id="etd_required" name="etd_required" value="on" checked>
+                            <input type="checkbox" name="etd_required" value="on" checked>
                             {% else %}
-                            <input type="checkbox" id="etd_required" name="etd_required" value="on">
+                            <input type="checkbox" name="etd_required" value="on">
                             {% endif %}
                         </p>
 
-                        <button type="button" id="subtle-submit" onclick="showAddress('{{ order.shipping_postcode | escape }}')">View on Google Maps</button>
+                        <button type="button" class="subtle-submit" onclick="showAddress('{{ order.shipping_postcode | escape }}')">View on Google Maps</button>
                     </div>
 
                     <!-- shipping details -->
-                    <div id="default-segment">
+                    <div class="default-segment">
                         <p><strong>Carrier:</strong> {{ order.order_carrier_name or '' }}</p>
                         <p><strong>Customer Paid Shipping:</strong> £{{ order.shipping_cost or '0.0' }}</p>
 
                         <p>
                             <strong><label for="order_total">Total Cost of Order: £</label></strong>
-                            <input type="number" id="order_total" name="order_total" value="{{ order.order_total or '0.0' }}" id="numberInput" step="any">
+                            <input type="number" name="order_total" value="{{ order.order_total or '0.0' }}" step="any">
                         </p>
 
                         <p>
                             <strong><label for="order_total_tax">Order Tax: £</label></strong>
-                            <input type="number" id="order_total_tax" name="order_total_tax" value="{{ order.order_total_tax or '0.0' }}" id="numberInput" step="any">
+                            <input type="number" name="order_total_tax" value="{{ order.order_total_tax or '0.0' }}" step="any">
                         </p>
 
                         <p>
                             <strong><label for="order_total_inc_tax">Total Cost inc Tax: £</label></strong>
-                            <input type="number" id="order_total_inc_tax" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '0.0' }}" id="numberInput" step="any">
+                            <input type="number" name="order_total_inc_tax" value="{{ order.order_total_inc_tax or '0.0' }}" step="any">
                         </p>
                     </div>
 
                     <!-- shipping notes -->
-                    <div id="default-segment">
+                    <div class="default-segment">
                         <p><strong>Picking Internal Note:</strong> {{ order.picking_internal_note or '' }}</p>
                         <p><strong>Customer Note:</strong> {{ order.picking_customer_note or '' }}</p>
                     </div>
@@ -173,18 +174,18 @@
                         <h2>Invoice Lines</h2>
 
                         {% for line in order.commercial_invoice_lines %}
-                        <div id="default-segment">
+                        <div class="default-segment">
                             <!-- Product SKU -->
                             <p>
-                                <strong><label for="line-product_sku_{{ loop.index }}-ignore">Product SKU:</label></strong>
-                                <textarea id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}">{{ line.product_sku or '' }}</textarea>
+                                <strong><label for="sku-ignore">Product SKU:</label></strong>
+                                <textarea data-group="sku" data-product_id="{{ line.product_id }}" name="sku-ignore">{{ line.product_sku or '' }}</textarea>
                                 {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                             </p>
 
                             <!-- Product name -->
                             <p>
-                                <strong><label for="line-product_name_{{ loop.index }}-ignore">Product Name:</label></strong>
-                                <textarea id="line-product_name_{{ loop.index }}-ignore" name="line-product_name_{{ loop.index }}-ignore">{{ line.product_name or '' }}</textarea>
+                                <strong><label for="name-ignore">Product Name:</label></strong>
+                                <textarea data-group="name" data-product_id="{{ line.product_id }}" name="name-ignore">{{ line.product_name or '' }}</textarea>
                             </p>
 
                             {% for option in line.product_options %}
@@ -194,39 +195,39 @@
 
                             <!-- Unit price -->
                             <p>
-                                <strong><label for="line-unit_price_{{ loop.index }}-ignore">Unit Price:</label></strong>
-                                <input type="number" id="line-unit_price_{{ loop.index }}-ignore" name="line-unit_price_{{ loop.index }}-ignore" value="{{ line.unit_price or '' }}" id="numberInput" step="any">
+                                <strong><label for="price-ignore">Unit Price:</label></strong>
+                                <input type="number" data-group="price" data-product_id="{{ line.product_id }}" name="price-ignore" value="{{ line.unit_price or '' }}" step="any">
                                 {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                             </p>
 
                             <!-- Quantity -->
                             <p>
-                                <strong><label for="line-product_demand_qty_{{ loop.index }}-ignore">Quantity:</label></strong>
-                                <input type="number" id="line-product_demand_qty_{{ loop.index }}-ignore" name="line-product_demand_qty_{{ loop.index }}-ignore" value="{{ line.product_demand_qty or '' }}" id="numberInput" step="any">
+                                <strong><label for="quantity-ignore">Quantity:</label></strong>
+                                <input type="number" data-group="quantity" data-product_id="{{ line.product_id }}" name="quantity-ignore" value="{{ line.product_demand_qty or '' }}" step="any">
                                 {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                             </p>
 
                             <!-- Unit weight -->
                             <p>
-                                <strong><label for="line-unit_weight_{{ loop.index }}-ignore">Unit Weight:</label></strong>
-                                <input type="number" id="line-unit_weight_{{ loop.index }}-ignore" name="line-unit_weight_{{ loop.index }}-ignore"value="{{ line.unit_weight or '' }}" id="numberInput" step="any">
+                                <strong><label for="weight-ignore">Unit Weight:</label></strong>
+                                <input type="number" data-group="weight" data-product_id="{{ line.product_id }}" name="weight-ignore"value="{{ line.unit_weight or '' }}" step="any">
                                 {% if errors.get('line-unit_weight_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                             </p>
 
 
                             <!-- Product dimensions -->
                             <p>
-                                <strong><label>Dimensions:</label></strong>
+                                <strong><label>Dimensions: </label></strong>
                                 H
-                                <input type="number" class="small-input" id="line-product_height_{{ loop.index }}-ignore" name="line-product_height_{{ loop.index }}" value="{{ line.product_height or '' }}" id="numberInput" step="any">
+                                <input type="number" data-group="height" data-product_id="{{ line.product_id }}" class="small-input" name="height-ignore" value="{{ line.product_height or '' }}" step="any">
                                 {% if errors.get('line-product_height_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
 
                                 W
-                                <input type="number" class="small-input" id="line-product_width_{{ loop.index }}-ignore" name="line-product_width_{{ loop.index }}" value="{{ line.product_width or '' }}" id="numberInput" step="any">
+                                <input type="number" data-group="width" data-product_id="{{ line.product_id }}" class="small-input" name="width-ignore" value="{{ line.product_width or '' }}" step="any">
                                 {% if errors.get('line-product_width_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
 
                                 L
-                                <input type="number" class="small-input" id="line-product_length_{{ loop.index }}-ignore" name="line-product_length_{{ loop.index }}" value="{{ line.product_length or '' }}" id="numberInput" step="any">
+                                <input type="number" data-group="length" data-product_id="{{ line.product_id }}" class="small-input" name="length-ignore" value="{{ line.product_length or '' }}" step="any">
                                 {% if errors.get('line-product_length_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                             </p>
                         </div>
@@ -245,15 +246,16 @@
                         <h2>Items Info</h2>
 
                         {% for item in order.order_items %}
-                        <div id="default-segment">
-                            <p><strong>Product SKU:</strong> {{ item.product_sku or '' }}</p>
-                            <p><strong>Parent SKU:</strong> {{ item.parent_sku or '' }}</p>
-                            <p><strong>Product Name:</strong> {{ item.product_name or '' }}</p>
+                        <div class="default-segment">
+                            <p><strong>Product SKU: </strong>{{ item.product_sku or '' }}</p>
+                            <p><strong>Parent SKU: </strong>{{ item.parent_sku or '' }}</p>
+                            <p><strong>Product Name: </strong>{{ item.product_name or '' }}</p>
                             {% for option in item.product_options %}
                             <p>{{ option | safe }}</p>
                             {% else %}
                             {% endfor %}
-                            <p><strong>Quantity:</strong> {{ item.product_demand_qty or '' }}</p>
+                            <strong><label for="item-product_demand_qty_{{ loop.index }}">Quantity: </label></strong>
+                            <input type="text" data-per_one_parent="{{ item.per_one_parent }}" data-product_id="{{ item.sale_product_id }}" class="no-input" id="item-qty" name="item-product_demand_qty_{{ loop.index }}" value="{{ item.product_demand_qty }}">
                         </div>
                         {% else %}
                         <p>No items found</p>
@@ -277,7 +279,7 @@
             <div id="billing-info" class="section">
                 <button type="button" onclick="closeSection()">Close</button>
                 <h2>Billing Info</h2>
-                <div id="default-segment">
+                <div class="default-segment">
                     <p><strong>Company: </strong>{{ order.billing_company or '' }}</p>
                     <p><strong>Name: </strong>{{ order.billing_name or '' }}</p>
                     <p><strong>Streetline 1: </strong>{{ order.billing_street or '' }}</p>
@@ -300,19 +302,18 @@
                 <h2>Invoice Lines</h2>
 
                 {% for line in order.commercial_invoice_lines %}
-                <div id="default-segment">
+                <div class="default-segment">
                     <!-- Product SKU -->
                     <p>
                         <strong><label for="line-product_sku_{{ loop.index }}">Product SKU:</label></strong>
-                        <!-- <input type="text" id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}" value="{{ line.product_sku or '' }}"> -->
-                        <textarea id="line-product_sku_{{ loop.index }}" name="line-product_sku_{{ loop.index }}">{{ line.product_sku or '' }}</textarea>
+                        <textarea data-group="sku" data-product_id="{{ line.product_id }}" name="line-product_sku_{{ loop.index }}">{{ line.product_sku or '' }}</textarea>
                         {% if errors.get('line-product_sku_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Product name -->
                     <p>
                         <strong><label for="line-product_name_{{ loop.index }}">Product Name:</label></strong>
-                        <textarea id="line-product_name_{{ loop.index }}" name="line-product_name_{{ loop.index }}">{{ line.product_name or '' }}</textarea>
+                        <textarea data-group="name" data-product_id="{{ line.product_id }}" name="line-product_name_{{ loop.index }}">{{ line.product_name or '' }}</textarea>
                     </p>
 
                     {% for option in line.product_options %}
@@ -323,61 +324,61 @@
                     <!-- Commodity code -->
                     <p>
                         <strong><label for="line-commodity_code_{{ loop.index }}">Commodity Code:</label></strong>
-                        <input type="text" id="line-commodity_code_{{ loop.index }}" name="line-commodity_code_{{ loop.index }}" value="{{ line.commodity_code or '' }}">
+                        <input type="text" name="line-commodity_code_{{ loop.index }}" value="{{ line.commodity_code or '' }}">
                     </p>
 
                     <!-- Country of manufacture -->
                     <p>
                         <strong><label for="line-country_of_manufacture_{{ loop.index }}">Country of Manufacture:</label></strong>
-                        <input type="text" id="line-country_of_manufacture_{{ loop.index }}" name="line-country_of_manufacture_{{ loop.index }}" value="{{ line.country_of_manufacture or '' }}">
+                        <input type="text" name="line-country_of_manufacture_{{ loop.index }}" value="{{ line.country_of_manufacture or '' }}">
                     </p>
 
                     <!-- Quantity -->
                     <p>
                         <strong><label for="line-product_demand_qty_{{ loop.index }}">Quantity:</label></strong>
-                        <input type="number" id="line-product_demand_qty_{{ loop.index }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}" id="numberInput" step="any">
+                        <input type="number" data-group="quantity" data-product_id="{{ line.product_id }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}" step="any">
                         {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Unit price -->
                     <p>
                         <strong><label for="line-unit_price_{{ loop.index }}">Unit Price:</label></strong>
-                        <input type="number" id="line-unit_price_{{ loop.index }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}" id="numberInput" step="any">
+                        <input type="number" data-group="price" data-product_id="{{ line.product_id }}" name="line-unit_price_{{ loop.index }}" value="{{ line.unit_price or '' }}" step="any">
                         {% if errors.get('line-unit_price_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Unit weight -->
                     <p>
                         <strong><label for="line-unit_weight_{{ loop.index }}">Unit Weight:</label></strong>
-                        <input type="number" id="line-unit_weight_{{ loop.index }}" name="line-unit_weight_{{ loop.index }}"value="{{ line.unit_weight or '' }}" id="numberInput" step="any">
+                        <input type="number" data-group="weight" data-product_id="{{ line.product_id }}" name="line-unit_weight_{{ loop.index }}"value="{{ line.unit_weight or '' }}" step="any">
                         {% if errors.get('line-unit_weight_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Unit height -->
                     <p>
                         <strong><label for="line-product_height_{{ loop.index }}">Unit Height:</label></strong>
-                        <input type="number" id="line-product_height_{{ loop.index }}" name="line-product_height_{{ loop.index }}" value="{{ line.product_height or '' }}" id="numberInput" step="any">
+                        <input type="number" data-group="height" data-product_id="{{ line.product_id }}" name="line-product_height_{{ loop.index }}" value="{{ line.product_height or '' }}" step="any">
                         {% if errors.get('line-product_height_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Unit width -->
                     <p>
                         <strong><label for="line-product_width_{{ loop.index }}">Unit Width:</label></strong>
-                        <input type="number" id="line-product_width_{{ loop.index }}" name="line-product_width_{{ loop.index }}" value="{{ line.product_width or '' }}" id="numberInput" step="any">
+                        <input type="number" data-group="width" data-product_id="{{ line.product_id }}" name="line-product_width_{{ loop.index }}" value="{{ line.product_width or '' }}" step="any">
                         {% if errors.get('line-product_width_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Unit length -->
                     <p>
                         <strong><label for="line-product_length_{{ loop.index }}">Unit Length:</label></strong>
-                        <input type="number" id="line-product_length_{{ loop.index }}" name="line-product_length_{{ loop.index }}" value="{{ line.product_length or '' }}" id="numberInput" step="any">
+                        <input type="number" data-group="length" data-product_id="{{ line.product_id }}" name="line-product_length_{{ loop.index }}" value="{{ line.product_length or '' }}" step="any">
                         {% if errors.get('line-product_length_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Parcel insurance -->
                     <p>
                         <strong><label for="line-parcel_insurance_{{ loop.index }}">Parcel Insurance:</label></strong>
-                        <input type="text" id="line-parcel_insurance_{{ loop.index }}" name="line-parcel_insurance_{{ loop.index }}" value=0>
+                        <input type="text" name="line-parcel_insurance_{{ loop.index }}" value=0>
                     </p>
                 </div>
                 {% else %}

@@ -260,13 +260,20 @@ def save_order():
             value = str(value).strip()
 
 
-            # order commercial invoice lines
-            if key.startswith('line-'):
+            # this is for the following if statement to combine 2 similar statements into 1
+            lookup_dict = {
+                'line': 'commercial_invoice_lines',
+                'item': 'order_items'
+            }
+
+            # parse commercial invoice line or the order item line
+            if key.startswith('line-') or key.startswith('item-'):
                 # extract the key name and index from the key
                 true_key, index = key.rsplit('_', 1)
-                true_key = true_key.split('-')[1]
+                group, true_key = true_key.split('-')
+                group = lookup_dict[group]
                 index = int(index) - 1
-                data['commercial_invoice_lines'][index][true_key] = value
+                data[group][index][true_key] = value
 
             # all other values
             else:

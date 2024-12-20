@@ -38,32 +38,3 @@ function submitReport() {
         document.getElementById('response').innerText = `Server response: ${data.response}`;
     })
 }
-
-
-
-
-// update the corresponding input to a changed input
-document.addEventListener('input', function (event) {
-    const changedId = event.target.id;
-    if (!changedId) {
-        return; // Exit if the input does not have an ID
-    }
-
-    // Parse through the changed input
-    const lastUnderscoreIndex = changedId.lastIndexOf('_');
-    const input = changedId.substring(0, lastUnderscoreIndex); // Part before the last underscore
-    let id = changedId.substring(lastUnderscoreIndex + 1); // Part after the last underscore
-
-    // Determine the suffix based on the presence of 'ignore' in the ID and remove '-ignore' from the ID if present
-    const suffix = id.includes('ignore') ? '' : '-ignore';
-    id = id.replace('-ignore', '');
-
-    // Construct the ID to update then try to find it
-    const inputToUpdate = `${input}_${id}${suffix}`;
-    const targetInput = document.getElementById(inputToUpdate);
-
-    // If the ID exists then it means we should update the other input
-    if (targetInput) {
-        targetInput.value = event.target.value;
-    }
-});

@@ -58,3 +58,13 @@ def log_event():
         update_log.create_log_line(data['location'], data['event'])
         return '', 204
     return 'Missing data', 400
+
+
+
+
+"""
+Test
+"""
+@default.route('/test')
+def test():
+    return render_template('test.html')
