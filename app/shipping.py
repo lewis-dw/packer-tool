@@ -225,14 +225,14 @@ def select_method():
     # if success then we need need to do other stuff
     if result['state'] == 'Success':
         # update the outs table in database
-        ShippingHistory.add_row(data['order_name'], shipper, datetime.now(), ship_at, data['shipping_name'], data['shipping_company'], data['shipping_country_id'], data['shipping_cost'], float(dw_paid), master_id, courier, shipping_code, commercial_invoice)
+        ShippingHistory.add_row(data['order_name'], shipper, datetime.now(), ship_at, data['shipping_name'], data['shipping_company'], data['shipping_country_id'], data['shipping_cost'], float(dw_paid), master_id, courier, shipping_code, commercial_invoice, False)
 
         # loop over labels
         label_results = []
         for label_id, label_dict in enumerate(labels):
             # send the zpl data to the print server
             # server_name and printer_name were found earlier
-            # print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data'])
+            # print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data']) # lewis
             print_res = {
                 'state': 'Success'
             }
@@ -259,7 +259,7 @@ def select_method():
         send_pack_message(shipper, data, master_id)
 
         # clear session data
-        # session.clear()
+        session.clear()
 
 
     # render the results to the user

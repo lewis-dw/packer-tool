@@ -62,12 +62,13 @@ class ShippingHistory(db.Model):
     courier = db.Column(db.String(32), nullable=False) # VARCHAR(32) NOT NULL
     method = db.Column(db.String(80), nullable=False) # VARCHAR(80) NOT NULL
     commercial_invoice = db.Column(MEDIUMBLOB, nullable=True) # MEDIUMBLOB NULL
+    shipped = db.Column(db.Boolean, nullable=False) # BOOLEAN NOT NULL
 
     def __repr__(self):
         return f'<Order Name {self.order_name}, Tracking Number {self.tracking_number}>'
 
     @staticmethod
-    def add_row(order_name, shipper, processed_at, shipped_at, name, company, shipped_to, customer_paid, dw_paid, tracking_number, courier, method, commercial_invoice):
+    def add_row(order_name, shipper, processed_at, shipped_at, name, company, shipped_to, customer_paid, dw_paid, tracking_number, courier, method, commercial_invoice, shipped):
         db.session.add(ShippingHistory(
             order_name=order_name,
             shipper=shipper,
@@ -81,7 +82,8 @@ class ShippingHistory(db.Model):
             tracking_number=tracking_number,
             courier=courier,
             method=method,
-            commercial_invoice=commercial_invoice
+            commercial_invoice=commercial_invoice,
+            shipped=shipped
         ))
         db.session.commit()
 

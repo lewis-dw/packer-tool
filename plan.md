@@ -67,28 +67,3 @@ For more information on how to use read the full PyMongo documentation or ask Ch
 ├── config.py
 └── run.py
 ```
-
-
-### Scraper functionality
-#### Current functions
-- API calls to ODOO
-  - List all ready to go orders
-  - Pull data in for specified order number
-- Present data to user and split into:
-  - Commercial invoice items
-  - Picking items
-- Allow user to check/edit all commercial invoice data
-- Set final weights and dims of packing information
-- Save all data in format for shipper
-- Normalise data for specific cases/scenarios
-  - Normalise non alphanumeric
-  - Specific naming for country codes
-
-
-#### What needs to actually be pulled across
-- ODOO API calls
-  - Figure out what best to store the data as, look at database implementation
-- Display data to user and allow it to be editable
-- Allow for weight and dimension saving
-- Normalise data for any scenario
-- Check length of streetlines
