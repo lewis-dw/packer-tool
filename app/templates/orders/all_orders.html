@@ -56,8 +56,8 @@ All Orders
                 <td>{{ order.order_carrier_name }}</td>
                 <td>{{ order.shipping_cost }}</td>
                 <td>{{ order.order_total_inc_tax }}</td>
-                <td>{{ order.picking_internal_note }}</td>
-                <td>{{ order.picking_customer_note }}</td>
+                <td>{{ order.picking_internal_note|strip_html }}</td>
+                <td>{{ order.picking_customer_note|strip_html }}</td>
             </tr>
         {% endfor %}
         </tbody>

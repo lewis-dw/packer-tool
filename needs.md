@@ -1,12 +1,17 @@
-#
+# Update for Odoo DW API
 
-What we need adding to the DWAPI:
+## For `/dwapi/orders`
 
-- For each set of pick, pack, and out IDs return the order details with these IDs included
-- Currently the
+The result should only be individual ready packs, where there can be multiple results for one 'order_name' but the pack ID is unique.
 
-## _
+## For `/dwapi/order/<order_name>`
 
-- Need a `shippable` var where shipping methods (like No Rush, UPS, Admin Shipping, Discounts, etc.) are False, whereas actual items are True.
-- Reidual amount on order
-- Need the pick, pack, and out id returned
+In the order details we want:
+
+- The pick, pack, and out id for the result
+- The residual amount on the order
+
+For each commercial invoice line:
+
+- A 'shippable' field for if the item is a shippable thing, eg. No Rush, UPS, Admin Shipping, Discounts, etc are all False, whereas actual items are True
+- A quantity for how many of the item has been packed already

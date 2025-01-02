@@ -246,7 +246,9 @@ def clean_data(data):
     # this var tracks if there is a need for user to manually select something
     user_intervention = False
 
-    """ Clean every item """
+
+    """ Data cleaning """
+    # clean every single item
     foreign_translate = ForeignCharacters.get_replacers()
     for key, value in data.items():
         # if the value is a string then proceed to clean it
@@ -261,6 +263,19 @@ def clean_data(data):
         # else if the value is a list then we still want to check it but it requires an extra step
         elif isinstance(value, list):
             """Lewis"""
+
+
+    # clean the html from the customer and internal comments
+    for field_name in ['picking_internal_note', 'picking_customer_note']:
+        note = re.sub(r'<.*?>', ' ', data[field_name])
+        data[field_name] = re.sub(r' +', ' ', note).strip()
+
+    # strip any nonalphanumerical and non spaces out of the postcode
+    if data['shipping_postcode']:
+        data['shipping_postcode'] = re.sub(r'[^a-zA-Z0-9 ]', '', data['shipping_postcode'])
+
+    # clean customer name
+    data['shipping_name'] = re.sub(' +', ' ', data['shipping_name']).strip()
 
 
 
@@ -290,10 +305,6 @@ def clean_data(data):
     bad_vals = ['n/a', 'no', 'none', 'false', '']
     if str(data['shipping_company']).strip().lower() in bad_vals:
         data['shipping_company'] = data['shipping_name']
-
-    # strip any nonalphanumerical and non spaces out of the postcode
-    if data['shipping_postcode']:
-        data['shipping_postcode'] = re.sub(r'[^a-zA-Z0-9 ]', '', data['shipping_postcode'])
 
 
 

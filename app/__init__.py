@@ -1,5 +1,5 @@
 # metadata variables
-__version__ = '1.14.2'  # semantic versioning: [MAJOR|MINOR|PATCH]
+__version__ = '1.14.3'  # semantic versioning: [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 
@@ -9,6 +9,7 @@ from flask import Flask, render_template, send_from_directory, g
 from flask_talisman import Talisman
 from flask_sqlalchemy import SQLAlchemy
 import os
+import re
 from dotenv import load_dotenv
 
 
@@ -54,6 +55,7 @@ def create_app():
     register_blueprints(app)
     set_global_variables(app)
     link_error_pages(app)
+    create_custom_filter(app)
     serve_manifest(app)
     return app
 
@@ -89,6 +91,17 @@ def link_error_pages(app):
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
+
+
+def create_custom_filter(app):
+    """
+    Create custom filter for filtering html in the Jinja2 template
+    """
+    @app.template_filter('strip_html')
+    def strip_html_filter(text):
+        clean_text = re.sub(r'<.*?>', ' ', text)
+        clean_text = re.sub(r' +', ' ', clean_text).strip()
+        return clean_text
 
 
 def serve_manifest(app):

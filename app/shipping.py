@@ -380,7 +380,14 @@ This page completes the end of day shipping
 """
 @shipping.route('/end_of_day')
 def end_of_day():
+    # get vars
+    shipper = request.cookies.get('current_shipper')
     result = ShippingHistory.get_end_of_day()
+
+    # log who is attempting to do the end of day
+    update_log.create_log_line('actions', f'`{shipper}` has ran the end of day shipping. ({len(result)} to do)')
+
+    # run through the results and log what happens to each one
     for row in result:
         send_ship_message(row.order_name, row.courier, row.tracking_number)
     return redirect('/')
