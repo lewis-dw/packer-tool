@@ -76,6 +76,14 @@ p {
     font-size: 13px;
 }
 
+input {
+    font-size: 11px;
+}
+
+textarea {
+    width: 50ch;
+    height: 1.2rem;
+}
 
 
 

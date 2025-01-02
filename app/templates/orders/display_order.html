@@ -121,7 +121,7 @@
                         <!-- Small SVG icon of the Country ID flag -->
                         <p>
                             <strong><label for="svg-container">Flag:</label></strong>
-                            <div id="svg-container">{{ svg_data | safe }}</div>
+                            <div id="svg-container" title="{{ order.shipping_country or '' }}">{{ svg_data | safe }}</div>
                         </p>
 
                         <!-- Checkbox for if the address needs ETD -->

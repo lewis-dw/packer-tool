@@ -377,13 +377,14 @@ def clean_data(data):
 
 
         # calculate the number of items actually wanted
-        line['qty_wanted'] = line['product_demand_qty'] - line['product_delivered_qty']
+        line['qty_wanted'] = line['product_demand_qty'] - line['product_delivered_qty'] # lewis
+        " This is incomplete i havent worked out what i want to do with qty wanted "
 
 
         # also need to update the lookup dict so later code can use it
         lookup_commercial[str(line['product_id'])] = {
             'sku': line['product_sku'],
-            'demand_qty': line['product_demand_qty']
+            'demand_qty': line['product_demand_qty'] # lewis - remember if i want this to be qty wanted etc post odoo update
         }
     data['commercial_invoice_lines'] = commercial_invoice
     data['needs_a_hand'] = needs_a_hand
