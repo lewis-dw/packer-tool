@@ -46,6 +46,12 @@ Dashboard
             </a>
         </div>
         <div class="dashboard-icon">
+            <a href="{{ url_for('shipping.end_of_day') }}">
+                <img src="static/icons/shipper-icon.png" alt="___">
+                <p>End of day shipping</p>
+            </a>
+        </div>
+        <div class="dashboard-icon">
             <a href="{{ url_for('orders.display_order') }}">
                 <img src="static/icons/shipper-icon.png" alt="___">
                 <p>Show Order</p>

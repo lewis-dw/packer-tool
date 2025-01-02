@@ -203,8 +203,8 @@
                             <!-- Quantity -->
                             <p>
                                 <strong><label for="quantity-ignore">Quantity:</label></strong>
-                                <input type="number" data-group="quantity" data-product_id="{{ line.product_id }}" name="quantity-ignore" value="{{ line.product_demand_qty or '' }}" step="any">
-                                {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                                <input type="number" data-group="quantity" data-product_id="{{ line.product_id }}" name="quantity-ignore" value="{{ line.qty_wanted or '' }}" step="any">
+                                {% if errors.get('line-qty_wanted_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                             </p>
 
                             <!-- Unit weight -->
@@ -335,9 +335,9 @@
 
                     <!-- Quantity -->
                     <p>
-                        <strong><label for="line-product_demand_qty_{{ loop.index }}">Quantity:</label></strong>
-                        <input type="number" data-group="quantity" data-product_id="{{ line.product_id }}" name="line-product_demand_qty_{{ loop.index }}" value="{{ line.product_demand_qty or '' }}" step="any">
-                        {% if errors.get('line-product_demand_qty_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
+                        <strong><label for="line-qty_wanted_{{ loop.index }}">Quantity:</label></strong>
+                        <input type="number" data-group="quantity" data-product_id="{{ line.product_id }}" name="line-qty_wanted_{{ loop.index }}" value="{{ line.qty_wanted or '' }}" step="any">
+                        {% if errors.get('line-qty_wanted_' ~ loop.index) %}<span class="missing">Required</span>{% endif %}
                     </p>
 
                     <!-- Unit price -->

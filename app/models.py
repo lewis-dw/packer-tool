@@ -128,6 +128,18 @@ class ShippingHistory(db.Model):
         )
         return recent_shipments
 
+    @staticmethod
+    def get_end_of_day():
+        """
+        Return all rows that need to be processed still for the end of day
+        """
+
+        # get all info where shipped is False
+        result = db.session.query(ShippingHistory.order_name, ShippingHistory.courier, ShippingHistory.tracking_number).filter(
+            ShippingHistory.shipped == False
+        ).all()
+        return result
+
 
 
 """

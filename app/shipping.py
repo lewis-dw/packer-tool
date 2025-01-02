@@ -3,7 +3,7 @@ from copy import deepcopy
 from flask import Blueprint, request, redirect, render_template, url_for, session, current_app, send_file
 from app.shipper import shipping_functions
 from app.print_zpl import printer
-from app.odoo.api import send_pack_message
+from app.odoo.api import send_pack_message, send_ship_message
 from app.parcel_packer import packer
 from app.logger import update_log
 from app import fedex, ups
@@ -223,12 +223,12 @@ def select_method():
 
 
     # if success then we need need to do other stuff
+    label_results = []
     if result['state'] == 'Success':
         # update the outs table in database
         ShippingHistory.add_row(data['order_name'], shipper, datetime.now(), ship_at, data['shipping_name'], data['shipping_company'], data['shipping_country_id'], data['shipping_cost'], float(dw_paid), master_id, courier, shipping_code, commercial_invoice, False)
 
         # loop over labels
-        label_results = []
         for label_id, label_dict in enumerate(labels):
             # send the zpl data to the print server
             # server_name and printer_name were found earlier
@@ -370,3 +370,17 @@ This page displays all the shipping history
 def shipping_history():
     history_result = ShippingHistory.get_shipping_history()
     return render_template('shipping_history.html', history=history_result)
+
+
+
+
+
+"""
+This page completes the end of day shipping
+"""
+@shipping.route('/end_of_day')
+def end_of_day():
+    result = ShippingHistory.get_end_of_day()
+    for row in result:
+        send_ship_message(row.order_name, row.courier, row.tracking_number)
+    return redirect('/')

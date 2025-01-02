@@ -235,7 +235,7 @@ def save_order():
 
         # invoice lines
         'product_sku': '',
-        'product_demand_qty':'',
+        'qty_wanted':'',
         'unit_price': '',
         'unit_weight':'',
         'product_height':'',

@@ -8,14 +8,15 @@ from app.shipper.shipping_functions import get_shipping_date, download_with_retr
 from app.logger import update_log
 from app.models import Countries
 
+
 # generate root_dir for outputting debug files
 cur_dir = pathlib.Path(__file__).parent
 debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 
+
 # load env variables and set if using live or test
 load_dotenv()
-prefix = 'TEST_'
-# prefix = ''
+prefix = os.getenv('RM_PREFIX')
 
 
 class RoyalMail(Courier):

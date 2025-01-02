@@ -10,13 +10,9 @@ from app.logger import update_log
 # database
 from app.models import Countries, StateCodes, ForeignCharacters, ProductOptions
 
-
-prefix='TEST_'
-# prefix=''
-
-
 # load .env variables
 load_dotenv()
+prefix = os.getenv('PREFIX')
 api_base_url = os.getenv(f'{prefix}ODOO_API_BASE_URL')
 main_headers = {"api_key": os.getenv(f'{prefix}ODOO_API_KEY')}
 
@@ -290,10 +286,10 @@ def clean_data(data):
     }
     data['customer_pricelist'] = customer_translate.get(data['customer_pricelist'], data['customer_pricelist'])
 
-    # make shipping company empty string if these conditions are met
-    bad_vals = ['n/a', 'no', 'none', 'false']
-    if data['shipping_name'] == data['shipping_company'] or str(data['shipping_company']).strip().lower() in bad_vals:
-        data['shipping_company'] = ''
+    # make shipping company the same as the shiping name if it is in the bad vals list
+    bad_vals = ['n/a', 'no', 'none', 'false', '']
+    if str(data['shipping_company']).strip().lower() in bad_vals:
+        data['shipping_company'] = data['shipping_name']
 
     # strip any nonalphanumerical and non spaces out of the postcode
     if data['shipping_postcode']:
@@ -367,6 +363,10 @@ def clean_data(data):
         # set parcel insurance if it doesnt exist
         if line.get('parcel_insurance', '') == '':
             line['parcel_insurance'] = 0
+
+
+        # calculate the number of items actually wanted
+        line['qty_wanted'] = line['product_demand_qty'] - line['product_delivered_qty']
 
 
         # also need to update the lookup dict so later code can use it
@@ -452,21 +452,22 @@ def send_pack_message(shipper, data, tracking_number):
             'items': order_items
         }
 
-    print(payload)
     response = requests.post(url, headers=main_headers, json=payload)
     print(response.text)
+    #{"jsonrpc": "2.0", "id": null, "result": {"success": "Picking stage marked done"}}
 
 
 
 
 def send_ship_message(order_name, courier, tracking_no):
     # generate url
-    url = join_url(api_base_url, 'dwapi', 'v1', 'orders', order_name, 'ship')
+    url = join_url(api_base_url, 'dwapi', 'v1', 'order', order_name, 'ship')
+    print(url)
 
     # generate payload
     payload = {
         'tracking_ref': f'{courier}: {tracking_no}',
-        'comment': 'test',
+        'comment': f'This has been shipped.', # lewis
         'complete': True
     }
 

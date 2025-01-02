@@ -7,17 +7,17 @@
     "theme_color": "#232323",
     "icons": [
         {
-            "src": "/static/icons/driftworks_512x512.png",
+            "src": "/static/icons/driftworks/dw_512x512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "/static/icons/driftworks_192x192.png",
+            "src": "/static/icons/driftworks/dw_192x192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/static/icons/driftworks_48x48.png",
+            "src": "/static/icons/driftworks/dw_48x48.png",
             "sizes": "48x48",
             "type": "image/png"
         }
