@@ -1,18 +1,21 @@
+/* table */
 table {
     width: 100%;
     border-collapse: collapse;
 }
+
 th, td {
-    border: 1px solid rgba(221, 221, 221, 1);
+    border: 1px solid var(--off-white-1);
     padding: 8px;
 }
+
 tr:hover {
     background-color: var(--bg-color-2);
     cursor: pointer;
 }
 
 .highlighted-row {
-    border: 2px solid var(--dw-orange-1);
+    border: 3px solid var(--dw-orange-1);
     background-color: var(--bg-color-3);
 }
 
@@ -24,7 +27,7 @@ tr:hover {
 
 
 
-/* parcel needs a segment */
+/* parcel container */
 .parcel {
     background-color: var(--bg-color-2);
     border: 2px solid var(--dw-orange-1);

@@ -10,7 +10,7 @@
 - - Void shipment
 - Voiding in general
 - Auto report missing key vals
-- End of day shipping <!-- Held up by Odoo update -->
+- End of day shipping <!-- Held up by Odoo update --> <!-- Need to get the separate pick/pack differentiation sorted -->
 - Grey out commercial invoice that is done packed <!-- Held up by Odoo update -->
 - Quoting screen
 - - Customer to collect

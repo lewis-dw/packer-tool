@@ -9,7 +9,7 @@ table {
 }
 
 th, td {
-    border: 1px solid rgba(221, 221, 221, 1);
+    border: 1px solid var(--off-white-1);
     padding: 8px;
 }
 
@@ -55,7 +55,7 @@ tr:hover {
 }
 
 .small-input {
-    width: 50px;
+    width: 6ch;
 }
 
 #svg-container {

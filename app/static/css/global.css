@@ -11,6 +11,10 @@
     --bg-color-1: rgba(32, 33, 35, 1);
     --bg-color-2: rgba(43, 44, 47, 1);
     --bg-color-3: rgba(60, 61, 64, 1);
+
+    /* Other colours */
+    --off-white-1: rgba(221, 221, 221, 1);
+    --off-white-2: rgba(235, 235, 235, 1);
 }
 
 /* reset default styling */
@@ -50,7 +54,7 @@
 body {
     display: flex;
     background-color: var(--bg-color-1);
-    color: rgba(235, 235, 235, 1); /* Text colour */
+    color: var(--off-white-2); /* Text colour */
     font-family: 'Inter';
     height: 100vh;
     flex-direction: column;
@@ -73,11 +77,11 @@ h1 {
 }
 
 p {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 input {
-    font-size: 11px;
+    font-size: 19px;
 }
 
 textarea {

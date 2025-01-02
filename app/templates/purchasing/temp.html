@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Temp tool
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block header %}
+<div id="navbar-buttons">
+    <a href="/">
+        <button type="Button">Back to dashboard</button>
+    </a>
+</div>
+{% endblock %}
+
+{% block main %}
+<style>
+textarea {
+    height: 25rem;
+}
+</style>
+<body>
+    <h1>Paste in the text:</h1>
+    <form method="POST" action="{{ url_for('purchases.temp_tool') }}">
+        <p>
+            <textarea name="text">{{ text }}</textarea>
+        </p>
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if result %}
+    <h2>Result:</h2>
+    <textarea>{{ result }}</textarea>
+    {% endif %}
+</body>
+{% endblock %}

@@ -1,5 +1,5 @@
 # metadata variables
-__version__ = '1.14.6'  # semantic versioning: [MAJOR|MINOR|PATCH]
+__version__ = '1.14.7'  # semantic versioning: [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 
@@ -67,10 +67,12 @@ def register_blueprints(app):
     from app.default import default
     from app.orders import orders
     from app.shipping import shipping
+    from app.purchases import purchasing
 
     app.register_blueprint(default, url_prefix='/')
     app.register_blueprint(orders, url_prefix='/orders')
     app.register_blueprint(shipping, url_prefix='/shipping')
+    app.register_blueprint(purchasing, url_prefix='/purchases')
 
 
 def set_global_variables(app):

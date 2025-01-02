@@ -77,6 +77,15 @@ Dashboard
             </a>
         </div>
         {% endif %}
+
+        {% if role in ['admin', 'purchases'] %}
+        <div class="dashboard-icon">
+            <a href="{{ url_for('purchases.temp_tool') }}">
+                <img src="static/icons/shipper-icon.png" alt="___">
+                <p>Temp tool for Ash</p>
+            </a>
+        </div>
+        {% endif %}
     </div>
 </body>
 {% endblock %}
