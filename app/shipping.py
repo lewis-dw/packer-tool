@@ -376,6 +376,18 @@ def shipping_history():
 
 
 """
+This handles the result of user clicking an action button on the shipping history page
+"""
+@shipping.route('/order_action', methods=['POST'])
+def order_action():
+    action = request.form.get('action')
+    row_id = request.form.get('row-id')
+    print(row_id, action)
+    return redirect('/')
+
+
+
+"""
 This page completes the end of day shipping
 """
 @shipping.route('/end_of_day')
@@ -389,5 +401,5 @@ def end_of_day():
 
     # run through the results and log what happens to each one
     for row in result:
-        send_ship_message(row.order_name, row.courier, row.tracking_number)
+        send_ship_message(row.order_name, row.courier, row.tracking_number) # lewis <- add response from this function for error etc
     return redirect('/')

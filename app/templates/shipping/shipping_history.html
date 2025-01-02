@@ -7,6 +7,7 @@ Shipping History
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shipper.css') }}">
 <script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/shipping_history.js') }}" defer></script>
 {% endblock %}
 
 {% block header %}
@@ -53,7 +54,7 @@ Shipping History
             </thead>
             <tbody>
                 {% for row in history %}
-                <tr>
+                <tr onclick="rowClicked('{{ row.id }}')" data-row-id="{{ row.id }}">
                     <td>{{ row.order_name }}</td>
                     <td>{{ row.shipper }}</td>
                     <td>{{ row.processed_at }}</td>
@@ -74,6 +75,17 @@ Shipping History
         {% else %}
         <p>No shipping history</p>
         {% endif %}
+    </div>
+
+    <div>
+        <form method="POST" action="{{ url_for('shipping.order_action') }}">
+            <input type="hidden" id="row-id" name="row-id">
+            <input type="hidden" id="action" name="action">
+            <button type="submit" onclick="setAction('reprint_labels')">Reprint Labels</button>
+            <button type="submit" onclick="setAction('show_invoice')">Show commercial invoice</button>
+            <button type="submit" onclick="setAction('download_invoice')">Download commercial invoice</button>
+            <button type="submit" onclick="setAction('void_shipment')">Void shipment</button>
+        </form>
     </div>
 </body>
 {% endblock %}

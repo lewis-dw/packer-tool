@@ -11,6 +11,16 @@ tr:hover {
     cursor: pointer;
 }
 
+.highlighted-row {
+    border: 2px solid var(--dw-orange-1);
+    background-color: var(--bg-color-3);
+}
+
+.highlighted-row:hover {
+    background-color: var(--bg-color-3);
+}
+
+
 
 
 
