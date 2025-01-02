@@ -29,6 +29,8 @@ function populateShippers() {
 
 
 
+
+
 // Send an AJAX request to Flask backend to log the event
 function logEvent(logLoc, eventMessage) {
     fetch('/log_event', {
@@ -48,17 +50,24 @@ function logEvent(logLoc, eventMessage) {
 
 
 
-// Set a cookie
-function setCookie(name, value, days) {
-    let expires = "";
-    if (days) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
+
+
+// Set the dropdown to the current shipper on page load
+document.addEventListener("DOMContentLoaded", function() {
+    // First populate the shipper options
+    populateShippers();
+
+    // Then change the option currently selected
+    const currentShipper = getCookie("current_shipper");
+    if (currentShipper) {
+        const dropdown = document.getElementById('current-shipper');
+        dropdown.value = currentShipper;
     }
-    value = encodeURIComponent(value || "");
-    document.cookie = `${name}=${value};${expires};path=/`;
-}
+});
+
+
+
+
 
 // Update the current shipper cookie
 function updateShipper() {
@@ -69,26 +78,3 @@ function updateShipper() {
     // Log the shipper update event
     logEvent(`actions`, `Shipper updated to: ${selectedShipper}`);
 }
-
-
-
-// Get a cookie
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
-    return null;
-}
-
-// Set the dropdown to the current shipper on page load
-window.onload = function() {
-    // First populate the shipper options
-    populateShippers();
-
-    // Then change the option currently selected
-    const currentShipper = getCookie("current_shipper");
-    if (currentShipper) {
-        const dropdown = document.getElementById('current-shipper');
-        dropdown.value = currentShipper;
-    }
-};

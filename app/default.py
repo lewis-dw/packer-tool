@@ -13,7 +13,8 @@ Loading the main dashboard where user can switch between different options
 """
 @default.route('/')
 def index():
-    return render_template('dashboard.html')
+    user_role = request.cookies.get('user-role', 'shipping')
+    return render_template('dashboard.html', role=user_role)
 
 
 
@@ -36,16 +37,6 @@ def clear_session():
 
 
 
-"""
-Allows user to switch user roles
-"""
-@default.route('/switch_role', methods=['POST'])
-def switch_role():
-    new_role = request.form.get('user-role')
-    print(new_role)
-    return redirect('/')
-
-
 
 """
 For logging stuff via the js
@@ -58,6 +49,7 @@ def log_event():
         update_log.create_log_line(data['location'], data['event'])
         return '', 204
     return 'Missing data', 400
+
 
 
 

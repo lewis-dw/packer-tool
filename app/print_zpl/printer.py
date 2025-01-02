@@ -4,6 +4,7 @@ import json
 
 
 def friendly_translate(x):
+    # lewis <- putting my name here as a unique lookup to find this quickly
     # need to keep this lookup_dict up to date with:
     # - quote_result.html
     # - printer_info table

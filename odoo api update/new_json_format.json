@@ -1,0 +1,190 @@
+{
+    "jsonrpc": "2.0",
+    "id": null,
+    "result": {
+        "order_id": 126006,
+        "order_name": "S125999",
+        "order_state": "sale",
+        "picking_ids": [
+            47247
+        ],
+        "pick_id": "WH/PICK/13725", # NEW
+        "pack_id": "WH/PACK/13725", # NEW
+        "out_id": "WH/OUT/13725", # NEW
+        "picking_stage": "packed",
+        "customer_name": "Paul Howard",
+        "customer_telephone": "01409231887",
+        "customer_email": "steve@jdmgarageuk.com",
+        "customer_pricelist": "Public Pricelist",
+        "shipping_name": " Christian Reiber Ref #A323552730DE",
+        "shipping_company": "Paul Howard",
+        "shipping_street": "Unit 3, Dove Close",
+        "shipping_street2": "Fradley Park",
+        "shipping_locality": "LICHFIELD",
+        "shipping_region": false,
+        "shipping_postcode": "WS13 8UR",
+        "shipping_country": "United Kingdom",
+        "shipping_country_id": "GB",
+        "shipping_telephone": "01705287848",
+        "billing_company": "Paul Howard",
+        "billing_name": "Ben Sherwin",
+        "billing_street": "27 Overdale Road",
+        "billing_street2": false,
+        "billing_locality": "DERBY",
+        "billing_region": false,
+        "billing_postcode": "DE23 6AU",
+        "billing_country": "United Kingdom",
+        "billing_country_id": "GB",
+        "billing_telephone": "07745882193",
+        "billing_vat_id": false,
+        "order_carrier_name": "UPS",
+        "shipping_cost": 23.0,
+        "order_total": 23.0,
+        "order_total_tax": 4.6,
+        "order_total_inc_tax": 27.6,
+        "residual_amount": 100.0, # NEW
+        "picking_internal_note": "<p><br></p>",
+        "picking_customer_note": "",
+        "items": [
+            {
+                "picking_line_id": 94626,
+                "sale_product_id": 26785,
+                "is_kit": true,
+                "product_id": 11901,
+                "product_sku": "DW-S-SB03-04-BLK-NRE",
+                "product_name": "SB03-04",
+                "line_description": "Driftworks Toe Arms with Rod Ends For Nissan 200sx S13/180sx 88-97",
+                "product_demand_qty": 1.0,
+                "product_delivered_qty": 0.0,
+                "product_reserved_qty": 1.0,
+                "line_picking_state": "assigned",
+                "order_picking_state": "assigned"
+            },
+            {
+                "picking_line_id": 94627,
+                "sale_product_id": 26785,
+                "is_kit": true,
+                "product_id": 139,
+                "product_sku": "DW-ROSE-M16-RH",
+                "product_name": "Driftworks XM-Series Rod End M16x2mm - Right Hand Thread",
+                "line_description": "Driftworks Toe Arms with Rod Ends For Nissan 200sx S13/180sx 88-97",
+                "product_demand_qty": 2.0,
+                "product_delivered_qty": 0.0,
+                "product_reserved_qty": 2.0,
+                "line_picking_state": "assigned",
+                "order_picking_state": "assigned"
+            },
+            {
+                "picking_line_id": 94628,
+                "sale_product_id": 25929,
+                "is_kit": true,
+                "product_id": 11901,
+                "product_sku": "DW-S-SB03-04-BLK-NRE",
+                "product_name": "SB03-04",
+                "line_description": "Driftworks Toe Arms with Rod Ends For Nissan Skyline R33 93-98",
+                "product_demand_qty": 1.0,
+                "product_delivered_qty": 0.0,
+                "product_reserved_qty": 1.0,
+                "line_picking_state": "assigned",
+                "order_picking_state": "assigned"
+            },
+            {
+                "picking_line_id": 94629,
+                "sale_product_id": 25929,
+                "is_kit": true,
+                "product_id": 139,
+                "product_sku": "DW-ROSE-M16-RH",
+                "product_name": "Driftworks XM-Series Rod End M16x2mm - Right Hand Thread",
+                "line_description": "Driftworks Toe Arms with Rod Ends For Nissan Skyline R33 93-98",
+                "product_demand_qty": 1.0,
+                "product_delivered_qty": 0.0,
+                "product_reserved_qty": 1.0,
+                "line_picking_state": "assigned",
+                "order_picking_state": "assigned"
+            },
+            {
+                "picking_line_id": 94630,
+                "sale_product_id": 25929,
+                "is_kit": true,
+                "product_id": 65,
+                "product_sku": "DW-S-ARMS-TOERODCOLLET",
+                "product_name": "S14/S15 Toe Rod collets",
+                "line_description": "Driftworks Toe Arms with Rod Ends For Nissan Skyline R33 93-98",
+                "product_demand_qty": 2.0,
+                "product_delivered_qty": 0.0,
+                "product_reserved_qty": 2.0,
+                "line_picking_state": "assigned",
+                "order_picking_state": "assigned"
+            }
+        ],
+        "commercial_invoice_lines": [
+            {
+                "product_id": 26785,
+                "product_sku": "DW-K-ARMS-SB03-04-BLK-M16R-S13",
+                "shippable": true, # NEW
+                "commodity_code": "87088099",
+                "country_of_manufacture": "Taiwan",
+                "product_name": "Driftworks Toe Arms with Rod Ends For Nissan 200sx S13/180sx 88-97",
+                "line_description": "Driftworks Toe Arms with Rod Ends For Nissan 200sx S13/180sx 88-97",
+                "product_demand_qty": 1.0,
+                "product_packed_qty": 0.0, # NEW
+                "product_delivered_qty": 0.0,
+                "product_type": "Adjustable Arms",
+                "unit_price": 0.0,
+                "line_price": 0.0,
+                "unit_weight": 3.0,
+                "line_weight": 3.0,
+                "product_height": 14.0,
+                "product_width": 7.0,
+                "product_length": 44.0,
+                "product_volume": 4312.0,
+                "line_volume": 4312.0
+            },
+            {
+                "product_id": 25929,
+                "product_sku": "DW-K-ARMS-SB03-04-BLK-M16R-R33",
+                "shippable": true, # NEW
+                "commodity_code": "87088099",
+                "country_of_manufacture": "Taiwan",
+                "product_name": "Driftworks Toe Arms with Rod Ends For Nissan Skyline R33 93-98",
+                "line_description": "Driftworks Toe Arms with Rod Ends For Nissan Skyline R33 93-98",
+                "product_demand_qty": 1.0,
+                "product_packed_qty": 0.0, # NEW
+                "product_delivered_qty": 0.0,
+                "product_type": "Adjustable Arms",
+                "unit_price": 0.0,
+                "line_price": 0.0,
+                "unit_weight": 3.0,
+                "line_weight": 3.0,
+                "product_height": 14.0,
+                "product_width": 7.0,
+                "product_length": 44.0,
+                "product_volume": 4312.0,
+                "line_volume": 4312.0
+            },
+            {
+                "product_id": 45855,
+                "product_sku": false,
+                "shippable": false, # NEW
+                "commodity_code": "",
+                "country_of_manufacture": "",
+                "product_name": "UPS",
+                "line_description": "UPS",
+                "product_demand_qty": 1.0,
+                "product_packed_qty": 0.0, # NEW
+                "product_delivered_qty": 0.0,
+                "product_type": "",
+                "unit_price": 23.0,
+                "line_price": 23.0,
+                "unit_weight": 0.0,
+                "line_weight": 0.0,
+                "product_height": 0.0,
+                "product_width": 0.0,
+                "product_length": 0.0,
+                "product_volume": 0.0,
+                "line_volume": 0.0
+            }
+        ],
+        "customer_notes": ""
+    }
+}

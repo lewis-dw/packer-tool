@@ -15,48 +15,68 @@ Dashboard
 <body>
     <h1>Dashboard</h1>
     <div role="listbox" class="dashboard-options">
+        {% if role in ['admin', 'shipping'] %}
         <div class="dashboard-icon">
             <a href="{{ url_for('orders.all_orders') }}">
                 <img src="static/icons/scraper-icon.png" alt="___">
                 <p>List Orders</p>
             </a>
         </div>
+        {% endif %}
+
+        {% if role in ['admin', 'shipping'] %}
         <div class="dashboard-icon">
             <a href="{{ url_for('orders.manual_search', action='search_order') }}">
                 <img src="static/icons/search-icon.png" alt="___">
                 <p>Search Order</p>
             </a>
         </div>
+        {% endif %}
+
+        {% if role in ['admin', 'shipping'] %}
         <div class="dashboard-icon">
             <a href="{{ url_for('orders.manual_search', action='reprint_label') }}">
                 <img src="static/icons/search-icon.png" alt="___">
                 <p>Reprint Labels</p>
             </a>
         </div>
+        {% endif %}
+
+        {% if role in ['admin', 'shipping'] %}
         <div class="dashboard-icon">
             <a href="{{ url_for('orders.manual_search', action='get_invoice') }}">
                 <img src="static/icons/search-icon.png" alt="___">
                 <p>Get invoice</p>
             </a>
         </div>
+        {% endif %}
+
+        {% if role in ['admin', 'shipping'] %}
         <div class="dashboard-icon">
             <a href="{{ url_for('shipping.shipping_history') }}">
                 <img src="static/icons/shipper-icon.png" alt="___">
                 <p>Shipping History</p>
             </a>
         </div>
+        {% endif %}
+
+        {% if role in ['admin', 'shipping'] %}
         <div class="dashboard-icon">
             <a href="{{ url_for('shipping.end_of_day') }}">
                 <img src="static/icons/shipper-icon.png" alt="___">
                 <p>End of day shipping</p>
             </a>
         </div>
+        {% endif %}
+
+        {% if role in ['admin'] %}
         <div class="dashboard-icon">
             <a href="{{ url_for('orders.display_order') }}">
                 <img src="static/icons/shipper-icon.png" alt="___">
                 <p>Show Order</p>
             </a>
         </div>
+        {% endif %}
     </div>
 </body>
 {% endblock %}
