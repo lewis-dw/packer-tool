@@ -11,7 +11,9 @@
 - Voiding in general
 - Auto report missing key vals
 - End of day shipping <!-- Held up by Odoo update --> <!-- Need to get the separate pick/pack differentiation sorted -->
-- Grey out commercial invoice that is done packed <!-- Held up by Odoo update -->
+- Order stuff
+- - Grey out commercial invoice that is done packed on order screen <!-- Held up by Odoo update -->
+- - Commercial invoice should not include the greyed out ones which stems from this section
 - Quoting screen
 - - Customer to collect
 - - Export via 3rd party

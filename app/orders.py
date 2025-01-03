@@ -1,8 +1,15 @@
+import os
+import pathlib
+import json
 from flask import Blueprint, request, redirect, render_template, session, url_for, jsonify
 from app.odoo.api import get_orders, get_specific_order, clean_data
 from app.clickup.api import create_task
 from app.logger import update_log
 from app.models import Countries, CountryFlags, CommodityCodes
+
+# debug output
+cur_dir = pathlib.Path(__file__).parent
+debug_dir = os.path.abspath(os.path.join(cur_dir, '..', 'debugging'))
 
 """
 These routes are used for when getting orders from odoo
@@ -255,7 +262,7 @@ def save_order():
             # this is for the following if statement to combine 2 similar statements into 1
             lookup_dict = {
                 'line': 'commercial_invoice_lines',
-                'item': 'order_items'
+                'item': 'pack_items'
             }
 
             # parse commercial invoice line or the order item line
@@ -295,6 +302,9 @@ def save_order():
 
         # if all required fields were entered then redirect user
         else:
+            # dump the saved order for debugging
+            with open(os.path.join(debug_dir, 'orders', 'current_order.json'), 'w') as f:
+                json.dump(data, f, indent=4)
             return redirect(url_for('shipping.create_parcels'))
     else:
         return redirect('/')

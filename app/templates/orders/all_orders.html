@@ -36,7 +36,8 @@ All Orders
         <thead>
             <tr>
                 <th>Order ID</th>
-                <th>Pick Name</th>
+                <th>Pick Name(s)</th>
+                <th>Pack Name</th>
                 <th>Shipping Name</th>
                 <th>Shipping Carrier</th>
                 <th>Shipping Cost</th>
@@ -48,18 +49,19 @@ All Orders
 
         <!-- For each order display the content in each row -->
         <tbody>
-        {% for order in orders %}
+            {% for order in orders %}
             <tr onclick="rowClicked('{{ order.order_name }}')">
                 <td>{{ order.order_name }}</td>
-                <td>{{ order.picking_names }}</td>
+                <td>{{ order.pick_names }}</td>
+                <td>{{ order.to_pack }}</td>
                 <td>{{ order.shipping_name }}</td>
-                <td>{{ order.order_carrier_name }}</td>
+                <td>{{ order.order_carrier_name or '' }}</td>
                 <td>{{ order.shipping_cost }}</td>
                 <td>{{ order.order_total_inc_tax }}</td>
                 <td>{{ order.picking_internal_note | strip_html }}</td>
                 <td>{{ order.picking_customer_note | strip_html }}</td>
             </tr>
-        {% endfor %}
+            {% endfor %}
         </tbody>
     </table>
 </body>

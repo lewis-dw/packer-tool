@@ -245,7 +245,7 @@
                     <div id="items-info">
                         <h2>Items Info</h2>
 
-                        {% for item in order.order_items %}
+                        {% for item in order.pack_items %}
                         <div class="default-segment">
                             <p><strong>Product SKU: </strong>{{ item.product_sku or '' }}</p>
                             <p><strong>Parent SKU: </strong>{{ item.parent_sku or '' }}</p>

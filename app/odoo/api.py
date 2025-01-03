@@ -17,7 +17,7 @@ api_base_url = os.getenv(f'{prefix}ODOO_API_BASE_URL')
 main_headers = {"api_key": os.getenv(f'{prefix}ODOO_API_KEY')}
 
 
-# vars
+# debug output
 cur_dir = pathlib.Path(__file__).parent
 debug_dir = os.path.abspath(os.path.join(cur_dir, '..', '..', 'debugging'))
 
@@ -49,10 +49,10 @@ def get_valid_orders(content):
     # loop over the content and check if the order wants to be completed
     valid_orders = []
     for order in content:
-        status = order.get('picking_stage', 'no')
+        has_pack = order.get('to_pack', None)
 
-        # if the status wants to be processed then add it to the valid_orders list
-        if status not in ['no', 'waiting', 'packed']:
+        # based on these conditions determine if the order is valid
+        if has_pack:
             valid_orders.append(order)
     return valid_orders
 
@@ -61,7 +61,7 @@ def get_orders():
     """Request all current orders and return the first one that wants to be processed."""
 
     # build url and query it
-    url = join_url(api_base_url, 'dwapi', 'orders')
+    url = join_url(api_base_url, 'dwapi', 'v1', 'orders')
     res = requests.get(url, headers=main_headers, json={})
     data = res.json()
 
@@ -98,7 +98,7 @@ def get_specific_order(order_id):
     """Search for a specific order id and return all the data"""
 
     # build url and query it
-    url = join_url(api_base_url, 'dwapi', 'order', order_id)
+    url = join_url(api_base_url, 'dwapi', 'v1', 'order', order_id)
     res = requests.get(url, headers=main_headers, json={})
     data = res.json()
 
@@ -126,28 +126,6 @@ def get_specific_order(order_id):
 
 ###########################################################################################################################################
 # Helper functions for cleaning order data
-
-
-def parse_product_description(description):
-    product_options = []
-    if description:
-        # first replace all newlines with a custom separator, then split by that separator
-        description = re.sub(r'\n+', '\n', description).replace('\n', '~DW~')
-        description = description.split('~DW~')
-        
-        # loop over the desc pieces and find the data we want
-        for piece in description:
-            if 'Option Price' in piece: # should always be present
-                # extract the data we want and clean it up before adding to the product options
-                piece = piece.split('Option Price')[0].strip(' -')
-                description_translate = ProductOptions.get_replacers()
-                for find, repl in description_translate:
-                    piece = piece.replace(find, repl)
-                product_options.append(piece)
-    return product_options
-
-
-
 
 
 def get_eircode(postcode):
@@ -210,6 +188,7 @@ def us_commodity_code_check(code, name):
 
 
 
+
 def clean_string(s, foreign_translate):
     # init vars
     valid_chars = ''.join([
@@ -236,6 +215,54 @@ def clean_string(s, foreign_translate):
 
     # return the cleaned string and the number of replacements made
     return rebuild_string, replacement_counter, bad_chars
+
+
+
+
+def parse_product_description(description):
+    product_options = []
+    if description:
+        # first replace all newlines with a custom separator, then split by that separator
+        description = re.sub(r'\n+', '\n', description).replace('\n', '~DW~')
+        description = description.split('~DW~')
+        
+        # loop over the desc pieces and find the data we want
+        for piece in description:
+            if 'Option Price' in piece: # should always be present
+                # extract the data we want and clean it up before adding to the product options
+                piece = piece.split('Option Price')[0].strip(' -')
+                description_translate = ProductOptions.get_replacers()
+                for find, repl in description_translate:
+                    piece = piece.replace(find, repl)
+                product_options.append(piece)
+    return product_options
+
+
+def filter_valid_commercial(data):
+    # lewis - also change data to be vvvvvvvv so i only need to pass that list in
+    commercial_lines = data['commercial_invoice_lines']
+    valid_lines = []
+    for line in commercial_lines:
+        if line['product_name'] != data['order_carrier_name']: # lewis <- this needs to be changed post odoo api update to filter the shipping/discount crap
+            valid_lines.append(line)
+        else:
+            continue
+    return valid_lines
+
+
+def split_commercial_invoice(commercial_lines, pack_items):
+    # create a set of each unique sale product id from the pack items
+    sale_product_ids = {str(item["sale_product_id"]) for item in pack_items}
+
+    # separate commercial_invoice_lines into two lists
+    wanted = []
+    unwanted = []
+    for line in commercial_lines:
+        if str(line["product_id"]) in sale_product_ids:
+            wanted.append(line)
+        else:
+            unwanted.append(line)
+    return wanted, unwanted
 
 
 ###########################################################################################################################################
@@ -336,23 +363,24 @@ def clean_data(data):
 
 
 
-    """ Commercial Invoice """
+    """ Commercial Invoice and Items"""
+    # first i need only the valid commercial invoice lines and i also want to extract the correct items to pack as a separate key
+    # commercial_invoice_lines = filter_valid_commercial(data['commercial_invoice_lines']) # uncomment when i get what i want form odoo api update
+    commercial_invoice_lines = filter_valid_commercial(data)
+    data['pack_items'] = data['order_items']['pack']
+
+    # then i want to split the commercial invoice items
+    wanted_commercial_invoice, unwanted_commercial_invoice = split_commercial_invoice(commercial_invoice_lines, data['pack_items'])
+
+
     # loop over commerical invoice items and clean them up
-    commercial_invoice = []
     needs_a_hand = []
     lookup_commercial = {}
-    for line in data['commercial_invoice_lines']:
+    for line in wanted_commercial_invoice:
         """
         This code here needs to be updated when we change the format we get our odoo orders back as, this should be used as a backup for compatibility with old orders.
         They will likely be fine though as the shipping items we want to set as 'False shippable' will also update for them too
         """
-        # need to remove the shipping method from the commercial invoice
-        if line['product_name'] != data['order_carrier_name']:
-            commercial_invoice.append(line)
-        else:
-            continue
-
-
         # need to extract the product options from the product description
         line['product_options'] = parse_product_description(line['line_description'])
 
@@ -376,28 +404,26 @@ def clean_data(data):
             line['parcel_insurance'] = 0
 
 
-        # calculate the number of items actually wanted
-        line['qty_wanted'] = line['product_demand_qty'] - line['product_delivered_qty'] # lewis
-        " This is incomplete i havent worked out what i want to do with qty wanted "
-
-
         # also need to update the lookup dict so later code can use it
         lookup_commercial[str(line['product_id'])] = {
             'sku': line['product_sku'],
             'demand_qty': line['product_demand_qty'] # lewis - remember if i want this to be qty wanted etc post odoo update
         }
-    data['commercial_invoice_lines'] = commercial_invoice
-    data['needs_a_hand'] = needs_a_hand
+
+    data['commercial_invoice_lines'] = wanted_commercial_invoice # re-assign the commercial invoice key to the cleaned and valid lines
+    data['unwanted_commercial_invoice_lines'] = unwanted_commercial_invoice # still store the unwanted ones because why not, you cant stop me
+    data['needs_a_hand'] = needs_a_hand # add in the commercial invoice items that need a hand from the user
 
 
 
     """ Order Items """
     # loop over pack items and find the parent sku
-    for line in data['order_items']:
-        parent_product = lookup_commercial[str(line['sale_product_id'])]
-        line['parent_sku'] = parent_product['sku']
-        line['product_options'] = parse_product_description(line['line_description'])
-        line['per_one_parent'] = line['product_demand_qty'] / parent_product['demand_qty']
+    items = data['pack_items']
+    # for item in items:
+    #     parent_product = lookup_commercial[str(line['sale_product_id'])]
+    #     line['parent_sku'] = parent_product['sku']
+    #     line['product_options'] = parse_product_description(line['line_description'])
+    #     line['per_one_parent'] = line['product_demand_qty'] / parent_product['demand_qty']
 
 
     # return a successful clean
@@ -449,7 +475,7 @@ def send_pack_message(shipper, data, tracking_number):
     pack_id = data['picking_names']
     done_items = create_message(data['commercial_invoice_lines'])
     n_kits_done = count_items_done(data['commercial_invoice_lines'])
-    order_items = parse_items(data['order_items'])
+    pack_items = parse_items(data['pack_items'])
 
     # generate payload
     if n_kits_done == 0:
@@ -461,7 +487,7 @@ def send_pack_message(shipper, data, tracking_number):
         payload = {
             'comment': f'IBAM2001: {shipper} has packed {n_kits_done} of {pack_id}<br>Items: {done_items}<br>Tracking Number: {tracking_number}',
             'complete': False,
-            'items': order_items
+            'items': pack_items
         }
 
     response = requests.post(url, headers=main_headers, json=payload)

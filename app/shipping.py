@@ -232,7 +232,7 @@ def select_method():
         for label_id, label_dict in enumerate(labels):
             # send the zpl data to the print server
             # server_name and printer_name were found earlier
-            # print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data']) # lewis
+            # print_res = printer.send_zpl_to_server(server_name, printer_name, label_dict['label_data']) # lewis <- comment this for no printing
             print_res = {
                 'state': 'Success'
             }
