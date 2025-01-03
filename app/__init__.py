@@ -1,5 +1,5 @@
 # metadata variables
-__version__ = '1.15.0'  # semantic versioning: [MAJOR|MINOR|PATCH]
+__version__ = '1.15.1'  # semantic versioning: [MAJOR|MINOR|PATCH]
 __author__ = 'Lewis Rumsby'
 __email__ = 'lewis@driftworks.com'
 

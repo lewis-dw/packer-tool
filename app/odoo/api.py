@@ -363,7 +363,7 @@ def clean_data(data):
 
 
 
-    """ Commercial Invoice and Items"""
+    """ Commercial Invoice """
     # first i need only the valid commercial invoice lines and i also want to extract the correct items to pack as a separate key
     # commercial_invoice_lines = filter_valid_commercial(data['commercial_invoice_lines']) # uncomment when i get what i want form odoo api update
     commercial_invoice_lines = filter_valid_commercial(data)
@@ -404,6 +404,11 @@ def clean_data(data):
             line['parcel_insurance'] = 0
 
 
+        # calculate the number of items actually wanted
+        line['qty_wanted'] = line['product_demand_qty'] - line['product_delivered_qty'] # lewis
+        " This is incomplete i havent worked out what i want to do with qty wanted "
+
+
         # also need to update the lookup dict so later code can use it
         lookup_commercial[str(line['product_id'])] = {
             'sku': line['product_sku'],
@@ -415,15 +420,18 @@ def clean_data(data):
     data['needs_a_hand'] = needs_a_hand # add in the commercial invoice items that need a hand from the user
 
 
+    """ Pack Items """
+    # loop over pack items
+    for item in data['pack_items']:
+        # find the parent sku
+        parent_product = lookup_commercial[str(item['sale_product_id'])]
+        item['parent_sku'] = parent_product['sku']
 
-    """ Order Items """
-    # loop over pack items and find the parent sku
-    items = data['pack_items']
-    # for item in items:
-    #     parent_product = lookup_commercial[str(line['sale_product_id'])]
-    #     line['parent_sku'] = parent_product['sku']
-    #     line['product_options'] = parse_product_description(line['line_description'])
-    #     line['per_one_parent'] = line['product_demand_qty'] / parent_product['demand_qty']
+        # parse product options
+        item['product_options'] = parse_product_description(item['line_description'])
+
+        # calculate the n of items per 1 parent product
+        item['per_one_parent'] = item['product_demand_qty'] / parent_product['demand_qty']
 
 
     # return a successful clean

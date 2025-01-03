@@ -38,35 +38,42 @@ Quote Result
 <body>
     <h1>Quoted [{{ data.order_id }}] to {{ data.country_to }}</h1>
 
-    <p>Customer paid: £{{ data.shipping_cost or '0.0' }}</p>
-
     <div>
-        <h2>Quotes</h2>
+        <h2>Quote Result</h2>
         {{ data.quote_content | safe }}
     </div>
 
+    {% if data.error_content %}
     <div>
         <h2>Errors</h2>
         {{ data.error_content | safe }}
     </div>
+    {% endif %}
 
+    <br>
 
-    <!-- this form handles the info on which row is selected -->
-    <form method="POST" action="{{ url_for('shipping.select_method') }}">
-        <input type="hidden" id="courier" name="courier">
-        <input type="hidden" id="shipping-code" name="shipping-code">
-        <input type="hidden" id="sat-indicator" name="sat-indicator">
-        <input type="hidden" id="cost" name="cost">
+    <div>
+        <h2>Ship</h2>
+        <p>Select a row and printer location before pressing GO</p>
 
-        <!-- need to keep these options up to date with what is available -->
-        <!-- lewis <- putting my name here as a unique lookup to find this quickly -->
-        <select id="printer-loc" name="printer-loc">
-            <option value="loc-1">Main Room</option>
-            <option value="loc-2">Josh Area</option>
-        </select>
+        <!-- this form handles the info on which row is selected -->
+        <form method="POST" action="{{ url_for('shipping.select_method') }}">
+            <input type="hidden" id="courier" name="courier">
+            <input type="hidden" id="shipping-code" name="shipping-code">
+            <input type="hidden" id="sat-indicator" name="sat-indicator">
+            <input type="hidden" id="cost" name="cost">
 
-        <button type="submit" onclick="return chooseMethod()">GO</button>
-    </form>
+            <!-- need to keep these options up to date with what is available -->
+            <!-- lewis <- putting my name here as a unique lookup to find this quickly -->
+            <label for="printer-loc"><strong>Printer location: </strong></label>
+            <select id="printer-loc" name="printer-loc">
+                <option value="loc-1">Main Room</option>
+                <option value="loc-2">Josh Area</option>
+            </select>
+
+            <button type="submit" onclick="return chooseMethod()">GO</button>
+        </form>
+    </div>
 
 
     <!-- loading gif div -->

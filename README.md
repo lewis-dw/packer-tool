@@ -47,3 +47,8 @@ Combined functionality of the scraper tool and the shipper tool.
 
 - User can now search for an order name and reprint labels based on that
 - User can also search for an order name and view/download commercial invoice based on that
+
+### 03-01-2025 - v1.15
+
+- Can't remember what happened in 1.14
+- Moved to work with correct DWAPI url (v1), will be moving to v2 when it is up

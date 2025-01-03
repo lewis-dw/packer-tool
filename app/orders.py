@@ -192,6 +192,10 @@ def load_order():
     # once the data is all cleaned and stuff we want to clear the current session data and save the data
     session.pop('order_data', None)
     session['order_data'] = data
+
+    # dump the saved order for debugging
+    with open(os.path.join(debug_dir, 'orders', 'current_order.json'), 'w') as f:
+        json.dump(data, f, indent=4)
     return redirect(url_for('orders.display_order'))
 
 
@@ -229,6 +233,7 @@ def save_order():
     # these are the key cols that are not allowed to be empty
     key_cols = {
         # shipping info
+        'shipping_name': '',
         'shipping_street': '',
         'shipping_postcode': '',
 

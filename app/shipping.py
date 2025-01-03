@@ -130,7 +130,7 @@ def quote_result():
 
 
         # parse the quote results then display to the user
-        quote_content, error_content = shipping_functions.parse_quotes({'quotes':all_quotes, 'errors':all_errors})
+        quote_content, error_content = shipping_functions.parse_quotes({'quotes':all_quotes, 'errors':all_errors}, data['shipping_cost'])
         data = {
             'order_id': data['order_name'],
             'country_to': data['shipping_country'],

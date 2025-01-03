@@ -27,8 +27,8 @@ tr:hover {
 
 
 
-/* parcel container */
-.parcel {
+/* generic container */
+.generic-container {
     background-color: var(--bg-color-2);
     border: 2px solid var(--dw-orange-1);
     border-radius: 10px;

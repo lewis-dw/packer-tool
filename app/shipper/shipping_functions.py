@@ -85,7 +85,7 @@ def get_shipping_date(end_time, days_penalty, date_format):
 
 
 
-def parse_quotes(data):
+def parse_quotes(data, customer_paid):
     """
     Just parses through the quotes and errors to format it into something displayable
     """
@@ -121,7 +121,7 @@ def parse_quotes(data):
 
         quote_content = ''.join([
             '<table>',
-            '<thead><tr><th>Courier</th><th>Method</th><th>Cost</th></tr></thead>',
+            f'<thead><tr><th>Courier</th><th>Method</th><th>Cost<br>(Customer paid: £{customer_paid:.2f})</th></tr></thead>',
             '<tbody>',
             ''.join(table_html),
             '</tbody></table>',
@@ -152,6 +152,6 @@ def parse_quotes(data):
             '</tbody></table>',
         ])
     else:
-        error_content = '<p>No errors during quoting</p>'
+        error_content = ''
 
     return quote_content, error_content
