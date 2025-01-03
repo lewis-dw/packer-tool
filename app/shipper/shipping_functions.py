@@ -99,7 +99,7 @@ def parse_quotes(data):
 
         # loop over the quotes after sorting and build up a html table
         table_html = []
-        for quote in quotes:
+        for row_id, quote in enumerate(quotes):
             # extract data
             courier = html.escape(quote['courier'].upper())
             shipping_code = html.escape(quote['shipping_code'])
@@ -110,8 +110,9 @@ def parse_quotes(data):
             friendly_code = ShippingCodes.get_friendly_code(shipping_code, sat_indicator)
 
             # construct table line and log to success
+            func_in = f"'{row_id}', '{courier}', '{shipping_code}', '{sat_indicator}', '{cost}'"
             html_row = ''.join([
-                f'<tr onclick="rowClicked(\'{courier}\', \'{shipping_code}\', \'{sat_indicator}\', \'{cost}\')">',
+                f'<tr onclick="rowClicked({func_in})" data-row-id="{row_id}">',
                 f'<td>{courier}</td><td>{friendly_code}</td><td>{cost}</td>',
                 '</tr>'
             ])

@@ -80,18 +80,15 @@ def get_order_id():
                 # Redirect directly to the desired URL
                 return redirect(url_for('orders.load_order'))
 
-
         # redirect to the reprint label page to handle this request
         elif action == 'reprint_label':
             return redirect(url_for('shipping.reprint_label', order_id=order_id))
-
 
         # redirect to the commercial invoice page to handle this request
         elif action == 'get_invoice':
             return redirect(url_for('shipping.get_invoice', order_id=order_id))
 
-
-        # not sure how the user would trigger this but we need to catch it before we continue
+        # redirect user if they try access this page without an action
         else:
             return redirect('/')
 
@@ -153,7 +150,7 @@ def load_order():
                     return redirect(url_for('orders.user_intervention'))
 
             else:
-                print(result['value'])
+                print(result['value']) # lewis
                 return redirect('/')
 
     # alternatively if the method to access this page was via a post request,
@@ -183,11 +180,6 @@ def load_order():
             # update state code if it exists
             if request.form.get('state_code'):
                 data['shipping_statecode'] = request.form.get('state_code')
-
-
-    # not sure how the user would trigger this but we need to catch it before we continue
-    else:
-        return redirect('/')
 
 
     # once the data is all cleaned and stuff we want to clear the current session data and save the data

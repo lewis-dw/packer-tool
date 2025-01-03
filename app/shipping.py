@@ -151,15 +151,15 @@ def quote_result():
 """
 This page handles the user selecting a shipping method from the quote page
 """
-@shipping.route('/select_method')
+@shipping.route('/select_method', methods=['POST'])
 def select_method():
     # get the args and set vars
     data = session.get('order_data', {})
-    courier = request.args.get('courier').upper()
-    shipping_code = request.args.get('shipping_code')
-    sat_indicator = request.args.get('sat_indicator')
-    dw_paid = request.args.get('cost')
-    printer_loc = request.args.get('printer_loc')
+    courier = request.form.get('courier').upper()
+    shipping_code = request.form.get('shipping-code')
+    sat_indicator = request.form.get('sat-indicator')
+    dw_paid = request.form.get('cost')
+    printer_loc = request.form.get('printer-loc')
     shipper = request.cookies.get('current_shipper')
 
 
@@ -291,15 +291,10 @@ def reprint_label():
     elif request.method == 'POST':
         for key, _ in request.form.items():
             # get the zpl data from the label id and send a print request to the print server
-            zpl_data = Labels.get_zpl_data(key)
+            zpl_data = Labels.get_zpl_via_label_id(key)
             res = printer.send_zpl_to_server('LOGISTICS', 'UPS', zpl_data)
             if res['state'] == 'Error':
                 update_log.create_log_line('results', res['value'])
-        return redirect('/')
-
-
-    # not sure how the user would trigger this but we need to catch it before we continue
-    else:
         return redirect('/')
 
 
@@ -329,7 +324,7 @@ def get_invoice():
         # get the commercial invoice by row id
         row_id = request.form.get('row_id')
         action = request.form.get('action')
-        order_name, commercial_invoice = ShippingHistory.search_row_id(row_id)
+        order_name, commercial_invoice, _ = ShippingHistory.search_row_id(row_id)
 
         # wrap the pdf data in a BytesIO object
         pdf_data = BytesIO(commercial_invoice)
@@ -355,11 +350,6 @@ def get_invoice():
             )
 
 
-    # not sure how the user would trigger this but we need to catch it before we continue
-    else:
-        return redirect('/')
-
-
 
 
 
@@ -383,6 +373,15 @@ def order_action():
     action = request.form.get('action')
     row_id = request.form.get('row-id')
     print(row_id, action)
+
+    if action == '':
+        # search for the tracking number of the row selected then all zpl labels for that tracking_number
+        _, _, tracking_number = ShippingHistory.search_row_id(row_id)
+        zpl_labels = Labels.get_zpl_via_tracking_no(tracking_number)
+
+        # print off the labels
+        for zpl_data in zpl_labels:
+            print(zpl_data)
     return redirect('/')
 
 

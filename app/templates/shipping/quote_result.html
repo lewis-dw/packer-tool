@@ -7,6 +7,7 @@ Quote Result
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shipper.css') }}">
 <script src="{{ url_for('static', filename='js/shipper_switch.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/select_quote_Result.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/show_loading_gif.js') }}" defer></script>
 {% endblock %}
 
@@ -42,6 +43,20 @@ Quote Result
     <div>
         <h2>Quotes</h2>
         {{ data.quote_content | safe }}
+    </div>
+
+    <div>
+        <h2>Errors</h2>
+        {{ data.error_content | safe }}
+    </div>
+
+
+    <!-- this form handles the info on which row is selected -->
+    <form method="POST" action="{{ url_for('shipping.select_method') }}">
+        <input type="hidden" id="courier" name="courier">
+        <input type="hidden" id="shipping-code" name="shipping-code">
+        <input type="hidden" id="sat-indicator" name="sat-indicator">
+        <input type="hidden" id="cost" name="cost">
 
         <!-- need to keep these options up to date with what is available -->
         <!-- lewis <- putting my name here as a unique lookup to find this quickly -->
@@ -49,12 +64,9 @@ Quote Result
             <option value="loc-1">Main Room</option>
             <option value="loc-2">Josh Area</option>
         </select>
-    </div>
 
-    <div>
-        <h2>Errors</h2>
-        {{ data.error_content | safe }}
-    </div>
+        <button type="submit" onclick="return setAction('choose_method')">GO</button>
+    </form>
 
 
     <!-- loading gif div -->
@@ -65,26 +77,4 @@ Quote Result
         </div>
     </div>
 </body>
-<script>
-    function rowClicked(courier, shipping_code, sat_indicator, cost) {
-        // needs 
-        showGif()
-
-        // Get values
-        const baseUrl = "{{ url_for('shipping.select_method')}}";
-        const printerLoc = document.getElementById('printer-loc').value;
-
-        // Build the query params with encoding
-        const queryParams = new URLSearchParams({
-            courier: courier,
-            shipping_code: shipping_code,
-            sat_indicator: sat_indicator,
-            cost: cost,
-            printer_loc: printerLoc
-        }).toString();
-
-        // Redirect with the query params
-        window.location.href = `${baseUrl}?${queryParams}`;
-    }
-</script>
 {% endblock %}

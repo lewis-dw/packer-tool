@@ -1,12 +1,14 @@
-// THIS IS FROM SHIPPING HISTORY
-// I NEED TO MERGE THEM
 let selectedRowId = null;
 
 // Function to handle row click
-function rowClicked(rowId) {
-    // update hidden input
-    selectedRowId = rowId;
-    document.getElementById('row-id').value = rowId; // Update hidden input
+function rowClicked(rowID, courier, shipping_code, sat_indicator, cost) {
+    // update hidden values
+    selectedRowId = rowID;
+    document.getElementById('courier').value = courier;
+    document.getElementById('shipping-code').value = shipping_code;
+    document.getElementById('sat-indicator').value = sat_indicator;
+    document.getElementById('cost').value = cost;
+
 
     // remove any previously selected row
     const previouslySelectedRow = document.querySelector('.highlighted-row');
@@ -15,7 +17,7 @@ function rowClicked(rowId) {
     }
 
     // add the highlight to the clicked row
-    const currentRow = document.querySelector(`[data-row-id="${rowId}"]`);
+    const currentRow = document.querySelector(`[data-row-id="${rowID}"]`);
     if (currentRow) {
         currentRow.classList.add('highlighted-row');
     }
@@ -23,35 +25,15 @@ function rowClicked(rowId) {
 
 // Function to handle button click
 function setAction(actionType) {
+    // save the action type pressed
+    document.getElementById('action').value = actionType;
+
+    // alert user if no row is selected
     if (!selectedRowId) {
         alert("Please select a row first!");
-        return;
+        return false;
     }
-    document.getElementById('action').value = actionType; // Set action type
-}
 
-
-
-
-// THIS BIT IS OLD
-
-function rowClicked(courier, shipping_code, sat_indicator, cost) {
-    // needs 
+    // if it has proceeded fine then show loading gif
     showGif()
-
-    // Get values
-    const baseUrl = "{{ url_for('shipping.select_method')}}";
-    const printerLoc = document.getElementById('printer-loc').value;
-
-    // Build the query params with encoding
-    const queryParams = new URLSearchParams({
-        courier: courier,
-        shipping_code: shipping_code,
-        sat_indicator: sat_indicator,
-        cost: cost,
-        printer_loc: printerLoc
-    }).toString();
-
-    // Redirect with the query params
-    window.location.href = `${baseUrl}?${queryParams}`;
 }

@@ -106,12 +106,16 @@ class ShippingHistory(db.Model):
 
     @staticmethod
     def search_row_id(row_id):
-        order_name, commercial_invoice = db.session.query(ShippingHistory.order_name, ShippingHistory.commercial_invoice).filter(
+        order_name, commercial_invoice, tracking_no = db.session.query(
+            ShippingHistory.order_name,
+            ShippingHistory.commercial_invoice,
+            ShippingHistory.tracking_number
+        ).filter(
             ShippingHistory.id == row_id
         ).first()
 
         # we dont need to validate that there is data there because this is a direct row get from a prior query so it should be there
-        return order_name, commercial_invoice
+        return order_name, commercial_invoice, tracking_no
 
     @staticmethod
     def get_shipping_history(max_rows=60):
@@ -171,13 +175,27 @@ class Labels(db.Model):
         db.session.commit()
 
     @staticmethod
-    def get_zpl_data(label_id):
+    def get_zpl_via_label_id(label_id):
         zpl_data = db.session.query(Labels.zpl_data).filter(
             Labels.label_id == label_id
         ).scalar() # returns first item of the result - in this case the zpl_data
 
         # we dont need to validate that there is data there because this label id is from a prior query so it should exist
         return zpl_data
+
+    @staticmethod
+    def get_zpl_via_tracking_no(tracking_no):
+        """
+        get all labels related to the main tracking number passed
+        """
+
+        # query the table
+        zpl_labels = db.session.query(Labels.zpl_data).filter(
+            Labels.tracking_number == tracking_no
+        ).all()
+
+        # we dont need to validate that there is data there because this tracking number is from a dropdown select so it should exist
+        return zpl_labels
 
     @staticmethod
     def get_labels_for_order(order_id):

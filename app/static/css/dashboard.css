@@ -6,12 +6,15 @@ main {
 
 
 .dashboard-options {
-    display: flex;
-    /* grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); */
-    /* justify-content: center;
-    align-items: center; */
-    flex-wrap: wrap;
-    gap: 10px;
+    /* for the grid icon display */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Dynamic columns */
+    grid-auto-rows: 120px;
+
+    justify-items: start;
+    align-items: start;
+
+    gap: 2vh;
     padding: 10px;
     height: 50vh;
     width: 100vh;
@@ -27,7 +30,7 @@ main {
 }
 
 .dashboard-icon a img {
-    object-fit: cover;
+    object-fit: contain;
     width:100%;
     height:100%;
 }
