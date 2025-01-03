@@ -23,11 +23,8 @@ function rowClicked(rowID, courier, shipping_code, sat_indicator, cost) {
     }
 }
 
-// Function to handle button click
-function setAction(actionType) {
-    // save the action type pressed
-    document.getElementById('action').value = actionType;
-
+// Function to handle choosing a method from the rows
+function chooseMethod() {
     // alert user if no row is selected
     if (!selectedRowId) {
         alert("Please select a row first!");
